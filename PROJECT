@@ -1,0 +1,9 @@
+domain: ansible.com
+layout:
+- go.kubebuilder.io/v3
+plugins:
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}
+projectName: aap-eda-operator
+repo: github.com/ansible/aap-eda-operator
+version: "3"
