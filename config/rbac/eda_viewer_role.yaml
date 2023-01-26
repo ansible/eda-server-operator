@@ -1,0 +1,27 @@
+# permissions for end users to view edas.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/name: clusterrole
+    app.kubernetes.io/instance: eda-viewer-role
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/created-by: aap-eda-operator
+    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: eda-viewer-role
+rules:
+- apiGroups:
+  - automationeda.ansible.com
+  resources:
+  - edas
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - automationeda.ansible.com
+  resources:
+  - edas/status
+  verbs:
+  - get
