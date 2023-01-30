@@ -19,12 +19,22 @@ package controllers
 import (
 	"context"
 
+	appsv1 "k8s.io/api/apps/v1"
+	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	automationedav1beta1 "github.com/ansible/aap-eda-operator/api/v1beta1"
+)
+
+const (
+	// typeAvailableEda represents the status of the StatefulSet reconciliation
+	typeAvailableEda = "Available"
+	// typeDegradedEda represents the status used when the custom resource is deleted and the finalizer operations are must to occur.
+	typeDegradedEda = "Degraded"
 )
 
 // EdaReconciler reconciles a Eda object
@@ -47,16 +57,30 @@ type EdaReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.13.0/pkg/reconcile
 func (r *EdaReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	log := log.FromContext(ctx)
 
-	// TODO(user): your logic here
+	eda := &automationedav1beta1.Eda{}
+	err := r.Get(ctx, req.NamespacedName, eda)
+	if err != nil {
+		if apierrors.IsNotFound(err) {
+			log.Info("Eda resource not found. Ignoring since object must be deleted")
+			return ctrl.Result{}, nil
+		}
 
-	return ctrl.Result{}, nil
+		log.Error(err, "Failed to get Eda")
+		return ctrl.Result{}, err
+	}
+
+	reconcileResult, err := r.reconcilePostgres(ctx, eda)
+
+	return reconcileResult, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *EdaReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&automationedav1beta1.Eda{}).
+		Owns(&corev1.Service{}).
+		Owns(&appsv1.StatefulSet{}).
 		Complete(r)
 }
