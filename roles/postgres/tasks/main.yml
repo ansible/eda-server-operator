@@ -1,0 +1,13 @@
+---
+# Deploy PostgreSQL database and required resources
+
+- name: Apply database resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: yes
+  register: postgres_resources_result
+  loop:
+    - 'postgres.service'
+    - 'postgres.statefulset'
+  no_log: "{{ no_log }}"

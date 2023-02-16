@@ -9,6 +9,9 @@ bin
 testbin/*
 Dockerfile.cross
 
+# Development directory and tools
+hacking/*
+
 # Test binary, build with `go test -c`
 *.test
 

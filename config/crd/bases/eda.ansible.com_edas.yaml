@@ -33,6 +33,17 @@ spec:
             description: Spec defines the desired state of EDA
             type: object
             x-kubernetes-preserve-unknown-fields: true
+            properties:
+              no_log:
+                description: Configure no_log for no_log tasks
+                type: boolean
+                default: true
+              postgres_configuration_secret:
+                description: Secret where the database configuration can be found
+                type: string
+              postgres_storage_class:
+                description: Storage class to use for the PostgreSQL PVC
+                type: string
           status:
             description: Status defines the observed state of EDA
             type: object

@@ -1,2 +1,5 @@
 ---
 # tasks file for EDA
+
+- name: Create Resources
+  include_tasks: resource_configuration.yml

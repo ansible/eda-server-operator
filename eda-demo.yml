@@ -1,0 +1,6 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda-demo
+spec:
+  no_log: false

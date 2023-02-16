@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ ansible_operator_meta.name }}-api"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    app: eda
+    comp: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eda
+      comp: postgres
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: eda
+        comp: postgres
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: eda
+        - name: POSTGRES_PASSWORD
+          value: secret
+        image: docker.io/library/postgres:13
+        name: postgres
+        ports:
+        - containerPort: 5432
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-data
+      restartPolicy: Always
+      volumes:
+      - name: postgres-data
+        persistentVolumeClaim:
+          claimName: postgres-data

@@ -1,0 +1,15 @@
+---
+# defaults file for EDA
+
+postgres_image: docker.io/library/postgres:13
+
+postgres:
+  replicas: 1
+  # log_level: INFO
+  resource_requirements:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  storage_requirements:
+    requests:
+      storage: 8Gi

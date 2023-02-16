@@ -1,0 +1,4 @@
+---
+# vars file for PostgreSQL database
+
+supported_pg_version: 13

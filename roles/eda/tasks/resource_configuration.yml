@@ -1,0 +1,24 @@
+---
+
+- name: Apply Resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: yes
+  register: resources_result
+  loop:
+    # - 'configmaps/config'
+    # - 'secrets/app_credentials'
+    # - 'rbac/service_account'
+    # - 'storage/persistent'
+    # - 'networking/service'
+    # - 'networking/ingress'
+  no_log: "{{ no_log }}"
+
+
+- name: Apply deployment resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'deployments/deployment.yaml.j2') }}"
+    wait: yes
+  register: this_deployment_result
