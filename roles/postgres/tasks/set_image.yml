@@ -1,0 +1,21 @@
+---
+# Set postgres image in the following precedence order:
+#   1. User defined postgres_image on CR spec
+#   2. RELATED_IMAGE_XXX env var if set
+#   3. Default _postgres_image variable
+
+
+- name: Set default postgres image
+  set_fact:
+    _default_postgres_image: "{{ _postgres_image }}:{{_postgres_image_version }}"
+
+- name: Set user provided postgres image
+  set_fact:
+    _custom_postgres_image: "{{ postgres_image }}:{{ postgres_image_version }}"
+  when:
+    - postgres_image | default([]) | length
+    - postgres_image_version is defined and postgres_image_version != ''
+
+- name: Set Postgres image URL
+  set_fact:
+    _postgres_image: "{{ _custom_postgres_image | default(lookup('env', 'RELATED_IMAGE_AWX_POSTGRES')) | default(_default_postgres_image, true) }}"

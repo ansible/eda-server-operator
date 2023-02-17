@@ -7,7 +7,7 @@ metadata:
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/instance: '{{ postgres_label_selector }}'
     app.kubernetes.io/component: 'database'
     app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
     app.kubernetes.io/managed-by: 'eda-operator'
@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-      app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/instance: '{{ postgres_label_selector }}'
       app.kubernetes.io/component: 'database'
       app.kubernetes.io/managed-by: 'eda-operator'
   serviceName: '{{ ansible_operator_meta.name }}'
@@ -26,7 +26,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-        app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+        app.kubernetes.io/instance: '{{ postgres_label_selector }}'
         app.kubernetes.io/component: 'database'
         app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
         app.kubernetes.io/managed-by: 'eda-operator' 
