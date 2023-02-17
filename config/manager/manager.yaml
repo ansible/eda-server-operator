@@ -6,8 +6,8 @@ metadata:
     app.kubernetes.io/name: namespace
     app.kubernetes.io/instance: system
     app.kubernetes.io/component: manager
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
   name: system
 ---
@@ -21,8 +21,8 @@ metadata:
     app.kubernetes.io/name: deployment
     app.kubernetes.io/instance: controller-manager
     app.kubernetes.io/component: manager
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
 spec:
   selector:
@@ -68,7 +68,7 @@ spec:
       containers:
       - args:
         - --leader-elect
-        - --leader-election-id=aap-eda-operator
+        - --leader-election-id=eda-server-operator
         image: controller:latest
         name: manager
         env:
