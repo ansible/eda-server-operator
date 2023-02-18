@@ -11,6 +11,7 @@ Dockerfile.cross
 
 # Development directory and tools
 hacking/*
+kustomization.yaml
 
 # Test binary, build with `go test -c`
 *.test
