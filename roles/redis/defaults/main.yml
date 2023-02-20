@@ -1,2 +1,17 @@
 ---
 # defaults file for EDA
+
+deployment_type: eda
+
+_redis_image: redis
+_redis_image_version: 7
+
+redis:
+  replicas: 1
+  resource_requirements:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+# Labels defined on the resource, which should be propagated to child resources
+additional_labels: []

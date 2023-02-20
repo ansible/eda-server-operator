@@ -1,2 +1,8 @@
 ---
 # tasks file for EDA
+
+- name: Set default redis image to be used
+  import_tasks: set_images.yml
+
+- name: Create managed Redis deployment
+  import_tasks: create_redis.yml
