@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: rbac
     app.kubernetes.io/created-by: eda-server-operator
     app.kubernetes.io/part-of: eda-server-operator
-    app.kubernets.io/managed-by: kustomize
+    app.kubernetes.io/managed-by: kustomize
   name: leader-election-role
 rules:
 - apiGroups:

@@ -44,6 +44,6 @@ postgres_selector: ''
 # postgres_tolerations: |
 #   - key: "dedicated"
 #     operator: "Equal"
-#     value: "AWX"
+#     value: "EDA"
 #     effect: "NoSchedule"
 postgres_tolerations: ''

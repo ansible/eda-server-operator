@@ -5,7 +5,7 @@
   import_tasks: set_configuration_secret.yml
 
 - name: Set default postgres image to be used
-  import_tasks: set_image.yml
+  import_tasks: set_images.yml
 
 - name: Set variables to be used in Postgres templates
   import_tasks: set_variables.yml
