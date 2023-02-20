@@ -7,7 +7,7 @@ metadata:
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-    app.kubernetes.io/instance: '{{ postgres_label_selector }}'
+    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
     app.kubernetes.io/component: 'database'
     app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
     app.kubernetes.io/managed-by: 'eda-operator'
@@ -15,7 +15,7 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-      app.kubernetes.io/instance: '{{ postgres_label_selector }}'
+      app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
       app.kubernetes.io/component: 'database'
       app.kubernetes.io/managed-by: 'eda-operator'
   serviceName: '{{ ansible_operator_meta.name }}'
@@ -26,7 +26,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
-        app.kubernetes.io/instance: '{{ postgres_label_selector }}'
+        app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
         app.kubernetes.io/component: 'database'
         app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
         app.kubernetes.io/managed-by: 'eda-operator' 
@@ -95,7 +95,7 @@ spec:
             - name: postgres-{{ supported_pg_version }}
               mountPath: '{{ postgres_data_path | dirname }}'
               subPath: '{{ postgres_data_path | dirname | basename }}'
-          resources: {{ postgres_resource_requirements }}
+          resources: {{ postgres.resource_requirements }}
 {% if postgres_selector %}
       nodeSelector:
         {{ postgres_selector | indent(width=8) }}
@@ -113,4 +113,4 @@ spec:
 {% if postgres_storage_class is defined %}
         storageClassName: '{{ postgres_storage_class }}'
 {% endif %}
-        resources: {{ postgres_storage_requirements }}
+        resources: {{ postgres.storage_requirements }}

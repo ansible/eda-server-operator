@@ -37,6 +37,50 @@ rules:
       - patch
       - update
       - watch
+
+  ##
+  ## Rules for EDA role
+  ##
+  - apiGroups:
+      - ""
+      - "rbac.authorization.k8s.io"
+    resources:
+      - pods
+      - services
+      - services/finalizers
+      - serviceaccounts
+      - endpoints
+      - persistentvolumeclaims
+      - events
+      - configmaps
+      - secrets
+      - roles
+      - rolebindings
+    verbs:
+      - get
+      - list
+      - create
+      - delete
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - apps
+      - networking.k8s.io
+    resources:
+      - deployments
+      - daemonsets
+      - replicasets
+      - statefulsets
+      - ingresses
+    verbs:
+      - get
+      - list
+      - create
+      - delete
+      - patch
+      - update
+      - watch
   ##
   ## Rules for eda.ansible.com/v1alpha1, Kind: EDA
   ##

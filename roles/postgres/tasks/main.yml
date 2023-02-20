@@ -1,13 +1,15 @@
 ---
-# Deploy PostgreSQL database and required resources
+# Configure PostgreSQL database and required resources
 
-- name: Apply database resources
-  k8s:
-    apply: yes
-    definition: "{{ lookup('template', item + '.yaml.j2') }}"
-    wait: yes
-  register: postgres_resources_result
-  loop:
-    - 'postgres.service'
-    - 'postgres.statefulset'
-  no_log: "{{ no_log }}"
+- name: Determine and set postgres configuration secret and variables
+  import_tasks: set_configuration_secret.yml
+
+- name: Set default postgres image to be used
+  import_tasks: set_image.yml
+
+- name: Set variables to be used in Postgres templates
+  import_tasks: set_variables.yml
+
+- name: Create managed Postgres StatefulSet if no external db is defined
+  import_tasks: create_managed_postgres.yml
+  when: managed_database
