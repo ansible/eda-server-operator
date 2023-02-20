@@ -81,6 +81,15 @@ rules:
       - patch
       - update
       - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods/exec
+      - pods/attach
+      - pods/log  # log & attach rules needed to be able to grant them to AWX service account
+    verbs:
+      - create
+      - get
   ##
   ## Rules for eda.ansible.com/v1alpha1, Kind: EDA
   ##

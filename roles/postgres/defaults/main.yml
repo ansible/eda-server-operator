@@ -47,3 +47,7 @@ postgres_selector: ''
 #     value: "EDA"
 #     effect: "NoSchedule"
 postgres_tolerations: ''
+
+
+# Labels defined on the resource, which should be propagated to child resources
+additional_labels: []

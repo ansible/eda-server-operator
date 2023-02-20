@@ -34,6 +34,11 @@ spec:
             type: object
             x-kubernetes-preserve-unknown-fields: true
             properties:
+              additional_labels:
+                description: Additional labels defined on the resource, which should be propagated to child resources
+                type: array
+                items:
+                  type: string
               image_pull_policy:
                 description: The image pull policy
                 type: string
@@ -112,6 +117,9 @@ spec:
                 type: string
               postgres_tolerations:
                 description: node tolerations for the Postgres pods
+                type: string
+              service_account_annotations:
+                description: ServiceAccount annotations
                 type: string
           status:
             description: Status defines the observed state of EDA

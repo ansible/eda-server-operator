@@ -1,0 +1,10 @@
+---
+# tasks file for EDA
+
+- name: Create EDA ServiceAccount
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+  loop:
+    - 'service_account'
+  no_log: "{{ no_log }}"
