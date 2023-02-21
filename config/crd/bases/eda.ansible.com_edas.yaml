@@ -121,6 +121,10 @@ spec:
               service_account_annotations:
                 description: ServiceAccount annotations
                 type: string
+              set_self_labels:
+                description: Maintain some of the recommended `app.kubernetes.io/*` labels on the resource (self)
+                type: boolean
+                default: true
           status:
             description: Status defines the observed state of EDA
             type: object

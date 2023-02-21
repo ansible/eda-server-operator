@@ -8,3 +8,6 @@
   loop:
     - 'service_account'
   no_log: "{{ no_log }}"
+
+- name: Patch Labels
+  include_tasks: patch_labels.yml
