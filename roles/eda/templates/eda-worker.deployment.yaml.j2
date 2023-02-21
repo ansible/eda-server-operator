@@ -5,23 +5,27 @@ metadata:
   name: "{{ ansible_operator_meta.name }}-worker"
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
-    app: eda
-    comp: worker
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-worker'
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eda
-      comp: worker
-  strategy: {}
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-worker'
   template:
     metadata:
       labels:
-        app: eda
-        comp: worker
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-worker'
     spec:
       containers:
-      - args:
+      - name: eda-worker
+        image: {{ _api_image }}
+        args:
         - /bin/bash
         - -c
         - aap-eda-manage rqworker --worker-class aap_eda.core.tasking.Worker
@@ -32,10 +36,9 @@ spec:
           value: eda-postgres
         - name: EDA_MQ_HOST
           value: eda-redis
-        image: aap-eda:latest
-        imagePullPolicy: Never
+        image: {{ _api_image }}
         name: eda-worker
         ports:
         - containerPort: 8000
-        resources: {}
+        resources: {{ api.resource_requirements }}
       restartPolicy: Always

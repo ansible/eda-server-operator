@@ -1,0 +1,12 @@
+---
+
+- name: Apply deployment resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: yes
+  loop:
+    - 'eda-api.deployment'
+    # - 'eda-ui.deployment'
+    # - 'eda-worker.deployment'
+  register: this_deployment_result
