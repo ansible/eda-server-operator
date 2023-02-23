@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ ansible_operator_meta.name }}-ui"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    app: eda
+    comp: ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: eda
+      comp: ui
+  template:
+    metadata:
+      labels:
+        app: eda
+        comp: ui
+    spec:
+      containers:
+      - image: eda-nginx
+        imagePullPolicy: Never
+        name: eda-ui
+        ports:
+        - containerPort: 8080

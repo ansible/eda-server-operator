@@ -6,13 +6,13 @@ metadata:
     app.kubernetes.io/name: clusterrole
     app.kubernetes.io/instance: eda-viewer-role
     app.kubernetes.io/component: rbac
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
   name: eda-viewer-role
 rules:
 - apiGroups:
-  - automationeda.ansible.com
+  - eda.ansible.com
   resources:
   - edas
   verbs:
@@ -20,7 +20,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - automationeda.ansible.com
+  - eda.ansible.com
   resources:
   - edas/status
   verbs:

@@ -6,13 +6,13 @@ metadata:
     app.kubernetes.io/name: clusterrole
     app.kubernetes.io/instance: eda-editor-role
     app.kubernetes.io/component: rbac
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
   name: eda-editor-role
 rules:
 - apiGroups:
-  - automationeda.ansible.com
+  - eda.ansible.com
   resources:
   - edas
   verbs:
@@ -24,7 +24,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - automationeda.ansible.com
+  - eda.ansible.com
   resources:
   - edas/status
   verbs:

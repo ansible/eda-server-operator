@@ -1,0 +1,53 @@
+---
+# defaults file for EDA
+deployment_type: eda
+database_name: "{{ deployment_type }}"
+database_username: "{{ deployment_type }}"
+
+# Name of k8s secret containing postgres host, username, password, database, port, and type
+postgres_configuration_secret: ''
+
+_postgres_image: docker.io/library/postgres
+_postgres_image_version: 13
+postgres_data_path: '/var/lib/postgresql/data/pgdata'
+
+postgres:
+  replicas: 1
+  resource_requirements:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+  storage_requirements:
+    requests:
+      storage: 8Gi
+
+image_pull_policy: IfNotPresent
+image_pull_secrets: []
+
+# Define postgres configuration arguments to use
+postgres_extra_args: ''
+
+# Assign a preexisting priority class to the postgres pod
+postgres_priority_class: ''
+
+# Add a nodeSelector for the Postgres pods.
+# It must match a node's labels for the pod to be scheduled on that node.
+# Specify as literal block. E.g.:
+# postgres_selector: |
+#   disktype: ssd
+#   kubernetes.io/arch: amd64
+#   kubernetes.io/os: linux
+postgres_selector: ''
+
+# Add node tolerations for the Postgres pods.
+# Specify as literal block. E.g.:
+# postgres_tolerations: |
+#   - key: "dedicated"
+#     operator: "Equal"
+#     value: "EDA"
+#     effect: "NoSchedule"
+postgres_tolerations: ''
+
+
+# Labels defined on the resource, which should be propagated to child resources
+additional_labels: []

@@ -1,0 +1,15 @@
+---
+# Configure PostgreSQL database and required resources
+
+- name: Determine and set postgres configuration secret and variables
+  import_tasks: set_configuration_secret.yml
+
+- name: Set default postgres image to be used
+  import_tasks: set_images.yml
+
+- name: Set variables to be used in Postgres templates
+  import_tasks: set_variables.yml
+
+- name: Create managed Postgres StatefulSet if no external db is defined
+  import_tasks: create_managed_postgres.yml
+  when: managed_database

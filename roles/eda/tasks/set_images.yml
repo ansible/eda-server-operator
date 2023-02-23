@@ -1,0 +1,39 @@
+---
+
+# API Image
+- name: Set default eda api container image
+  set_fact:
+    _default_api_image: "{{ _api_image }}:{{ _api_image_version }}"
+
+- name: Set user provided image
+  set_fact:
+    _custom_api_image: "{{ api_image }}:{{ api_image_version }}"
+  when:
+    - api_image | default([]) | length
+    - api_image_version is defined or api_image_version != ''
+
+- name: Set image URL
+  set_fact:
+    _api_image: >-
+      {{ _custom_api_image |
+         default(lookup('env', 'RELATED_IMAGE_EDA_API')) |
+         default(_default_api_image, true) }}
+
+# UI Image
+- name: Set default eda ui container image
+  set_fact:
+    _default_ui_image: "{{ _ui_image }}:{{ _ui_image_version }}"
+
+- name: Set user provided image
+  set_fact:
+    _custom_ui_image: "{{ ui_image }}:{{ ui_image_version }}"
+  when:
+    - ui_image | default([]) | length
+    - ui_image_version is defined or ui_image_version != ''
+
+- name: Set image URL
+  set_fact:
+    _ui_image: >-
+      {{ _custom_ui_image |
+         default(lookup('env', 'RELATED_IMAGE_EDA_UI')) |
+         default(_default_ui_image, true) }}

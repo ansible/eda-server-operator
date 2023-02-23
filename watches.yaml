@@ -1,0 +1,6 @@
+---
+- version: v1alpha1
+  group: eda.ansible.com
+  kind: EDA
+  role: eda
+#+kubebuilder:scaffold:watch

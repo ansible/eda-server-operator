@@ -6,8 +6,8 @@ metadata:
     app.kubernetes.io/name: namespace
     app.kubernetes.io/instance: system
     app.kubernetes.io/component: manager
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
   name: system
 ---
@@ -21,8 +21,8 @@ metadata:
     app.kubernetes.io/name: deployment
     app.kubernetes.io/instance: controller-manager
     app.kubernetes.io/component: manager
-    app.kubernetes.io/created-by: aap-eda-operator
-    app.kubernetes.io/part-of: aap-eda-operator
+    app.kubernetes.io/created-by: eda-server-operator
+    app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
 spec:
   selector:
@@ -37,7 +37,7 @@ spec:
         control-plane: controller-manager
     spec:
       # TODO(user): Uncomment the following code to configure the nodeAffinity expression
-      # according to the platforms which are supported by your solution. 
+      # according to the platforms which are supported by your solution.
       # It is considered best practice to support multiple architectures. You can
       # build your manager image using the makefile target docker-buildx.
       # affinity:
@@ -58,20 +58,17 @@ spec:
       #               - linux
       securityContext:
         runAsNonRoot: true
-        # TODO(user): For common cases that do not require escalating privileges
-        # it is recommended to ensure that all your Pods/Containers are restrictive.
-        # More info: https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
-        # Please uncomment the following code if your project does NOT have to work on old Kubernetes
-        # versions < 1.19 or on vendors versions which do NOT support this field by default (i.e. Openshift < 4.11 ).
-        # seccompProfile:
-        #   type: RuntimeDefault
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-      - command:
-        - /manager
-        args:
+      - args:
         - --leader-elect
+        - --leader-election-id=eda-server-operator
         image: controller:latest
         name: manager
+        env:
+        - name: ANSIBLE_GATHERING
+          value: explicit
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:
@@ -80,13 +77,13 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: 8081
+            port: 6789
           initialDelaySeconds: 15
           periodSeconds: 20
         readinessProbe:
           httpGet:
             path: /readyz
-            port: 8081
+            port: 6789
           initialDelaySeconds: 5
           periodSeconds: 10
         # TODO(user): Configure the resources accordingly based on the project requirements.
@@ -94,9 +91,9 @@ spec:
         resources:
           limits:
             cpu: 500m
-            memory: 128Mi
+            memory: 768Mi
           requests:
             cpu: 10m
-            memory: 64Mi
+            memory: 256Mi
       serviceAccountName: controller-manager
       terminationGracePeriodSeconds: 10

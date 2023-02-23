@@ -1,0 +1,20 @@
+---
+# tasks file for EDA
+
+- name: Configure cluster
+  include_role:
+    name: common
+
+- name: Setup PostgreSQL Database
+  include_role:
+    name: postgres
+
+- name: Setup Redis Cache
+  include_role:
+    name: redis
+
+- name: Set App images
+  include_tasks: set_images.yml
+
+# - name: Deploy EDA
+#   include_tasks: deploy_eda.yml
