@@ -1,2 +1,9 @@
 ---
 # tasks file for EDA
+
+- name: Setup PostgreSQL Database
+  include_role: 
+    name: postgres
+
+# - name: Create Resources
+#   include_tasks: resource_configuration.yml

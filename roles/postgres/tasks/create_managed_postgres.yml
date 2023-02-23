@@ -1,0 +1,45 @@
+---
+
+# Create Managed Postgres StatefulSet, add labels, and wait for migrations to complete
+
+- name: Set Default label selector for custom resource generated postgres
+  set_fact:
+    postgres_label_selector: "app.kubernetes.io/instance=postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}"
+  when: postgres_label_selector is not defined
+
+- name: Apply database resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: yes
+  register: postgres_resources_result
+  loop:
+    - 'postgres.service'
+    - 'postgres.statefulset'
+  no_log: "{{ no_log }}"
+
+- name: Get the postgres pod information
+  k8s_info:
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "{{ postgres_label_selector }}"
+    field_selectors:
+      - status.phase=Running
+  register: postgres_pod
+
+- name: Wait for Database to initialize if managed DB
+  k8s_info:
+    kind: Pod
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    label_selectors:
+      - "{{ postgres_label_selector }}"
+    field_selectors:
+      - status.phase=Running
+  register: postgres_pod
+  until:
+    - "postgres_pod['resources'] | length"
+    - "postgres_pod['resources'][0]['status']['phase'] == 'Running'"
+    - "postgres_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
+  delay: 5
+  retries: 60

@@ -28,8 +28,8 @@ BUNDLE_METADATA_OPTS ?= $(BUNDLE_CHANNELS) $(BUNDLE_DEFAULT_CHANNEL)
 # This variable is used to construct full image tags for bundle and catalog images.
 #
 # For example, running 'make bundle-build bundle-push catalog-build catalog-push' will build and push both
-# ansible.com/aap-eda-operator-bundle:$VERSION and ansible.com/aap-eda-operator-catalog:$VERSION.
-IMAGE_TAG_BASE ?= ansible.com/aap-eda-operator
+# ansible.com/eda-server-operator-bundle:$VERSION and ansible.com/eda-server-operator-catalog:$VERSION.
+IMAGE_TAG_BASE ?= ansible.com/eda-server-operator
 
 # BUNDLE_IMG defines the image:tag used for the bundle.
 # You can use it as an arg. (E.g make bundle-build BUNDLE_IMG=<some-registry>/<project-name-bundle>:<tag>)
@@ -47,7 +47,7 @@ ifeq ($(USE_IMAGE_DIGESTS), true)
 endif
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= $(IMAGE_TAG_BASE):$(VERSION)
 
 .PHONY: all
 all: docker-build
@@ -114,6 +114,7 @@ uninstall: kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube
 .PHONY: deploy
 deploy: kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	cd config/default && $(KUSTOMIZE) edit set namespace ${NAMESPACE}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
 .PHONY: undeploy
