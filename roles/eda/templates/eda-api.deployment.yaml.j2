@@ -23,29 +23,35 @@ spec:
         app.kubernetes.io/component: '{{ deployment_type }}-api'
     spec:
       containers:
-      - image: {{ _api_image }}
-        name: eda-api
+      - name: eda-api
+        image: {{ _api_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
         - -c
-        - aap-eda-manage migrate && aap-eda-manage runserver 0.0.0.0:8000
+        - sleep 6000 #aap-eda-manage migrate && aap-eda-manage runserver 0.0.0.0:8000
         env:
-        - name: EDA_DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __postgres_configuration_secret }}'
-              key: host
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
               name: '{{ __postgres_configuration_secret }}'
               key: host
-        - name: EDA_DATABASE_USERNAME
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: port
+        - name: EDA_DB_USER
           valueFrom:
             secretKeyRef:
               name: '{{ __postgres_configuration_secret }}'
               key: username
-        - name: EDA_DATABASE_PASSWORD
+        - name: EDA_DB_PASSWORD
           valueFrom:
             secretKeyRef:
               name: '{{ __postgres_configuration_secret }}'

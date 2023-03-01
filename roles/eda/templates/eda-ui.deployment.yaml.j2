@@ -25,6 +25,7 @@ spec:
       containers:
       - name: eda-ui
         image: {{ _ui_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
         ports:
         - containerPort: 8080
         resources: {{ ui.resource_requirements }}

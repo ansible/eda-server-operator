@@ -5,8 +5,10 @@ metadata:
   name: "{{ ansible_operator_meta.name }}-postgres"
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
-    app: eda
-    comp: postgres
+    app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
+    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/component: 'database'
+    app.kubernetes.io/managed-by: 'eda-operator'
 spec:
   ports:
   - name: "5432"
@@ -14,7 +16,7 @@ spec:
     targetPort: 5432
   clusterIP: None
   selector:
-    app: eda
-    comp: postgres
-status:
-  loadBalancer: {}
+    app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
+    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/component: 'database'
+    app.kubernetes.io/managed-by: 'eda-operator'

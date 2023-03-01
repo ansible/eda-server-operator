@@ -6,7 +6,11 @@
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
     wait: yes
   loop:
+    - 'eda-api.service'
     - 'eda-api.deployment'
+    # - 'eda-ui.service'
     # - 'eda-ui.deployment'
+    # - 'eda-worker.service'
+
     # - 'eda-worker.deployment'
   register: this_deployment_result

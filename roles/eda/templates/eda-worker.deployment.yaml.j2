@@ -25,6 +25,7 @@ spec:
       containers:
       - name: eda-worker
         image: {{ _api_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
         - -c
