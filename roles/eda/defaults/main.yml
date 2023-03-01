@@ -5,7 +5,7 @@ deployment_type: eda
 
 no_log: true
 
-_api_image: quay.io/ansible/eda-api
+_api_image: quay.io/ansible/eda-server
 _api_image_version: latest
 
 _ui_image: quay.io/ansible/eda-ui
