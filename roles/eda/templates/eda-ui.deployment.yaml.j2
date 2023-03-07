@@ -29,3 +29,15 @@ spec:
         ports:
         - containerPort: 8080
         resources: {{ ui.resource_requirements }}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-nginx-conf
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-nginx-conf
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: nginx_conf
+                path: nginx.conf

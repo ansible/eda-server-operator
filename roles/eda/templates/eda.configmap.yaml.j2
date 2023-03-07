@@ -1,0 +1,51 @@
+# EDA ConfigMap.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
+data:
+  nginx_conf: |
+    server_tokens off;
+
+    upstream eda-api-backend {
+      server {{ ansible_operator_meta.name }}-api:8000;
+    }
+
+    server {
+        listen       8080 default_server;
+        listen  [::]:8080;
+        server_name  _;
+        root /opt/app-root/ui/eda;
+        index index.html;
+
+        location ~ ^/api/eda/v1/ws[0-9a-z-]+ {
+            proxy_pass http://eda-api-backend;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Port $server_port;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+        }
+
+        location ~ ^/api/eda/v1/ {
+            proxy_pass http://eda-api-backend;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Port $server_port;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+
+        location / {
+            expires         5m;
+            add_header      Cache-Control "public";
+            try_files $uri $uri/ /index.html =404;
+        }
+    }
