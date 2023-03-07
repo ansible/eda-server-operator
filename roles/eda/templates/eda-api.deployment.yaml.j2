@@ -29,7 +29,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - sleep 6000 #aap-eda-manage migrate && aap-eda-manage runserver 0.0.0.0:8000
+        - aap-eda-manage migrate && aap-eda-manage runserver 0.0.0.0:8000
         env:
         - name: EDA_DB_HOST
           valueFrom:

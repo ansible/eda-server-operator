@@ -31,12 +31,35 @@ spec:
         - -c
         - aap-eda-manage rqworker --worker-class aap_eda.core.tasking.Worker
         env:
-        - name: EDA_DATABASE_URL
-          value: postgresql+asyncpg://postgres:secret@postgres/eda
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: password
         - name: EDA_DB_HOST
           value: eda-postgres
         - name: EDA_MQ_HOST
-          value: eda-redis
+          value: {{ ansible_operator_meta.name }}-redis-svc
         image: {{ _api_image }}
         name: eda-worker
         ports:
