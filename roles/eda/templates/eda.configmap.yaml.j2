@@ -9,43 +9,47 @@ metadata:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
 data:
   nginx_conf: |
-    server_tokens off;
-
-    upstream eda-api-backend {
-      server {{ ansible_operator_meta.name }}-api:8000;
+    events {
+        worker_connections 1024;
     }
-
-    server {
-        listen       8080 default_server;
-        listen  [::]:8080;
-        server_name  _;
-        root /opt/app-root/ui/eda;
-        index index.html;
-
-        location ~ ^/api/eda/v1/ws[0-9a-z-]+ {
-            proxy_pass http://eda-api-backend;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Port $server_port;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "Upgrade";
+    http {
+        include mime.types;
+        types {
+            application/manifest+json webmanifest;
         }
-
-        location ~ ^/api/eda/v1/ {
-            proxy_pass http://eda-api-backend;
-            proxy_set_header Host $http_host;
-            proxy_set_header X-Forwarded-Host $host;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Port $server_port;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        }
-
-        location / {
-            expires         5m;
-            add_header      Cache-Control "public";
-            try_files $uri $uri/ /index.html =404;
+        server {
+            listen 8080 default_server;
+            listen [::]:8080;
+            server_name _;
+            server_tokens off;
+            root /usr/share/nginx/html;
+            location ~ ^/api/eda/v[0-9]+/ws[0-9a-z-]+ {
+                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+            }
+            location ~ ^/api/eda/v[0-9]+/ {
+                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+            location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
+                add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable";
+                try_files $uri =404;
+            }
+            location / {
+                autoindex off;
+                expires off;
+                add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
+                try_files $uri /index.html =404;
+            }
         }
     }
