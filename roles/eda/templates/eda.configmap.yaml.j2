@@ -22,7 +22,7 @@ data:
             listen [::]:8080;
             server_name _;
             server_tokens off;
-            root /usr/share/nginx/html;
+            root /opt/app-root/ui/eda;
             location ~ ^/api/eda/v[0-9]+/ws[0-9a-z-]+ {
                 proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
                 proxy_set_header X-Forwarded-Proto $scheme;

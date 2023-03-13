@@ -37,7 +37,22 @@ rules:
       - patch
       - update
       - watch
-
+  ##
+  ## Rules for EDA Route
+  ##
+  - apiGroups:
+      - route.openshift.io
+    resources:
+      - routes
+      - routes/custom-host
+    verbs:
+      - get
+      - list
+      - create
+      - delete
+      - patch
+      - update
+      - watch
   ##
   ## Rules for EDA role
   ##
