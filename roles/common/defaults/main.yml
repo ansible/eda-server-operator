@@ -1,0 +1,14 @@
+---
+# defaults file for EDA
+
+deployment_type: eda
+kind: 'EDA'
+api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
+
+# Labels defined on the resource, which should be propagated to child resources
+additional_labels: []
+
+# Add annotations to the service account. Specify as literal block. E.g.:
+# service_account_annotations: |
+#   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/<IAM_ROLE_NAME>
+service_account_annotations: ''

@@ -34,6 +34,11 @@ spec:
             type: object
             x-kubernetes-preserve-unknown-fields: true
             properties:
+              additional_labels:
+                description: Additional labels defined on the resource, which should be propagated to child resources
+                type: array
+                items:
+                  type: string
               image_pull_policy:
                 description: The image pull policy
                 type: string
@@ -51,17 +56,12 @@ spec:
                 items:
                   type: string
               no_log:
-                description: Configure no_log for no_log tasks
+                description: Configure no_log for no log tasks
                 type: boolean
                 default: true
               postgres:
                 description: The EDA postgres StatefulSet
                 properties:
-                  replicas:
-                    description: The number of replicas for the deployment.
-                    type: integer
-                    default: 1
-                    format: int32
                   resource_requirements:
                     description: Resource requirements for the EDA postgres container
                     properties:
@@ -113,6 +113,82 @@ spec:
               postgres_tolerations:
                 description: node tolerations for the Postgres pods
                 type: string
+              service_account_annotations:
+                description: ServiceAccount annotations
+                type: string
+              set_self_labels:
+                description: Maintain some of the recommended `app.kubernetes.io/*` labels on the resource (self)
+                type: boolean
+                default: true
+              service_type:
+                description: The service type to be used on the deployed instance
+                type: string
+                enum:
+                - LoadBalancer
+                - loadbalancer
+                - ClusterIP
+                - clusterip
+                - NodePort
+                - nodeport
+              ingress_type:
+                description: The ingress type to use to reach the deployed instance
+                type: string
+                enum:
+                - none
+                - Ingress
+                - ingress
+                - Route
+                - route
+              ingress_api_version:
+                description: The Ingress API version to use
+                type: string
+              ingress_path:
+                description: The ingress path used to reach the deployed service
+                type: string
+              ingress_path_type:
+                description: The ingress path type for the deployed service
+                type: string
+              ingress_annotations:
+                description: Annotations to add to the Ingress Controller
+                type: string
+              ingress_tls_secret:
+                description: Secret where the Ingress TLS secret can be found
+                type: string
+              ingress_class_name:
+                description: The name of ingress class to use instead of the cluster default.
+                type: string
+              loadbalancer_protocol:
+                description: Protocol to use for the loadbalancer
+                type: string
+                default: http
+                enum:
+                - http
+                - https
+              loadbalancer_port:
+                description: Port to use for the loadbalancer
+                type: integer
+                default: 80
+              route_host:
+                description: The DNS to use to points to the instance
+                type: string
+              route_tls_termination_mechanism:
+                description: The secure TLS termination mechanism to use
+                type: string
+                default: Edge
+                enum:
+                - Edge
+                - edge
+                - Passthrough
+                - passthrough
+              route_api_version:
+                description: The route API version to use
+                type: string
+              route_tls_secret:
+                description: Secret where the TLS related credentials are stored
+                type: string
+              nodeport_port:
+                description: Port to use for the nodeport
+                type: integer
           status:
             description: Status defines the observed state of EDA
             type: object

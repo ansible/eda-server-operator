@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: '{{ ansible_operator_meta.name }}-postgres'
+  name: '{{ ansible_operator_meta.name }}-postgres-{{ supported_pg_version }}'
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
@@ -35,7 +35,6 @@ spec:
         allowPrivilegeEscalation: false
         seccompProfile:
           type: RuntimeDefault
-        runAsNonRoot: true
         capabilities:
           drop: ["ALL"]
 {% if postgres_priority_class is defined %}

@@ -5,23 +5,39 @@ metadata:
   name: "{{ ansible_operator_meta.name }}-ui"
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
-    app: eda
-    comp: ui
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-ui'
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eda
-      comp: ui
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-ui'
   template:
     metadata:
       labels:
-        app: eda
-        comp: ui
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-ui'
     spec:
       containers:
-      - image: eda-nginx
-        imagePullPolicy: Never
-        name: eda-ui
+      - name: eda-ui
+        image: {{ _ui_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
         ports:
         - containerPort: 8080
+        resources: {{ ui.resource_requirements }}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-nginx-conf
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-nginx-conf
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: nginx_conf
+                path: nginx.conf

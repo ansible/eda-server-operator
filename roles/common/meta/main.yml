@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Ansible
-  description: Application role for EDA operator configuration
+  description: Common role for EDA operator configuration
   company: Red Hat, Inc.
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -15,7 +15,7 @@ galaxy_info:
   # - GPLv3
   # - Apache
   # - CC-BY
-  license: license (GPLv2, CC-BY, etc)
+  license: MIT
 
   min_ansible_version: 2.9
 

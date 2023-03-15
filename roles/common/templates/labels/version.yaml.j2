@@ -1,0 +1,1 @@
+app.kubernetes.io/version: '{{ _api_image.split(':')[-1] | truncate(63, True, '', 0) }}'

@@ -1,0 +1,14 @@
+---
+
+- name: Redis Deployment
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'redis.deployment.yaml.j2') }}"
+    wait: no
+  no_log: "{{ no_log }}"
+
+- name: Redis Service
+  k8s:
+    state: present
+    definition: "{{ lookup('template', 'templates/' + 'redis.service.yaml.j2') | from_yaml }}"
+  no_log: "{{ no_log }}"
