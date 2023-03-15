@@ -10,13 +10,14 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - description: Deploy a new instance of EDA. A standardized way to define, operate and scale automation with Ansible.
+    - description: Deploy a new instance of EDA. A standardized way to define, operate
+        and scale automation with Ansible.
       displayName: EDA
       kind: EDA
       name: edas.eda.ansible.com
       specDescriptors:
-      - displayName: Additional labels defined on the resource, which should be
-          propagated to child resources
+      - displayName: Additional labels defined on the resource, which should be propagated
+          to child resources
         path: additional_labels
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
@@ -46,7 +47,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
-
       - displayName: PostgreSQL server configuration
         path: postgres
         x-descriptors:
@@ -56,8 +56,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-
-
       - displayName: Database configuration secret
         path: postgres_configuration_secret
         x-descriptors:
@@ -98,8 +96,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-
-
       - displayName: API server pod configuration
         path: api
         x-descriptors:
@@ -121,7 +117,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-
       - displayName: UI pod configuration
         path: ui
         x-descriptors:
@@ -143,7 +138,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-
       - displayName: Worker pod configuration
         path: worker
         x-descriptors:
@@ -165,7 +159,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-
       - displayName: Service Type
         path: service_type
         x-descriptors:
@@ -190,7 +183,7 @@ spec:
         path: ingress_api_version
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:text 
+        - urn:alm:descriptor:com.tectonic.ui:text
       - displayName: Ingress Path
         path: ingress_path
         x-descriptors:
@@ -284,8 +277,8 @@ spec:
     rulebooks.
   displayName: Event-Driven Ansible Server
   icon:
-  - base64data: ""
-    mediatype: ""
+  - base64data: PHN2ZyB2ZXJzaW9uPSIxLjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKIHdpZHRoPSI1MC4wMDAwMDBwdCIgaGVpZ2h0PSI1MC4wMDAwMDBwdCIgdmlld0JveD0iMCAwIDUwLjAwMDAwMCA1MC4wMDAwMDAiCiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCBtZWV0Ij4KCjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLDUwLjAwMDAwMCkgc2NhbGUoMC4xMDAwMDAsLTAuMTAwMDAwKSIKZmlsbD0iIzAwMDAwMCIgc3Ryb2tlPSJub25lIj4KPHBhdGggZD0iTTMxMyA0OTMgYy03IC0yIC0xMyAtMTYgLTEzIC0yOSAwIC0xOSAtNSAtMjQgLTI0IC0yNCAtMzAgMCAtMzkgLTI4Ci0xOCAtNTIgMTIgLTE1IDEzIC0yMCAxIC0zNCAtNyAtOSAtMTMgLTI4IC0xNCAtNDIgMCAtMzYgLTQyIC00NSAtNDcgLTEwIC0yCjE4IC05IDIzIC0zMyAyMyAtMjMgMCAtMzEgLTUgLTMzIC0yMiAtNCAtMjUgLTMwIC0zMSAtNTAgLTExIC0xMCAxMCAtMTcgNwotMzQgLTEwIC0xNyAtMTcgLTIwIC0yNCAtMTAgLTM0IDIwIC0yMCAxNCAtNDYgLTEwIC01MCAtMTggLTIgLTIzIC0xMCAtMjMKLTMzIDAgLTIzIDUgLTMxIDIzIC0zMyAyNCAtNCAzMCAtMzAgMTAgLTUwIC0xMCAtMTAgLTcgLTE3IDEwIC0zNCAxNyAtMTcgMjQKLTIwIDM0IC0xMCAyMCAyMCA0NiAxNCA1MCAtMTAgMiAtMTggMTAgLTIzIDMzIC0yMyAyMyAwIDMxIDUgMzMgMjMgNCAyNCAzMAozMCA1MCAxMCAxMCAtMTAgMTcgLTcgMzQgMTAgMTcgMTcgMjAgMjQgMTAgMzQgLTIwIDIwIC0xNCA0NiAxMSA1MCAxNyAyIDIyCjEwIDIyIDMzIDAgMjQgLTUgMzEgLTIzIDMzIC0xNyAzIC0yMiA5IC0yMCAyNSAyIDE3IDEwIDIyIDMzIDIxIDE3IDAgMzUgNyA0MgoxNSAxMCAxNCAxMyAxNCAzMCAwIDI1IC0yMiA1MyAtMTMgNTMgMTcgMCAxOSA1IDI0IDI0IDI0IDMzIDAgNDUgMzYgMjAgNTUKLTE4IDEzIC0xOCAxNCAtMSAzMyAyMiAyNCAxMiA1MiAtMTkgNTIgLTE5IDAgLTI0IDUgLTI0IDI0IDAgMzMgLTM2IDQ1IC01NQoyMCAtMTMgLTE4IC0xNCAtMTggLTMyIC0xIC0yMSAxOCAtMjEgMTggLTQwIDEweiBtODcgLTk4IGMyNiAtMzIgLTEzIC04MSAtNDcKLTU5IC0yMyAxNCAtMjggNDEgLTEzIDU5IDE2IDE5IDQ0IDE5IDYwIDB6IG0tMTAwIC0xMTEgYzAgLTE0IC0zIC0xNCAtMTUgLTQKLTggNyAtMTUgMTQgLTE1IDE2IDAgMiA3IDQgMTUgNCA4IDAgMTUgLTcgMTUgLTE2eiBtLTEwMCAtODQgYzExIC0xMSAyMCAtMjcKMjAgLTM1IDAgLTggLTkgLTI0IC0yMCAtMzUgLTExIC0xMSAtMjcgLTIwIC0zNSAtMjAgLTE5IDAgLTU1IDM2IC01NSA1NSAwIDgKOSAyNCAyMCAzNSAxMSAxMSAyNyAyMCAzNSAyMCA4IDAgMjQgLTkgMzUgLTIweiIvPgo8L2c+Cjwvc3ZnPg==
+    mediatype: image/svg+xml
   install:
     spec:
       deployments: null
@@ -313,7 +306,7 @@ spec:
   - email: awx-project@googlegroups.com
     name: EDA Team
   maturity: alpha
-  MinKubeVersion: 1.22.15
+  minKubeVersion: 1.22.15
   provider:
     name: Ansible
     url: github.com/ansible/eda-server-operator
