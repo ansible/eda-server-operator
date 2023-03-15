@@ -8,7 +8,255 @@ metadata:
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
-  customresourcedefinitions: {}
+  customresourcedefinitions:
+    owned:
+    - description: Deploy a new instance of EDA. A standardized way to define, operate and scale automation with Ansible.
+      displayName: EDA
+      kind: EDA
+      name: edas.eda.ansible.com
+      specDescriptors:
+      - displayName: Additional labels defined on the resource, which should be
+          propagated to child resources
+        path: additional_labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Set default labels on EDA resource
+        path: set_self_labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Image Pull Policy
+        path: image_pull_policy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
+      - displayName: Image Pull Secrets
+        path: image_pull_secrets
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: No Log Configuration
+        path: no_log
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+
+      - displayName: PostgreSQL server configuration
+        path: postgres
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: PostgreSQL server resource requirements
+        path: postgres.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+
+
+      - displayName: Database configuration secret
+        path: postgres_configuration_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Database data path
+        path: postgres_data_path
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Postgres Extra Arguments
+        path: postgres_extra_args
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image
+        path: postgres_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image Version
+        path: postgres_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Postgres Selector
+        path: postgres_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Postgres Tolerations
+        path: postgres_tolerations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Postgres Storage Class
+        path: postgres_storage_class
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+
+
+      - displayName: API server pod configuration
+        path: api
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of API replicas.
+        displayName: Replicas
+        path: api.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: api.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: API server resource requirements
+        path: api.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+
+      - displayName: UI pod configuration
+        path: ui
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of UI replicas.
+        displayName: Replicas
+        path: ui.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: ui.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: UI pod resource requirements
+        path: ui.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+
+      - displayName: Worker pod configuration
+        path: worker
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of Worker replicas.
+        displayName: Replicas
+        path: worker.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: worker.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: UI pod resource requirements
+        path: worker.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+
+      - displayName: Service Type
+        path: service_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:ClusterIP
+        - urn:alm:descriptor:com.tectonic.ui:select:LoadBalancer
+        - urn:alm:descriptor:com.tectonic.ui:select:NodePort
+      - displayName: Ingress Type
+        path: ingress_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:none
+        - urn:alm:descriptor:com.tectonic.ui:select:Ingress
+        - urn:alm:descriptor:com.tectonic.ui:select:Route
+      - displayName: Ingress Class Name
+        path: ingress_class_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - displayName: Ingress API Version
+        path: ingress_api_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text 
+      - displayName: Ingress Path
+        path: ingress_path
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - displayName: Ingress Path Type
+        path: ingress_path_type
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - displayName: Ingress Annotations
+        path: ingress_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - displayName: Ingress TLS Secret
+        path: ingress_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Ingress
+      - displayName: LoadBalancer Protocol
+        path: loadbalancer_protocol
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:http
+        - urn:alm:descriptor:com.tectonic.ui:select:https
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:LoadBalancer
+      - displayName: LoadBalancer Port
+        path: loadbalancer_port
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:number
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:LoadBalancer
+      - displayName: Route API Version
+        path: route_api_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Route DNS host
+        path: route_host
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
+      - displayName: Route TLS Termination Mechanism
+        path: route_tls_termination_mechanism
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:select:Edge
+        - urn:alm:descriptor:com.tectonic.ui:select:Passthrough
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
+      - displayName: Route TLS Credential Secret
+        path: route_tls_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:Route
+      - displayName: Nodeport Port
+        path: nodeport_port
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Service Account Annotations
+        path: service_account_annotations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
   description: |
     An ansible operator for managing the lifecycle of an Event-Driven Ansible
     Server. EDA Server is a console for configuring and managing your automation

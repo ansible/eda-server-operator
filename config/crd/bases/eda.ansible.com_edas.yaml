@@ -56,17 +56,12 @@ spec:
                 items:
                   type: string
               no_log:
-                description: Configure no_log for no_log tasks
+                description: Configure no_log for no log tasks
                 type: boolean
                 default: true
               postgres:
                 description: The EDA postgres StatefulSet
                 properties:
-                  replicas:
-                    description: The number of replicas for the deployment.
-                    type: integer
-                    default: 1
-                    format: int32
                   resource_requirements:
                     description: Resource requirements for the EDA postgres container
                     properties:
