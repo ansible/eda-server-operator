@@ -1,0 +1,51 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: '[]'
+    capabilities: Basic Install
+  name: eda-server-operator.v0.0.0
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions: {}
+  description: |
+    An ansible operator for managing the lifecycle of an Event-Driven Ansible
+    Server. EDA Server is a console for configuring and managing your automation
+    rulebooks.
+  displayName: Event-Driven Ansible Server
+  icon:
+  - base64data: ""
+    mediatype: ""
+  install:
+    spec:
+      deployments: null
+    strategy: ""
+  installModes:
+  - supported: false
+    type: OwnNamespace
+  - supported: false
+    type: SingleNamespace
+  - supported: false
+    type: MultiNamespace
+  - supported: true
+    type: AllNamespaces
+  keywords:
+  - ansible
+  - automation
+  - event-driven
+  - eda
+  links:
+  - name: EDA Server Operator
+    url: https://github.com/ansible/eda-server-operator
+  - name: EDA Server
+    url: https://github.com/ansible/eda-server
+  maintainers:
+  - email: awx-project@googlegroups.com
+    name: EDA Team
+  maturity: alpha
+  MinKubeVersion: 1.22.15
+  provider:
+    name: Ansible
+    url: github.com/ansible/eda-server-operator
+  version: 0.0.0
