@@ -13,8 +13,8 @@
   include_role:
     name: redis
 
-- name: Set App images
+- name: Set EDA app images
   include_tasks: set_images.yml
 
-# - name: Deploy EDA
-#   include_tasks: deploy_eda.yml
+- name: Deploy EDA
+  include_tasks: deploy_eda.yml

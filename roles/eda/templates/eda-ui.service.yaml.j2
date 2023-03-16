@@ -5,13 +5,52 @@ metadata:
   name: "{{ ansible_operator_meta.name }}-ui"
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
-    app: eda
-    comp: ui
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-ui'
+{% if service_annotations %}
+  annotations:
+    {{ service_annotations | indent(width=4) }}
+{% endif %}
 spec:
   ports:
-  - name: "8080"
-    port: 8080
-    targetPort: 8080
+{% if service_type | lower == "nodeport" %}
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+      name: http
+{% if nodeport_port is defined %}
+      nodePort: {{ nodeport_port }}
+{% endif %}
+{% elif service_type | lower != 'loadbalancer' and loadbalancer_protocol | lower != 'https' %}
+    - port: 80
+      protocol: TCP
+      targetPort: 8080
+      name: http
+{% endif %}
+{% if ingress_type | lower == 'route' and route_tls_termination_mechanism | lower == 'passthrough' %}
+    - port: 443
+      protocol: TCP
+      targetPort: 8853 # TODO: Use something like 8053 and update nginx.con
+      name: https
+{% endif %}
+{% if service_type | lower == 'loadbalancer' and loadbalancer_protocol | lower == 'https' %}
+    - port: {{ loadbalancer_port }}
+      protocol: TCP
+      targetPort: 8080
+      name: https
+{% elif service_type | lower == 'loadbalancer' and loadbalancer_protocol | lower != 'https' %}
+    - port: {{ loadbalancer_port }}
+      protocol: TCP
+      targetPort: 8080
+      name: http
+{% endif %}
   selector:
-    app: eda
-    comp: ui
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-ui'
+{% if service_type | lower == "nodeport" %}
+  type: NodePort
+{% elif service_type | lower == "loadbalancer" %}
+  type: LoadBalancer
+{% else %}
+  type: ClusterIP
+{% endif %}

@@ -2,41 +2,65 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ ansible_operator_meta.name }}-api"
-  namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
-    app: eda
-    comp: postgres
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-api'
+  name: '{{ ansible_operator_meta.name }}-api'
+  namespace: '{{ ansible_operator_meta.namespace }}'
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: eda
-      comp: postgres
-  strategy:
-    type: Recreate
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-api'
   template:
     metadata:
       labels:
-        app: eda
-        comp: postgres
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-api'
     spec:
       containers:
-      - env:
-        - name: POSTGRES_DB
-          value: eda
-        - name: POSTGRES_PASSWORD
-          value: secret
-        image: docker.io/library/postgres:13
-        name: postgres
+      - name: eda-api
+        image: {{ _api_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        args:
+        - /bin/bash
+        - -c
+        - aap-eda-manage migrate && aap-eda-manage runserver 0.0.0.0:8000
+        env:
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __postgres_configuration_secret }}'
+              key: password
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
+        - name: EDA_MQ_HOST
+          value: {{ ansible_operator_meta.name }}-redis-svc
         ports:
-        - containerPort: 5432
-        resources: {}
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: postgres-data
+        - containerPort: 8000
+        resources: {{ api.resource_requirements }}
       restartPolicy: Always
-      volumes:
-      - name: postgres-data
-        persistentVolumeClaim:
-          claimName: postgres-data

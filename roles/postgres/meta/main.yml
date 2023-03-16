@@ -1,7 +1,7 @@
 ---
 galaxy_info:
   author: Ansible
-  description: Postgres database role for EDA operator configuration
+  description: Postgres database role for EDA operator
   company: Red Hat, Inc.
 
   # If the issue tracker for your role is not on github, uncomment the
