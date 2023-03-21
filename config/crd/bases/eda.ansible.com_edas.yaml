@@ -199,6 +199,9 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
                 type: array
+              secret_key_secret:
+                description: Secret where the secret key can be found
+                type: string
           status:
             description: Status defines the observed state of EDA
             type: object
