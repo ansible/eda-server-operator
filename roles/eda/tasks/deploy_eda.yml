@@ -1,4 +1,20 @@
 ---
+- name: Get the current resource pod information.
+  k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    label_selectors:
+      - "app.kubernetes.io/name={{ ansible_operator_meta.name }}"
+      - "app.kubernetes.io/managed-by={{ deployment_type }}-operator"
+      - "app.kubernetes.io/component={{ deployment_type }}-api"
+    field_selectors:
+      - status.phase=Running
+  register: eda_api_pod
+
+- name: Set the resource pod name as a variable.
+  set_fact:
+    eda_api_pod_name: "{{ eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
 
 - name: Apply deployment resources
   k8s:

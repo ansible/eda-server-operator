@@ -104,3 +104,6 @@ node_selector: ''
 # Secret to lookup that provide the secret key
 # #
 secret_key_secret: ''
+
+admin_user: admin
+admin_email: test@example.com

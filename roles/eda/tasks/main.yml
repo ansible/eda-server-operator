@@ -21,3 +21,6 @@
 
 - name: Deploy EDA
   include_tasks: deploy_eda.yml
+
+- name: Create admin user
+  include_tasks: create_admin_user.yml

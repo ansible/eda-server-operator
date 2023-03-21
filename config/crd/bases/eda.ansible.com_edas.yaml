@@ -202,6 +202,13 @@ spec:
               secret_key_secret:
                 description: Secret where the secret key can be found
                 type: string
+              admin_user:
+                description: Username to use for the admin account
+                type: string
+                default: admin
+              admin_password_secret:
+                description: Secret where the admin password can be found
+                type: string
           status:
             description: Status defines the observed state of EDA
             type: object
