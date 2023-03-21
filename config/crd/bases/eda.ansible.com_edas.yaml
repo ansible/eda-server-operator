@@ -189,6 +189,16 @@ spec:
               nodeport_port:
                 description: Port to use for the nodeport
                 type: integer
+              extra_settings:
+                description: Extra settings to specify for the API
+                items:
+                  properties:
+                    setting:
+                      type: string
+                    value:
+                      x-kubernetes-preserve-unknown-fields: true
+                  type: object
+                type: array
           status:
             description: Status defines the observed state of EDA
             type: object
