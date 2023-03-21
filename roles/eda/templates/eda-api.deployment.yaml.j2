@@ -60,6 +60,11 @@ spec:
           value: "['*']"
         - name: EDA_MQ_HOST
           value: {{ ansible_operator_meta.name }}-redis-svc
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ secret_key_secret_name }}'
+              key: secret_key
         ports:
         - containerPort: 8000
         resources: {{ api.resource_requirements }}

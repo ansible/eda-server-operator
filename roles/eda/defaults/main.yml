@@ -100,3 +100,7 @@ hostname: ''
 #   kubernetes.io/arch: amd64
 #   kubernetes.io/os: linux
 node_selector: ''
+
+# Secret to lookup that provide the secret key
+# #
+secret_key_secret: ''
