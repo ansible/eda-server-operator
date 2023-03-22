@@ -1063,7 +1063,7 @@ spec:
                     description: 'Defines Redis Deployment replicas'
                     format: int32
                     type: integer
-                  redis_resource_requirements:
+                  resource_requirements:
                     description: Resource requirements for the Redis container
                     properties:
                       claims:
