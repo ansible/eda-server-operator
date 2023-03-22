@@ -53,6 +53,13 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Name of the k8s secret the symmetric encryption key is stored
+          in.
+        displayName: Secret Key
+        path: secret_key_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
       - displayName: Database configuration secret
         path: postgres_configuration_secret
         x-descriptors:
@@ -77,7 +84,6 @@ spec:
         path: postgres.storage_requirements
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
       - displayName: Postgres Priority Class
         path: postgres.priority_class
         x-descriptors:
@@ -349,8 +355,7 @@ spec:
         path: nodeport_port
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:ingress_type:none
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:NodePort
       - displayName: Service Account Annotations
         path: service_account_annotations
         x-descriptors:
