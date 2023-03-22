@@ -268,6 +268,16 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Admin Account Username
+        path: admin_user
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Admin Password Secret
+        path: admin_password_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
   description: |
     An ansible operator for managing the lifecycle of an Event-Driven Ansible
     Server. EDA Server is a console for configuring and managing your automation
