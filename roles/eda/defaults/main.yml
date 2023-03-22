@@ -11,6 +11,14 @@ _api_image_version: latest
 _ui_image: quay.io/ansible/eda-ui
 _ui_image_version: latest
 
+# Add a nodeSelector for the AWX pods. It must match a node's labels for the pod
+# to be scheduled on that node. Specify as literal block. E.g.:
+# api:
+#   node_selector: |
+#     disktype: ssd
+#     kubernetes.io/arch: amd64
+#     kubernetes.io/os: linux
+
 api:
   replicas: 1
   resource_requirements:
@@ -92,14 +100,6 @@ route_api_version: 'route.openshift.io/v1'
 route_host: ''
 
 hostname: ''
-
-# Add a nodeSelector for the AWX pods. It must match a node's labels for the pod
-# to be scheduled on that node. Specify as literal block. E.g.:
-# node_selector: |
-#   disktype: ssd
-#   kubernetes.io/arch: amd64
-#   kubernetes.io/os: linux
-node_selector: ''
 
 # Secret to lookup that provide the secret key
 # #
