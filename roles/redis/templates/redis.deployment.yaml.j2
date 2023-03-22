@@ -33,9 +33,9 @@ spec:
       nodeSelector:
         {{ redis.node_selector | indent(width=8) }}
 {% endif %}
-{% if tolerations %}
-      tolerations:
-        {{ tolerations | indent(width=8) }}
+{% if redis.tolerations %}
+      redis.tolerations:
+        {{ redis.tolerations | indent(width=8) }}
 {% endif %}
       containers:
         - name: redis

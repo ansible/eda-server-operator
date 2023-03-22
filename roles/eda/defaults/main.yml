@@ -25,6 +25,8 @@ api:
     requests:
       cpu: 200m
       memory: 512Mi
+  node_selector: ''
+  tolerations: ''
 
 worker:
   replicas: 1
@@ -32,6 +34,8 @@ worker:
     requests:
       cpu: 200m
       memory: 512Mi
+  node_selector: ''
+  tolerations: ''
 
 ui:
   replicas: 1
@@ -39,6 +43,8 @@ ui:
     requests:
       cpu: 200m
       memory: 512Mi
+  node_selector: ''
+  tolerations: ''
 
 # Labels defined on the resource, which should be propagated to child resources
 additional_labels: []

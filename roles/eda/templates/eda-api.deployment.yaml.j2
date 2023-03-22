@@ -33,15 +33,15 @@ spec:
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
         app.kubernetes.io/component: '{{ deployment_type }}-api'
     spec:
-{% if api.node_selector %}
+{% if api.node_selector is defined %}
       nodeSelector:
         {{ api.node_selector | indent(width=8) }}
 {% endif %}
-{% if api.tolerations %}
+{% if api.tolerations is defined %}
       tolerations:
         {{ api.tolerations | indent(width=8) }}
 {% endif %}
-{% if api.topology_spread_constraints %}
+{% if api.topology_spread_constraints is defined %}
       topologySpreadConstraints:
         {{ api.topology_spread_constraints | indent(width=8) }}
 {% endif %}
@@ -90,7 +90,9 @@ spec:
               key: secret_key
         ports:
         - containerPort: 8000
+{% if api.resource_requirements is defined %}
         resources: {{ api.resource_requirements }}
+{% endif %}
         volumeMounts:
           - name: {{ ansible_operator_meta.name }}-settings
             mountPath: /app/src/src/aap_eda/settings/default.py

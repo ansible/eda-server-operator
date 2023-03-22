@@ -44,9 +44,9 @@ spec:
       nodeSelector:
         {{ postgres.node_selector | indent(width=8) }}
 {% endif %}
-{% if tolerations %}
+{% if postgres.tolerations %}
       tolerations:
-        {{ tolerations | indent(width=8) }}
+        {{ postgres.tolerations | indent(width=8) }}
 {% endif %}
       containers:
         - image: '{{ _postgres_image }}'
@@ -102,14 +102,8 @@ spec:
             - name: postgres-{{ supported_pg_version }}
               mountPath: '{{ postgres.postgres_data_path | dirname }}'
               subPath: '{{ postgres.postgres_data_path | dirname | basename }}'
+{% if postgres.resource_requirements is defined %}
           resources: {{ postgres.resource_requirements }}
-{% if postgres_selector %}
-      nodeSelector:
-        {{ postgres_selector | indent(width=8) }}
-{% endif %}
-{% if postgres_tolerations %}
-      tolerations:
-        {{ postgres_tolerations | indent(width=8) }}
 {% endif %}
   volumeClaimTemplates:
     - metadata:

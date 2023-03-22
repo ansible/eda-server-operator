@@ -1063,6 +1063,11 @@ spec:
                     description: 'Defines Redis Deployment replicas'
                     format: int32
                     type: integer
+                  node_selector:
+                    additionalProperties:
+                      type: string
+                    description: NodeSelector for the EDA pods.
+                    type: object
                   resource_requirements:
                     description: Resource requirements for the Redis container
                     properties:
@@ -1165,7 +1170,7 @@ spec:
                         type: string
                     type: object
                   tolerations:
-                    description: Node tolerations for the Pulp pods.
+                    description: Node tolerations for the EDA pods.
                     items:
                       description: The pod this Toleration is attached to tolerates
                         any taint that matches the triple <key,value,effect> using
@@ -1205,11 +1210,6 @@ spec:
                           type: string
                       type: object
                     type: array
-                  node_selector:
-                    additionalProperties:
-                      type: string
-                    description: NodeSelector for the Pulp pods.
-                    type: object
                 type: object
               postgres:
                 description: The EDA postgres StatefulSet

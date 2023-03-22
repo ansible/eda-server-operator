@@ -9,7 +9,7 @@ metadata:
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-worker'
 spec:
-  replicas: {{ ui.replicas }}
+  replicas: {{ worker.replicas }}
 {% if worker.strategy is defined %}
   strategy:
     type: {{ worker.strategy.type }}
@@ -33,15 +33,15 @@ spec:
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
         app.kubernetes.io/component: '{{ deployment_type }}-worker'
     spec:
-{% if worker.node_selector %}
+{% if worker.node_selector is defined %}
       nodeSelector:
         {{ worker.node_selector | indent(width=8) }}
 {% endif %}
-{% if worker.tolerations %}
+{% if worker.tolerations is defined %}
       tolerations:
         {{ worker.tolerations | indent(width=8) }}
 {% endif %}
-{% if worker.topology_spread_constraints %}
+{% if worker.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
         {{ worker.topology_spread_constraints | indent(width=8) }}
 {% endif %}
@@ -85,5 +85,7 @@ spec:
           value: {{ ansible_operator_meta.name }}-redis-svc
         ports:
         - containerPort: 8000
+{% if worker.resource_requirements is defined %}
         resources: {{ worker.resource_requirements }}
+{% endif %}
       restartPolicy: Always
