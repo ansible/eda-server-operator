@@ -19,6 +19,9 @@
 - name: Create secret key
   include_tasks: secret_key_configuration.yml
 
+- name: Create admin password
+  include_tasks: admin_password_configuration.yml
+
 - name: Deploy EDA
   include_tasks: deploy_eda.yml
 

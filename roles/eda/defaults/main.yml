@@ -107,3 +107,4 @@ secret_key_secret: ''
 
 admin_user: admin
 admin_email: test@example.com
+admin_password_secret: ''
