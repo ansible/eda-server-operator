@@ -19,20 +19,9 @@
     namespace: "{{ ansible_operator_meta.namespace }}"
     pod: "{{ eda_api_pod_name }}"
     container: "eda-api"
-    command: aap-eda-manage createsuperuser --username={{ admin_user | quote }} --email={{ admin_email | quote }} --noinput
+    command: bash -c "DJANGO_SUPERUSER_PASSWORD={{ admin_password }} aap-eda-manage createsuperuser --username={{ admin_user | quote }} --email={{ admin_email | quote }} --noinput"
   register: result
   changed_when: "'That username is already taken' not in result.stderr"
   failed_when: "'That username is already taken' not in result.stderr and 'Superuser created successfully' not in result.stdout"
-  no_log: "{{ no_log }}"
-  when: users_result.return_code > 0
-
-- name: Update Django super user password
-  kubernetes.core.k8s_exec:
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    pod: "{{ eda_api_pod_name }}"
-    container: "eda-api"
-    command: aap-eda-manage update_password --username='{{ admin_user }}' --password='{{ admin_password }}'
-  register: result
-  changed_when: "'Password updated' in result.stdout"
   no_log: "{{ no_log }}"
   when: users_result.return_code > 0
