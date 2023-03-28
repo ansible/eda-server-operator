@@ -5,8 +5,12 @@
 *.dll
 *.so
 *.dylib
+.cache/
 bin
 testbin/*
+/bundle
+/bundle_tmp*
+/bundle.Dockerfile
 Dockerfile.cross
 
 # Development directory and tools
@@ -28,3 +32,4 @@ kustomization.yaml
 *.swp
 *.swo
 *~
+.vscode/

@@ -19,7 +19,7 @@ spec:
       app.kubernetes.io/component: 'database'
       app.kubernetes.io/managed-by: 'eda-operator'
   serviceName: '{{ ansible_operator_meta.name }}'
-  replicas: 1
+  replicas: {{ api.replicas }}
   updateStrategy:
     type: RollingUpdate
   template:
@@ -37,15 +37,23 @@ spec:
           type: RuntimeDefault
         capabilities:
           drop: ["ALL"]
-{% if postgres_priority_class is defined %}
-      priorityClassName: '{{ postgres_priority_class }}'
+{% if postgres.priority_class is defined %}
+      priorityClassName: '{{ postgres.priority_class }}'
+{% endif %}
+{% if postgres.node_selector %}
+      nodeSelector:
+        {{ postgres.node_selector | indent(width=8) }}
+{% endif %}
+{% if postgres.tolerations %}
+      tolerations:
+        {{ postgres.tolerations | indent(width=8) }}
 {% endif %}
       containers:
         - image: '{{ _postgres_image }}'
           imagePullPolicy: '{{ image_pull_policy }}'
           name: postgres
-{% if postgres_extra_args %}
-          args: {{ postgres_extra_args }}
+{% if postgres.postgres_extra_args %}
+          args: {{ postgres.postgres_extra_args }}
 {% endif %}
           env:
             # For postgres_image based on rhel8/postgresql-13
@@ -82,7 +90,7 @@ spec:
                   name: '{{ __postgres_configuration_secret }}'
                   key: password
             - name: PGDATA
-              value: '{{ postgres_data_path }}'
+              value: '{{ postgres.postgres_data_path }}'
             - name: POSTGRES_INITDB_ARGS
               value: '{{ postgres_initdb_args }}'
             - name: POSTGRES_HOST_AUTH_METHOD
@@ -92,16 +100,10 @@ spec:
               name: postgres-{{ supported_pg_version }}
           volumeMounts:
             - name: postgres-{{ supported_pg_version }}
-              mountPath: '{{ postgres_data_path | dirname }}'
-              subPath: '{{ postgres_data_path | dirname | basename }}'
+              mountPath: '{{ postgres.postgres_data_path | dirname }}'
+              subPath: '{{ postgres.postgres_data_path | dirname | basename }}'
+{% if postgres.resource_requirements is defined %}
           resources: {{ postgres.resource_requirements }}
-{% if postgres_selector %}
-      nodeSelector:
-        {{ postgres_selector | indent(width=8) }}
-{% endif %}
-{% if postgres_tolerations %}
-      tolerations:
-        {{ postgres_tolerations | indent(width=8) }}
 {% endif %}
   volumeClaimTemplates:
     - metadata:
@@ -110,6 +112,6 @@ spec:
         accessModes:
           - ReadWriteOnce
 {% if postgres_storage_class is defined %}
-        storageClassName: '{{ postgres_storage_class }}'
+        storageClassName: '{{ database.postgres_storage_class }}'
 {% endif %}
         resources: {{ postgres.storage_requirements }}
