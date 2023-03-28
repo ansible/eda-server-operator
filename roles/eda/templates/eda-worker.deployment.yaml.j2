@@ -79,8 +79,6 @@ spec:
             secretKeyRef:
               name: '{{ __postgres_configuration_secret }}'
               key: password
-        - name: EDA_DB_HOST
-          value: eda-postgres
         - name: EDA_MQ_HOST
           value: {{ ansible_operator_meta.name }}-redis-svc
         ports:
