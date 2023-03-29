@@ -3,4 +3,4 @@
   group: eda.ansible.com
   kind: EDA
   role: eda
-#+kubebuilder:scaffold:watch
+# +kubebuilder:scaffold:watch

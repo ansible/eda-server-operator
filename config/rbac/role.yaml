@@ -122,4 +122,4 @@ rules:
       - patch
       - update
       - watch
-#+kubebuilder:scaffold:rules
+# +kubebuilder:scaffold:rules

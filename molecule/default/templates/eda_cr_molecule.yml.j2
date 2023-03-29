@@ -1,0 +1,32 @@
+---
+apiVersion: eda.ansible.com/v1beta1
+kind: EDA
+metadata:
+  name: example-eda
+spec:
+{% if eda_image %}
+  image: {{ eda_image }}
+{% endif %}
+{% if eda_version %}
+  image_version: {{ eda_version }}
+{% endif %}
+  ingress_type: ingress
+  ingress_path: /eda
+  ingress_annotations: |
+    kubernetes.io/ingress.class: nginx
+  web_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 32M
+  task_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 32M
+  ee_resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 16M
+  no_log: false
+  postgres_resource_requirements: {}
+  postgres_init_container_resource_requirements: {}
+  redis_resource_requirements: {}

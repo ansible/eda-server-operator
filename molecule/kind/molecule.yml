@@ -5,7 +5,7 @@ driver:
   name: delegated
 lint: |
   set -e
-  yamllint -d "{extends: relaxed, rules: {line-length: {max: 120}}}" .
+  yamllint .
 platforms:
   - name: cluster
     groups:
@@ -13,7 +13,6 @@ platforms:
 provisioner:
   name: ansible
   playbooks:
-    prepare: ../default/prepare.yml
     verify: ../default/verify.yml
   lint: |
     set -e
@@ -24,7 +23,10 @@ provisioner:
         namespace: ${TEST_OPERATOR_NAMESPACE:-osdk-test}
     host_vars:
       localhost:
+        eda_image: ${EDA_TEST_IMAGE:-""}
+        eda_version: ${EDA_TEST_VERSION:-""}
         ansible_python_interpreter: '{{ ansible_playbook_python }}'
+        default_eda_version: "{{ lookup('url', 'https://api.github.com/repos/ansible/aap-eda/releases/latest') | from_json | json_query('tag_name') }}"
         config_dir: ${MOLECULE_PROJECT_DIRECTORY}/config
         samples_dir: ${MOLECULE_PROJECT_DIRECTORY}/config/samples
         project_dir: ${MOLECULE_PROJECT_DIRECTORY}
