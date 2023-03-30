@@ -1211,9 +1211,12 @@ spec:
                       type: object
                     type: array
                 type: object
-              postgres:
-                description: The EDA postgres StatefulSet
+              database:
+                description: The EDA PostgreSQL database StatefulSet
                 properties:
+                  database_secret:
+                    description: Secret where the database configuration can be found. Set this to us your own external PostgreSQL database. If not specified, this secret will be generated and EDA will not create a managed postgres pod.
+                    type: string
                   resource_requirements:
                     description: Resource requirements for the database container.
                     properties:
@@ -1341,9 +1344,6 @@ spec:
                       type: object
                     type: array
                 type: object
-              postgres_configuration_secret:
-                description: Secret where the database configuration can be found
-                type: string
               postgres_image:
                 description: Registry path to the PostgreSQL container to use
                 type: string
@@ -1437,14 +1437,14 @@ spec:
                   type: object
                 type: array
               secret_key_secret:
-                description: Secret where the secret key can be found
+                description: Secret where the secret key can be found. If not specified, one will be generated.
                 type: string
               admin_user:
                 description: Username to use for the admin account
                 type: string
                 default: admin
               admin_password_secret:
-                description: Secret where the admin password can be found
+                description: Secret where the admin password can be found. If not specified, one will be generated.
                 type: string
           status:
             description: Status defines the observed state of EDA

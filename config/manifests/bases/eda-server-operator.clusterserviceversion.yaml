@@ -26,8 +26,9 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
-      - displayName: Secret Key
-        description: Name of the k8s secret the symmetric encryption key is stored in.
+      - description: Name of the k8s secret the symmetric encryption key is stored
+          in.
+        displayName: Secret Key
         path: secret_key_secret
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
@@ -60,51 +61,44 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
-      - displayName: Database configuration secret
-        path: postgres_configuration_secret
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:io.kubernetes:Secret
       - displayName: API Extra Settings
         path: extra_settings
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: PostgreSQL server configuration
-        path: postgres
+      - displayName: PostgreSQL Database configuration
+        path: database
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: PostgreSQL server resource requirements
-        path: postgres.resource_requirements
+      - displayName: External database configuration secret
+        path: database.database_secret
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Database resource requirements
+        path: database.resource_requirements
+        x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-      - description: Define Postgres storage requirements
-        displayName: Postgres Storage Requirements
-        path: postgres.storage_requirements
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Postgres Priority Class
-        path: postgres.priority_class
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Define Database storage requirements
+        displayName: Database Storage Requirements
+        path: database.storage_requirements
       - description: 'Configure PostgreSQL connection sslmode option. Default: "prefer"'
-        displayName: Postgres SSLMode
-        path: postgres.postgres_ssl_mode
+        displayName: Database SSLMode
+        path: database.postgres_ssl_mode
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Name of the StorageClass required by the claim.
-        displayName: Postgres Storage Class
-        path: postgres.postgres_storage_class
+        displayName: Database Storage Class
+        path: database.postgres_storage_class
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:StorageClass
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - displayName: Database data path
-        path: postgres.postgres_data_path
+        path: database.postgres_data_path
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Postgres Extra Arguments
-        path: postgres.postgres_extra_args
+      - displayName: Database Extra Arguments
+        path: database.postgres_extra_args
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
@@ -118,15 +112,19 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Postgres Selector
-        path: postgres.node_selector
+      - displayName: Database Selector
+        path: database.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Postgres Tolerations
-        path: postgres.tolerations
+      - displayName: Database Tolerations
+        path: database.tolerations
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Database Priority Class
+        path: database.priority_class
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-api deployment resources
         displayName: API deployment configuration
         path: api
