@@ -24,4 +24,4 @@
   changed_when: "'That username is already taken' not in result.stderr"
   failed_when: "'That username is already taken' not in result.stderr and 'Superuser created successfully' not in result.stdout"
   no_log: "{{ no_log }}"
-  when: users_result.return_code > 0
+  when: users_result.result_code is defined and users_result.return_code > 0

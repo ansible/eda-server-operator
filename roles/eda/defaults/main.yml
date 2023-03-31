@@ -2,6 +2,8 @@
 # defaults file for EDA
 
 deployment_type: eda
+kind: 'EDA'
+api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 
 no_log: true
 
