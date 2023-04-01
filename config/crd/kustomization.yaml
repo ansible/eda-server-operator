@@ -3,4 +3,6 @@
 # It should be run by config/default
 resources:
 - bases/eda.ansible.com_edas.yaml
+- bases/eda.ansible.com_edabackups.yaml
+- bases/eda.ansible.com_edarestores.yaml
 #+kubebuilder:scaffold:crdkustomizeresource

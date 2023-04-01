@@ -1,0 +1,24 @@
+# permissions for end users to edit edarestores.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: edarestore-editor-role
+rules:
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edarestores
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edarestores/status
+  verbs:
+  - get

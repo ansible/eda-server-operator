@@ -10,6 +10,141 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
+    - description: Back up a deployment of the eda, including jobs, inventories, and
+        credentials
+      displayName: EDA Backup
+      kind: EDABackup
+      name: edabackups.eda.ansible.com
+      specDescriptors:
+      - displayName: Deployment Name
+        path: deployment_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Backup Persistent Volume Claim
+        path: backup_pvc
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Backup Persistent Volume Claim Namespace
+        path: backup_pvc_namespace
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Backup PVC Storage Requirements
+        path: backup_storage_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Backup Management Pod Resource Requirements
+        path: backup_resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - displayName: Backup PVC Storage Class
+        path: backup_storage_class
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Database Backup Label Selector
+        path: postgres_label_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image
+        path: postgres_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image Version
+        path: postgres_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: No Log Configuration
+        path: no_log
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      statusDescriptors:
+      - description: Persistent volume claim name used during backup
+        displayName: Backup Claim
+        path: backupClaim
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: The directory that data is backed up to on the PVC
+        displayName: Backup Directory
+        path: backupDirectory
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      version: v1alpha1
+    - description: Restore a previous eda deployment from an EDABackup. The deployment
+        name you provide will be the name of the new EDA CR that will be created.
+      displayName: EDA Restore
+      kind: EDARestore
+      name: edarestores.eda.ansible.com
+      specDescriptors:
+      - displayName: Backup Source to restore from
+        description: Select what type of backup to specify. Backup CR, allows you to specify
+          the name of an EDABackup object (recommended approach).  The PVC option allows you to
+          specify a custom PVC and directory to backup from.
+        path: backup_source
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:select:Backup CR
+        - urn:alm:descriptor:com.tectonic.ui:select:PVC
+      - displayName: Backup Name
+        path: backup_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:backup_source:Backup
+          CR
+      - displayName: New Deployment Name
+        path: deployment_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Backup Persistent Volume Claim
+        path: backup_pvc
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:backup_source:PVC
+      - displayName: Backup Namespace
+        path: backup_pvc_namespace
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Backup Directory
+        description: This is the directory inside the PVC that your backup is stored in.
+        path: backup_dir
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:backup_source:PVC
+      - displayName: Postgres Restore Label Selector
+        path: postgres_label_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image
+        path: postgres_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: PostgreSQL Image Version
+        path: postgres_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Restore Management Pod Resource Requirements
+        path: restore_resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - displayName: No Log Configuration
+        path: no_log
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      statusDescriptors:
+      - description: The state of the restore
+        displayName: Restore Status
+        path: restoreComplete
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      version: v1alpha1
     - description: Deploy a new instance of Event-Driven Ansible Server. A standardized
         way to configure and run rulebooks to trigger automation.
       displayName: EDA
@@ -398,7 +533,7 @@ spec:
   - name: EDA Server
     url: https://github.com/ansible/eda-server
   maintainers:
-  - email: awx-project@googlegroups.com
+  - email: eda-project@googlegroups.com
     name: EDA Team
   maturity: alpha
   minKubeVersion: 1.22.15

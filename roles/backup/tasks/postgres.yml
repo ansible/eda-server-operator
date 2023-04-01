@@ -1,0 +1,109 @@
+---
+
+- name: Get PostgreSQL configuration
+  k8s_info:
+    kind: Secret
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: "{{ this_eda['resources'][0]['status']['postgresConfigurationSecret'] }}"
+  register: pg_config
+  no_log: "{{ no_log }}"
+
+- name: Fail if postgres configuration secret status does not exist
+  fail:
+    msg: "The postgresConfigurationSecret status is not set on the EDA object yet or the secret has been deleted."
+  when: not pg_config | default([]) | length
+
+- name: Store Database Configuration
+  set_fact:
+    eda_postgres_user: "{{ pg_config['resources'][0]['data']['username'] | b64decode }}"
+    eda_postgres_pass: "{{ pg_config['resources'][0]['data']['password'] | b64decode }}"
+    eda_postgres_database: "{{ pg_config['resources'][0]['data']['database'] | b64decode }}"
+    eda_postgres_port: "{{ pg_config['resources'][0]['data']['port'] | b64decode }}"
+    eda_postgres_host: "{{ pg_config['resources'][0]['data']['host'] | b64decode }}"
+    eda_postgres_type: "{{ pg_config['resources'][0]['data']['type'] | default('unmanaged'|b64encode) | b64decode }}"
+  no_log: "{{ no_log }}"
+
+- block:
+    - name: Delete pod to reload a resource configuration
+      set_fact:
+        postgres_label_selector: "app.kubernetes.io/instance=postgres-{{ supported_pg_version }}-{{ deployment_name }}"
+      when: postgres_label_selector is not defined
+
+    - name: Get the postgres pod information
+      k8s_info:
+        kind: Pod
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        label_selectors:
+          - "{{ postgres_label_selector }}"
+      register: postgres_pod
+      until:
+        - "postgres_pod['resources'] | length"
+        - "postgres_pod['resources'][0]['status']['phase'] == 'Running'"
+        - "postgres_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
+      delay: 5
+      retries: 60
+
+    - name: Set the resource pod name as a variable.
+      set_fact:
+        postgres_pod_name: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+  when: eda_postgres_type == 'managed'
+
+- name: Determine the timestamp for the backup once for all nodes
+  set_fact:
+    now: '{{ lookup("pipe", "date +%F-%T") }}'
+
+- name: Set backup directory name
+  set_fact:
+    backup_dir: "/backups/eda-openshift-backup-{{ now }}"
+
+- name: Create directory for backup
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: >-
+      mkdir -p {{ backup_dir }}
+
+- name: Precreate file for database dump
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: >-
+      touch {{ backup_dir }}/eda.db
+
+- name: Set permissions on file for database dump
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: >-
+      bash -c "chmod 660 {{ backup_dir }}/eda.db && chown :root {{ backup_dir }}/eda.db"
+
+- name: Set full resolvable host name for postgres pod
+  set_fact:
+    resolvable_db_host: '{{ (eda_postgres_type == "managed") | ternary(eda_postgres_host + "." + ansible_operator_meta.namespace + ".svc.cluster.local", eda_postgres_host) }}'  # yamllint disable-line rule:line-length
+  no_log: "{{ no_log }}"
+
+- name: Set pg_dump command
+  set_fact:
+    pgdump: >-
+      pg_dump --clean --create
+      -h {{ resolvable_db_host }}
+      -U {{ eda_postgres_user }}
+      -d {{ eda_postgres_database }}
+      -p {{ eda_postgres_port }}
+      -F custom
+      {{ pg_dump_suffix }}
+  no_log: "{{ no_log }}"
+
+- name: Write pg_dump to backup on PVC
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: |
+      bash -c """
+      set -e -o pipefail
+      PGPASSWORD='{{ eda_postgres_pass }}' {{ pgdump }} > {{ backup_dir }}/eda.db
+      echo 'Successful'
+      """
+  register: data_migration
+  no_log: "{{ no_log }}"
+  failed_when: "'Successful' not in data_migration.stdout"
