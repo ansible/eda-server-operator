@@ -1,6 +1,9 @@
 ---
 # tasks file for EDA
 
+- name: Combine default and custom vars for each component
+  include_tasks: combine_defaults.yml
+
 - name: Configure cluster
   include_role:
     name: common
@@ -9,7 +12,7 @@
   include_role:
     name: postgres
 
-- name: Setup Redis Cache
+- name: Setup Redis
   include_role:
     name: redis
 

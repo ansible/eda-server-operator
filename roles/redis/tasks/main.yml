@@ -1,6 +1,9 @@
 ---
 # tasks file for EDA
 
+- name: Combine default and custom vars for each component
+  include_tasks: combine_defaults.yml
+
 - name: Set default redis image to be used
   import_tasks: set_images.yml
 

@@ -6,7 +6,8 @@ deployment_type: eda
 _redis_image: redis
 _redis_image_version: 7
 
-redis:
+redis: {}
+_redis:
   replicas: 1
   resource_requirements:
     requests:
