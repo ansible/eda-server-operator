@@ -7,7 +7,7 @@ database_username: "{{ deployment_type }}"
 # Name of k8s secret containing postgres host, username, password, database, port, and type
 database_secret: ''
 
-_postgres_image: docker.io/library/postgres
+_postgres_image: postgres
 _postgres_image_version: 13
 
 # Add a nodeSelector for the Postgres pods.
