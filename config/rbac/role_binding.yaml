@@ -3,16 +3,16 @@ kind: ClusterRoleBinding
 metadata:
   labels:
     app.kubernetes.io/name: clusterrolebinding
-    app.kubernetes.io/instance: manager-rolebinding
+    app.kubernetes.io/instance: eda-manager-rolebinding
     app.kubernetes.io/component: rbac
     app.kubernetes.io/created-by: eda-server-operator
     app.kubernetes.io/part-of: eda-server-operator
     app.kubernetes.io/managed-by: kustomize
-  name: manager-rolebinding
+  name: eda-manager-rolebinding
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: manager-role
+  name: eda-manager-role
 subjects:
 - kind: ServiceAccount
   name: controller-manager
