@@ -27,6 +27,7 @@
 
 - name: Create admin user
   include_tasks: create_admin_user.yml
+  when: eda_api_pod_name | length
 
 - name: Update status variables
   include_tasks: update_status.yml
