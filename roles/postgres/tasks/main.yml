@@ -1,6 +1,9 @@
 ---
 # Configure PostgreSQL database and required resources
 
+- name: Combine default and custom vars for each component
+  include_tasks: combine_defaults.yml
+
 - name: Determine and set postgres configuration secret and variables
   import_tasks: set_configuration_secret.yml
 

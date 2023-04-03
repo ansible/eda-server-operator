@@ -1,0 +1,7 @@
+---
+
+- name: Combine default and custom variables from the CR for each component
+  set_fact:
+    combined_api: "{{ api | combine ( _api ) }}"
+    combined_ui: "{{ ui | combine ( _ui ) }}"
+    combined_worker: "{{ worker | combine ( _worker ) }}"

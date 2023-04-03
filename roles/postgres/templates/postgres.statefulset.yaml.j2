@@ -19,7 +19,6 @@ spec:
       app.kubernetes.io/component: 'database'
       app.kubernetes.io/managed-by: 'eda-operator'
   serviceName: '{{ ansible_operator_meta.name }}'
-  replicas: {{ api.replicas }}
   updateStrategy:
     type: RollingUpdate
   template:
@@ -37,23 +36,23 @@ spec:
           type: RuntimeDefault
         capabilities:
           drop: ["ALL"]
-{% if database.priority_class is defined %}
-      priorityClassName: '{{ database.priority_class }}'
+{% if combined_database.priority_class is defined %}
+      priorityClassName: '{{ combined_database.priority_class }}'
 {% endif %}
-{% if database.node_selector %}
+{% if combined_database.node_selector %}
       nodeSelector:
-        {{ database.node_selector | indent(width=8) }}
+        {{ combined_database.node_selector | indent(width=8) }}
 {% endif %}
-{% if database.tolerations %}
+{% if combined_database.tolerations %}
       tolerations:
-        {{ database.tolerations | indent(width=8) }}
+        {{ combined_database.tolerations | indent(width=8) }}
 {% endif %}
       containers:
         - image: '{{ _postgres_image }}'
           imagePullPolicy: '{{ image_pull_policy }}'
           name: postgres
-{% if database.postgres_extra_args %}
-          args: {{ database.postgres_extra_args }}
+{% if combined_database.postgres_extra_args %}
+          args: {{ combined_database.postgres_extra_args }}
 {% endif %}
           env:
             # For postgres_image based on rhel8/postgresql-13
@@ -90,7 +89,7 @@ spec:
                   name: '{{ __database_secret }}'
                   key: password
             - name: PGDATA
-              value: '{{ database.postgres_data_path }}'
+              value: '{{ combined_database.postgres_data_path }}'
             - name: POSTGRES_INITDB_ARGS
               value: '{{ postgres_initdb_args }}'
             - name: POSTGRES_HOST_AUTH_METHOD
@@ -100,10 +99,10 @@ spec:
               name: postgres-{{ supported_pg_version }}
           volumeMounts:
             - name: postgres-{{ supported_pg_version }}
-              mountPath: '{{ database.postgres_data_path | dirname }}'
-              subPath: '{{ database.postgres_data_path | dirname | basename }}'
-{% if database.resource_requirements is defined %}
-          resources: {{ database.resource_requirements }}
+              mountPath: '{{ combined_database.postgres_data_path | dirname }}'
+              subPath: '{{ combined_database.postgres_data_path | dirname | basename }}'
+{% if combined_database.resource_requirements is defined %}
+          resources: {{ combined_database.resource_requirements }}
 {% endif %}
   volumeClaimTemplates:
     - metadata:
@@ -112,6 +111,6 @@ spec:
         accessModes:
           - ReadWriteOnce
 {% if postgres_storage_class is defined %}
-        storageClassName: '{{ database.postgres_storage_class }}'
+        storageClassName: '{{ combined_database.postgres_storage_class }}'
 {% endif %}
-        resources: {{ database.storage_requirements }}
+        resources: {{ combined_database.storage_requirements }}
