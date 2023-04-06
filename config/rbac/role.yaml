@@ -105,6 +105,23 @@ rules:
     verbs:
       - create
       - get
+
+  ## Rule for Operator SA so it can grant them to worker deployment SA
+  - apiGroups:
+      - ""
+      - batch
+      - extensions
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+
   ##
   ## Rules for eda.ansible.com/v1alpha1, Kind: EDA
   ##

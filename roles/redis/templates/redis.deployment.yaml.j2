@@ -28,7 +28,6 @@ spec:
         app.kubernetes.io/part-of: '{{ deployment_type }}'
         app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
     spec:
-      serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if combined_redis.node_selector %}
       nodeSelector:
         {{ combined_redis.node_selector | indent(width=8) }}
