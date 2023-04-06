@@ -11,6 +11,8 @@
 - name: Set EDA object
   set_fact:
     _eda: "{{ this_eda['resources'][0]['spec'] }}"
+    _db_secret_value: |
+      {"database_secret": "{{ this_eda['resources'][0]['status']['databaseConfigurationSecret'] }}"}
 
 - name: Set names of backed up secrets in the CR spec
   set_fact:
@@ -18,7 +20,7 @@
   with_items:
     - {"key": "secret_key_secret", "value": "{{ this_eda['resources'][0]['status']['secretKeySecret'] }}"}
     - {"key": "admin_password_secret", "value": "{{ this_eda['resources'][0]['status']['adminPasswordSecret'] }}"}
-    - {"key": "database_secret", "value": "{{ this_eda['resources'][0]['status']['databaseConfigurationSecret'] }}"}
+    - {"key": "database", "value": "{{ _db_secret_value }}" }
 
 - name: Set EDA object
   set_fact:

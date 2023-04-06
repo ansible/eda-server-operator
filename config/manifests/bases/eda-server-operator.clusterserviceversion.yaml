@@ -82,10 +82,10 @@ spec:
       kind: EDARestore
       name: edarestores.eda.ansible.com
       specDescriptors:
-      - displayName: Backup Source to restore from
-        description: Select what type of backup to specify. Backup CR, allows you to specify
-          the name of an EDABackup object (recommended approach).  The PVC option allows you to
-          specify a custom PVC and directory to backup from.
+      - description: Select what type of backup to specify. Backup CR, allows you
+          to specify the name of an EDABackup object (recommended approach).  The
+          PVC option allows you to specify a custom PVC and directory to backup from.
+        displayName: Backup Source to restore from
         path: backup_source
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:select:Backup CR
@@ -109,8 +109,9 @@ spec:
         path: backup_pvc_namespace
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Backup Directory
-        description: This is the directory inside the PVC that your backup is stored in.
+      - description: This is the directory inside the PVC that your backup is stored
+          in.
+        displayName: Backup Directory
         path: backup_dir
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text

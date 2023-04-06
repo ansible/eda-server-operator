@@ -1,9 +1,8 @@
 ---
 
-- name: Assert that Database Secret is set
-  assert:
-    that:
-      - database_secret is defined
+- name: Set Postgres Configuration Secret name
+  set_fact:
+    database_secret: "{{ spec['database']['database_secret'] }}"
 
 - name: Check for specified PostgreSQL configuration
   k8s_info:
