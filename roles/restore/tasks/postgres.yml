@@ -1,14 +1,15 @@
 ---
 
-- name: Set Postgres Configuration Secret name
-  set_fact:
-    postgres_configuration_secret: "{{ spec['postgres_configuration_secret'] | default(postgres_configuration_secret) }}"
+- name: Assert that Database Secret is set
+  assert:
+    that:
+      - database_secret is defined
 
 - name: Check for specified PostgreSQL configuration
   k8s_info:
     kind: Secret
     namespace: '{{ ansible_operator_meta.namespace }}'
-    name: '{{ postgres_configuration_secret }}'
+    name: '{{ database_secret }}'
   register: pg_config
   no_log: "{{ no_log }}"
 

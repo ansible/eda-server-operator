@@ -88,11 +88,6 @@ backup_pvc: 'eda-backup-volume-claim'
 
 The backup pvc will be created in the same namespace the edabackup object is created in.
 
-If a custom postgres configuration secret was used when deploying EDA, it must be set:
-
-```
-postgres_configuration_secret: 'eda-postgres-configuration'
-```
 
 If the edabackup object no longer exists, it is still possible to restore from the backup it created by specifying the pvc name and the back directory.
 
@@ -101,7 +96,7 @@ backup_pvc: myoldeda-backup-claim
 backup_dir: /backups/eda-openshift-backup-2021-04-02-03:25:08
 ```
 
-Variable to define resources limits and request for restore CR.
+Variable to define resources limits and request for the management pod used by the edarestore CR.
 
 ```
 restore_resource_requirements:

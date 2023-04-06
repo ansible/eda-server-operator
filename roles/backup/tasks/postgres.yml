@@ -4,13 +4,13 @@
   k8s_info:
     kind: Secret
     namespace: '{{ ansible_operator_meta.namespace }}'
-    name: "{{ this_eda['resources'][0]['status']['postgresConfigurationSecret'] }}"
+    name: "{{ this_eda['resources'][0]['status']['databaseConfigurationSecret'] }}"
   register: pg_config
   no_log: "{{ no_log }}"
 
 - name: Fail if postgres configuration secret status does not exist
   fail:
-    msg: "The postgresConfigurationSecret status is not set on the EDA object yet or the secret has been deleted."
+    msg: "The databaseConfigurationSecret status is not set on the EDA object yet or the secret has been deleted."
   when: not pg_config | default([]) | length
 
 - name: Store Database Configuration

@@ -4,9 +4,6 @@ deployment_type: eda
 database_name: "{{ deployment_type }}"
 database_username: "{{ deployment_type }}"
 
-# Name of k8s secret containing postgres host, username, password, database, port, and type
-database_secret: ''
-
 _postgres_image: postgres
 _postgres_image_version: 13
 
@@ -45,6 +42,8 @@ _database:
   tolerations: ''
   postgres_data_path: '/var/lib/postgresql/data/pgdata'
   postgres_extra_args: ''
+  database_secret: '' # Name of k8s secret containing postgres host, username, password, database, port, and type
+
 
 image_pull_policy: IfNotPresent
 image_pull_secrets: []

@@ -18,7 +18,7 @@
   with_items:
     - {"key": "secret_key_secret", "value": "{{ this_eda['resources'][0]['status']['secretKeySecret'] }}"}
     - {"key": "admin_password_secret", "value": "{{ this_eda['resources'][0]['status']['adminPasswordSecret'] }}"}
-    - {"key": "postgres_configuration_secret", "value": "{{ this_eda['resources'][0]['status']['postgresConfigurationSecret'] }}"}
+    - {"key": "database_secret", "value": "{{ this_eda['resources'][0]['status']['databaseConfigurationSecret'] }}"}
 
 - name: Set EDA object
   set_fact:
