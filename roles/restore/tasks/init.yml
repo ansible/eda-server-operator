@@ -43,8 +43,6 @@
     kind: PersistentVolumeClaim
     namespace: "{{ backup_pvc_namespace }}"
   register: provided_pvc
-  when:
-    - backup_pvc != ''
 
 - name: Surface error to user
   block:
