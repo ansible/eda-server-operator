@@ -3,4 +3,22 @@
   group: eda.ansible.com
   kind: EDA
   role: eda
+
+- version: v1alpha1
+  group: eda.ansible.com
+  kind: EDABackup
+  role: backup
+  snakeCaseParameters: False
+  finalizer:
+    name: eda.ansible.com/finalizer
+    role: backup
+    vars:
+      finalizer_run: true
+
+- version: v1alpha1
+  group: eda.ansible.com
+  kind: EDARestore
+  role: restore
+  snakeCaseParameters: False
+
 #+kubebuilder:scaffold:watch

@@ -1,0 +1,31 @@
+---
+# Required: specify name of eda deployment to restore to
+deployment_name: ''
+kind: 'EDARestore'
+api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
+
+# Required: specify a pre-created PVC (name) to restore from
+backup_pvc: ''
+backup_pvc_namespace: '{{ ansible_operator_meta.namespace }}'
+
+# Required: backup name, found on the edabackup object
+backup_dir: ''
+
+# Default cluster name
+cluster_name: 'cluster.local'
+
+# Set no_log settings on certain tasks
+no_log: true
+
+# Default resource requirements
+restore_resource_requirements:
+  limits:
+    cpu: "1000m"
+    memory: "4096Mi"
+  requests:
+    cpu: "25m"
+    memory: "32Mi"
+
+# Maintain some of the recommended `app.kubernetes.io/*` labels on the resource (self)
+set_self_labels: true
+...

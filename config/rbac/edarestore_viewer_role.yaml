@@ -1,0 +1,20 @@
+# permissions for end users to view edarestores.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: edarestore-viewer-role
+rules:
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edarestores
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edarestores/status
+  verbs:
+  - get
