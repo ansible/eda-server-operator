@@ -29,7 +29,6 @@ _postgres_image_version: 13
 # Assign a preexisting priority class to the postgres pod
 database: {}
 _database:
-  replicas: 1
   resource_requirements:
     requests:
       cpu: 200m

@@ -9,4 +9,39 @@ metadata:
     app.kubernetes.io/created-by: eda-server-operator
   name: eda-sample
 spec:
-  # TODO(user): Add fields here
+  no_log: true
+  image_pull_policy: IfNotPresent
+  service_type: ClusterIP
+  ingress_type: Route
+  api:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 150m
+        memory: 256Mi
+  worker:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 150m
+        memory: 256Mi
+  ui:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+  redis:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 150m
+        memory: 256Mi
+  database:
+    resource_requirements:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+    storage_requirements:
+      requests:
+        storage: 20Gi
