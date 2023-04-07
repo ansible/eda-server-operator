@@ -1,4 +1,11 @@
 ---
+- name: Fail if backup_name is not set
+  assert:
+    that:
+      - backup_name is defined
+      - backup_name | lenth
+    fail_msg: "When the backup_source is 'CR' (custom EDABackup resource), backup_name must be set."
+  when: backup_source == "CR"
 
 - name: Set variables from edabackup object statuses if provided
   block:
