@@ -85,10 +85,10 @@ spec:
       - description: Select what type of backup to specify. Backup CR, allows you
           to specify the name of an EDABackup object (recommended approach).  The
           PVC option allows you to specify a custom PVC and directory to backup from.
-        displayName: Backup Source to restore from
+        displayName: Backup Source to restore from. Default: "CR"
         path: backup_source
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:select:Backup CR
+        - urn:alm:descriptor:com.tectonic.ui:select:CR
         - urn:alm:descriptor:com.tectonic.ui:select:PVC
       - displayName: Backup Name
         path: backup_name
