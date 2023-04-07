@@ -1,7 +1,7 @@
 apiVersion: eda.ansible.com/v1alpha1
 kind: EDARestore
 metadata:
-  name: edarestore-sample
+  name: eda-restore-sample
 spec:
   deployment_name: example-eda-2
   backup_name: example-eda-backup
