@@ -46,15 +46,16 @@ spec:
                 enum:
                 - CR
                 - PVC
+                default: CR
+              backup_name:
+                description: EDABackup custom resource name. Required if backup source is 'CR'.
+                type: string
               deployment_name:
                 description: Name of the restored deployment. This should be different from the original deployment name
                   if the original deployment still exists.
                 type: string
               cluster_name:
-                description: Cluster name
-                type: string
-              backup_name:
-                description: EDABackup object name
+                description: Set a custom clusterDomain for the new cluster if restoring to a different cluster
                 type: string
               backup_pvc:
                 description: Name of the PVC to be restored from, set as a status found on the edabackup object (backupClaim)

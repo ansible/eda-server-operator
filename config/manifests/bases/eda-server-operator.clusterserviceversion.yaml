@@ -42,7 +42,7 @@ spec:
       - displayName: Backup PVC Storage Class
         path: backup_storage_class
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:io.kubernetes:StorageClass
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - displayName: Database Backup Label Selector
         path: postgres_label_selector
@@ -64,6 +64,21 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Clean up backup when EDABackup is deleted
+        path: clean_backup_on_delete
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Extra flags for pg_dump when backing up the database
+        path: pg_dump_suffix
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Set default labels on EDA resource
+        path: set_self_labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       statusDescriptors:
       - description: Persistent volume claim name used during backup
         displayName: Backup Claim
@@ -88,14 +103,13 @@ spec:
         displayName: Backup Source to restore from
         path: backup_source
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:select:Backup CR
+        - urn:alm:descriptor:com.tectonic.ui:select:CR
         - urn:alm:descriptor:com.tectonic.ui:select:PVC
       - displayName: Backup Name
         path: backup_name
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
-        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:backup_source:Backup
-          CR
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:backup_source:CR
       - displayName: New Deployment Name
         path: deployment_name
         x-descriptors:
@@ -121,6 +135,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Custom cluster name
+        path: cluster_name
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: PostgreSQL Image
         path: postgres_image
         x-descriptors:
@@ -139,6 +158,12 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Set default labels on EDA resource
+        path: set_self_labels
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       statusDescriptors:
       - description: The state of the restore
         displayName: Restore Status
