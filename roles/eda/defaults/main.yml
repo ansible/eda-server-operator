@@ -13,7 +13,7 @@ _api_image_version: latest
 _ui_image: quay.io/ansible/eda-ui
 _ui_image_version: latest
 
-# Add a nodeSelector for the AWX pods. It must match a node's labels for the pod
+# Add a nodeSelector for the EDA pods. It must match a node's labels for the pod
 # to be scheduled on that node. Specify as literal block. E.g.:
 # api:
 #   node_selector: |
@@ -21,7 +21,8 @@ _ui_image_version: latest
 #     kubernetes.io/arch: amd64
 #     kubernetes.io/os: linux
 
-api:
+api: {}
+_api:
   replicas: 1
   resource_requirements:
     requests:
@@ -30,7 +31,8 @@ api:
   node_selector: ''
   tolerations: ''
 
-worker:
+worker: {}
+_worker:
   replicas: 1
   resource_requirements:
     requests:
@@ -39,7 +41,8 @@ worker:
   node_selector: ''
   tolerations: ''
 
-ui:
+ui: {}
+_ui:
   replicas: 1
   resource_requirements:
     requests:
@@ -63,7 +66,7 @@ ingress_api_version: 'networking.k8s.io/v1'
 #   eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/<IAM_ROLE_NAME>
 service_account_annotations: ''
 
-# Custom labels for the tower service. Specify as literal block. E.g.:
+# Custom labels for the eda service. Specify as literal block. E.g.:
 # service_labels: |
 #   environment: non-production
 #   zone: internal

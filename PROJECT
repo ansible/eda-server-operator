@@ -13,4 +13,18 @@ resources:
   group: eda
   kind: EDA
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: ansible.com
+  group: eda
+  kind: EDABackup
+  version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: ansible.com
+  group: eda
+  kind: EDARestore
+  version: v1alpha1
 version: "3"

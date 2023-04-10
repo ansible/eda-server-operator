@@ -1,6 +1,6 @@
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+kind: Role
 metadata:
   name: eda-manager-role
 rules:
@@ -114,6 +114,12 @@ rules:
       - edas
       - edas/status
       - edas/finalizers
+      - edabackups
+      - edabackups/status
+      - edabackups/finalizers
+      - edarestores
+      - edarestores/status
+      - edarestores/finalizers
     verbs:
       - create
       - delete

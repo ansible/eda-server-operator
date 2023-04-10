@@ -4,9 +4,6 @@ deployment_type: eda
 database_name: "{{ deployment_type }}"
 database_username: "{{ deployment_type }}"
 
-# Name of k8s secret containing postgres host, username, password, database, port, and type
-database_secret: ''
-
 _postgres_image: quay.io/sclorg/postgresql-13-c8s
 _postgres_image_version: latest
 
@@ -30,9 +27,8 @@ _postgres_image_version: latest
 
 
 # Assign a preexisting priority class to the postgres pod
-
-database:
-  replicas: 1
+database: {}
+_database:
   resource_requirements:
     requests:
       cpu: 200m
@@ -45,6 +41,8 @@ database:
   tolerations: ''
   postgres_data_path: '/var/lib/postgresql/data/pgdata'
   postgres_extra_args: ''
+  database_secret: '' # Name of k8s secret containing postgres host, username, password, database, port, and type
+
 
 image_pull_policy: IfNotPresent
 image_pull_secrets: []

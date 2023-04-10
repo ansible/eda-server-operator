@@ -1,0 +1,36 @@
+---
+
+- name: Get EDA custom resource object
+  k8s_info:
+    version: v1alpha1
+    kind: EDA
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: '{{ deployment_name }}'
+  register: _eda_cro
+
+- name: Set EDA object
+  set_fact:
+    _eda: "{{ this_eda['resources'][0]['spec'] }}"
+    _db_secret_value: |
+      {"database_secret": "{{ this_eda['resources'][0]['status']['databaseConfigurationSecret'] }}"}
+
+- name: Set names of backed up secrets in the CR spec
+  set_fact:
+    _eda: "{{ _eda | combine ({ item.key : item.value }) }}"
+  with_items:
+    - {"key": "secret_key_secret", "value": "{{ this_eda['resources'][0]['status']['secretKeySecret'] }}"}
+    - {"key": "admin_password_secret", "value": "{{ this_eda['resources'][0]['status']['adminPasswordSecret'] }}"}
+    - {"key": "database", "value": "{{ _db_secret_value }}" }
+
+- name: Set EDA object
+  set_fact:
+    eda_spec:
+      spec: "{{ _eda }}"
+      previous_deployment_name: "{{ this_eda['resources'][0]['metadata']['name'] }}"
+
+- name: Write eda object to pvc
+  k8s_cp:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    remote_path: "{{ backup_dir  }}/eda_object"
+    content: "{{ eda_spec | to_yaml }}"

@@ -1,0 +1,14 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDARestore
+metadata:
+  name: eda-restore-sample
+spec:
+  deployment_name: example-eda-2
+  backup_name: example-eda-backup
+  restore_resource_requirements:
+    limits:
+      cpu: "1000m"
+      memory: "4096Mi"
+    requests:
+      cpu: "25m"
+      memory: "32Mi"

@@ -1,0 +1,24 @@
+# permissions for end users to edit edabackups.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: edabackup-editor-role
+rules:
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edabackups
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - eda.ansible.com
+  resources:
+  - edabackups/status
+  verbs:
+  - get

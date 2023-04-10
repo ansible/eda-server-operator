@@ -1,6 +1,9 @@
 ---
 # tasks file for EDA
 
+- name: Combine default and custom vars for each component
+  include_tasks: combine_defaults.yml
+
 - name: Configure cluster
   include_role:
     name: common
@@ -9,7 +12,7 @@
   include_role:
     name: postgres
 
-- name: Setup Redis Cache
+- name: Setup Redis
   include_role:
     name: redis
 
@@ -27,6 +30,7 @@
 
 - name: Create admin user
   include_tasks: create_admin_user.yml
+  when: eda_api_pod_name | length
 
 - name: Update status variables
   include_tasks: update_status.yml

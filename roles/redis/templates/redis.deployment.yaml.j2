@@ -11,7 +11,7 @@ metadata:
     app.kubernetes.io/part-of: '{{ deployment_type }}'
     app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
 spec:
-  replicas: {{ api.replicas }}
+  replicas: {{ combined_redis.replicas }}
   selector:
     matchLabels:
       app.kubernetes.io/name: 'redis'
@@ -29,13 +29,13 @@ spec:
         app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
-{% if redis.node_selector %}
+{% if combined_redis.node_selector %}
       nodeSelector:
-        {{ redis.node_selector | indent(width=8) }}
+        {{ combined_redis.node_selector | indent(width=8) }}
 {% endif %}
-{% if redis.tolerations %}
-      redis.tolerations:
-        {{ redis.tolerations | indent(width=8) }}
+{% if combined_redis.tolerations %}
+      tolerations:
+        {{ combined_redis.tolerations | indent(width=8) }}
 {% endif %}
       containers:
         - name: redis
@@ -74,8 +74,8 @@ spec:
                 - -i
                 - -c
                 - redis-cli -h 127.0.0.1 -p 6379
-{% if redis.resource_requirements is defined %}
-          resources: {{ redis.resource_requirements }}
+{% if combined_redis.resource_requirements is defined %}
+          resources: {{ combined_redis.resource_requirements }}
 {% endif %}
       volumes:
         - name: {{ ansible_operator_meta.name }}-redis-data

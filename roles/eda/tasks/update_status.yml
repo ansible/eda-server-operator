@@ -24,7 +24,7 @@
     name: "{{ ansible_operator_meta.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
     status:
-      postgresConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
+      databaseConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
 
 - name: Update secret key status
   operator_sdk.util.k8s_status:
@@ -35,26 +35,28 @@
     status:
       secretKeySecret: "{{ secret_key_secret_name }}"
 
-- name: Retrieve instance version
-  k8s_exec:
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    pod: "{{ eda_api_pod_name }}"
-    container: "eda-api"
-    command: >-
-      bash -c "echo 'import pkg_resources;
-      print(pkg_resources.get_distribution(\"aap-eda\").version)'
-      | aap-eda-manage shell"
-  register: instance_version
-  changed_when: false
+- block:
+    - name: Retrieve instance version
+      k8s_exec:
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        pod: "{{ eda_api_pod_name }}"
+        container: "eda-api"
+        command: >-
+          bash -c "echo 'import pkg_resources;
+          print(pkg_resources.get_distribution(\"aap-eda\").version)'
+          | aap-eda-manage shell"
+      register: instance_version
+      changed_when: false
 
-- name: Update version status
-  operator_sdk.util.k8s_status:
-    api_version: '{{ api_version }}'
-    kind: "{{ kind }}"
-    name: "{{ ansible_operator_meta.name }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    status:
-      version: "{{ instance_version.stdout | trim }}"
+    - name: Update version status
+      operator_sdk.util.k8s_status:
+        api_version: '{{ api_version }}'
+        kind: "{{ kind }}"
+        name: "{{ ansible_operator_meta.name }}"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+        status:
+          version: "{{ instance_version.stdout | trim }}"
+  when: eda_api_pod_name | length
 
 - name: Update image status
   operator_sdk.util.k8s_status:

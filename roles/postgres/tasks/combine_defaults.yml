@@ -1,0 +1,5 @@
+---
+
+- name: Combine default and custom variables from the CR for each component
+  set_fact:
+    combined_database: "{{ database | combine ( _database ) }}"

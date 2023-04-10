@@ -9,16 +9,16 @@ metadata:
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-worker'
 spec:
-  replicas: {{ worker.replicas }}
-{% if worker.strategy is defined %}
+  replicas: {{ combined_worker.replicas }}
+{% if combined_worker.strategy is defined %}
   strategy:
-    type: {{ worker.strategy.type }}
-{% if worker.strategy.type == "Recreate" %}
+    type: {{ combined_worker.strategy.type }}
+{% if combined_worker.strategy.type == "Recreate" %}
     rollingUpdate: null
-{% elif worker.strategy.type == "RollingUpdate" %}
+{% elif combined_worker.strategy.type == "RollingUpdate" %}
     rollingUpdate:
-      maxSurge:  {{ worker.strategy.rollingUpdate.maxSurge | default("25%")}}
-      maxUnavailable: {{ worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+      maxSurge:  {{ combined_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
 {% endif %}
 {% endif %}
   selector:
@@ -33,17 +33,17 @@ spec:
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
         app.kubernetes.io/component: '{{ deployment_type }}-worker'
     spec:
-{% if worker.node_selector is defined %}
+{% if combined_worker.node_selector is defined %}
       nodeSelector:
-        {{ worker.node_selector | indent(width=8) }}
+        {{ combined_worker.node_selector | indent(width=8) }}
 {% endif %}
-{% if worker.tolerations is defined %}
+{% if combined_worker.tolerations is defined %}
       tolerations:
-        {{ worker.tolerations | indent(width=8) }}
+        {{ combined_worker.tolerations | indent(width=8) }}
 {% endif %}
-{% if worker.topology_spread_constraints is defined %} %}
+{% if combined_worker.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
-        {{ worker.topology_spread_constraints | indent(width=8) }}
+        {{ combined_worker.topology_spread_constraints | indent(width=8) }}
 {% endif %}
       containers:
       - name: eda-worker
@@ -83,7 +83,7 @@ spec:
           value: {{ ansible_operator_meta.name }}-redis-svc
         ports:
         - containerPort: 8000
-{% if worker.resource_requirements is defined %}
-        resources: {{ worker.resource_requirements }}
+{% if combined_worker.resource_requirements is defined %}
+        resources: {{ combined_worker.resource_requirements }}
 {% endif %}
       restartPolicy: Always
