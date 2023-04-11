@@ -3,7 +3,7 @@
   assert:
     that:
       - backup_name is defined
-      - backup_name | lenth
+      - backup_name | length
     fail_msg: "When the backup_source is 'CR' (custom EDABackup resource), backup_name must be set."
   when: backup_source == "CR"
 
