@@ -32,8 +32,6 @@ spec:
     spec:
       securityContext:
         allowPrivilegeEscalation: false
-        seccompProfile:
-          type: RuntimeDefault
         capabilities:
           drop: ["ALL"]
 {% if combined_database.priority_class is defined %}
