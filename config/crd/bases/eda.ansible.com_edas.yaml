@@ -59,6 +59,24 @@ spec:
                 description: Configure no_log for no log tasks
                 type: boolean
                 default: true
+              api_image:
+                description: Registry path to API container image to use
+                type: string
+              api_image_version:
+                description: API container image tag or version to use
+                type: string
+              ui_image:
+                description: Registry path to UI container image to use
+                type: string
+              ui_image_version:
+                description: UI container image tag or version to use
+                type: string
+              redis_image:
+                description: Registry path to Redis container image to use
+                type: string
+              redis_image_version:
+                description: Redis container image tag or version to use
+                type: string
               api:
                 default:
                   replicas: 1
