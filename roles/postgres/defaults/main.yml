@@ -4,8 +4,8 @@ deployment_type: eda
 database_name: "{{ deployment_type }}"
 database_username: "{{ deployment_type }}"
 
-_postgres_image: postgres
-_postgres_image_version: 13
+_postgres_image: quay.io/sclorg/postgresql-13-c8s
+_postgres_image_version: latest
 
 # Add a nodeSelector for the Postgres pods.
 # It must match a node's labels for the pod to be scheduled on that node.
