@@ -7,6 +7,9 @@ api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 
 no_log: true
 
+image_pull_policy: IfNotPresent
+image_pull_secrets: []
+
 _api_image: quay.io/ansible/eda-server
 _api_image_version: main
 

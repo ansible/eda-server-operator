@@ -34,7 +34,7 @@ spec:
         app.kubernetes.io/component: '{{ deployment_type }}-worker'
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
-{% elif image_pull_secrets | length > 0 %}
+{% if image_pull_secrets | length > 0 %}
       imagePullSecrets:
 {% for secret in image_pull_secrets %}
         - name: {{ secret }}
