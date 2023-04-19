@@ -3,6 +3,9 @@
 
 deployment_type: eda
 
+image_pull_policy: IfNotPresent
+image_pull_secrets: []
+
 _redis_image: quay.io/sclorg/redis-6-c8s
 _redis_image_version: latest
 

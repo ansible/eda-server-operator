@@ -58,8 +58,6 @@ spec:
       #               - linux
       securityContext:
         runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
       containers:
       - args:
         - --leader-elect
