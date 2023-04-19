@@ -45,3 +45,40 @@ metadata:
 spec:
   no_log: true
 ```
+
+
+### Advanced Configuration
+
+#### Deploying a specific version of EDA
+
+There are a few variables that are customizable for eda the image management.
+
+| Name                   | Description               | Default                                 |
+| ---------------------- | ------------------------- | --------------------------------------  |
+| image                  | Path of the image to pull | quay.io/ansible/eda-server              |
+| image_version          | Image version to pull     | main                                    |
+| image                  | Path of the image to pull | quay.io/ansible/eda-ui                  |
+| image_version          | Image version to pull     | latest                                  |
+| image_pull_policy      | The pull policy to adopt  | IfNotPresent                            |
+| image_pull_secrets     | The pull secrets to use   | None                                    |
+| redis_image            | Path of the image to pull | redis                                   |
+| redis_image_version    | Image version to pull     | latest                                  |
+| postgres_image         | Path of the image to pull | postgres                                |
+| postgres_image_version | Image version to pull     | latest                                  |
+
+Example of customization could be:
+
+```yaml
+---
+spec:
+  ...
+  api_image: myorg/my-custom-eda
+  api_image_version: latest
+  ui_image: myorg/my-custom-eda
+  ui_image_version: latest
+  image_pull_policy: Always
+  image_pull_secrets:
+    - pull_secret_name
+```
+
+**Note**: The `*_image` and `*_image_version` variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
