@@ -34,6 +34,12 @@ spec:
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
+{% elif image_pull_secrets | length > 0 %}
+      imagePullSecrets:
+{% for secret in image_pull_secrets %}
+        - name: {{ secret }}
+{% endfor %}
+{% endif %}
 {% if combined_database.priority_class is defined %}
       priorityClassName: '{{ combined_database.priority_class }}'
 {% endif %}
