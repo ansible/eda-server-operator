@@ -34,7 +34,7 @@ spec:
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
-{% elif image_pull_secrets | length > 0 %}
+{% if image_pull_secrets | length > 0 %}
       imagePullSecrets:
 {% for secret in image_pull_secrets %}
         - name: {{ secret }}
