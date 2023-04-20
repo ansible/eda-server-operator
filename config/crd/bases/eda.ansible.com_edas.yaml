@@ -1454,8 +1454,8 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                   type: object
                 type: array
-              secret_key_secret:
-                description: Secret where the secret key can be found. If not specified, one will be generated.
+              db_fields_encryption_secret:
+                description: Secret where the DB fields encryption key can be found. If not specified, one will be generated.
                 type: string
               admin_user:
                 description: Username to use for the admin account

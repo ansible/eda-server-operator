@@ -117,7 +117,7 @@ hostname: ''
 
 # Secret to lookup that provide the secret key
 # #
-secret_key_secret: ''
+db_fields_encryption_secret: ''
 
 admin_user: admin
 admin_email: test@example.com

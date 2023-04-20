@@ -19,8 +19,8 @@
 - name: Set EDA app images
   include_tasks: set_images.yml
 
-- name: Create secret key
-  include_tasks: secret_key_configuration.yml
+- name: Create DB fields encryption
+  include_tasks: db_fields_encryption_configuration.yml
 
 - name: Create admin password
   include_tasks: admin_password_configuration.yml

@@ -18,7 +18,7 @@
   set_fact:
     _eda: "{{ _eda | combine ({ item.key : item.value }) }}"
   with_items:
-    - {"key": "secret_key_secret", "value": "{{ this_eda['resources'][0]['status']['secretKeySecret'] }}"}
+    - {"key": "db_fields_encryption_secret", "value": "{{ this_eda['resources'][0]['status']['dbFieldsEncryptionSecret'] }}"}
     - {"key": "admin_password_secret", "value": "{{ this_eda['resources'][0]['status']['adminPasswordSecret'] }}"}
     - {"key": "database", "value": "{{ _db_secret_value }}" }
 
