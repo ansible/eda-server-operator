@@ -214,10 +214,10 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
-      - description: Name of the k8s secret the symmetric encryption key is stored
+      - description: Name of the k8s secret the DB fields encryption key is stored
           in.
-        displayName: Secret Key
-        path: secret_key_secret
+        displayName: DB Fields Encryption Key
+        path: db_fields_encryption_secret
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
@@ -239,13 +239,6 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:imagePullPolicy
       - displayName: Image Pull Secrets
         path: image_pull_secrets
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:io.kubernetes:Secret
-      - description: Name of the k8s secret the symmetric encryption key is stored
-          in.
-        displayName: Secret Key
-        path: secret_key_secret
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret

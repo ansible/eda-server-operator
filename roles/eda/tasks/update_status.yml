@@ -26,14 +26,14 @@
     status:
       databaseConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
 
-- name: Update secret key status
+- name: Update DB fields encryption status
   operator_sdk.util.k8s_status:
     api_version: '{{ api_version }}'
     kind: "{{ kind }}"
     name: "{{ ansible_operator_meta.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
     status:
-      secretKeySecret: "{{ secret_key_secret_name }}"
+      dbEncryptionFieldsSecret: "{{ db_fields_encryption_secret_name }}"
 
 - block:
     - name: Retrieve instance version

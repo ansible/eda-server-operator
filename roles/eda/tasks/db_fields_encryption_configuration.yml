@@ -1,0 +1,49 @@
+---
+- name: Check for specified DB fields encryption configuration
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: '{{ db_fields_encryption_secret }}'
+  register: _custom_db_fields_encryption
+  no_log: "{{ no_log }}"
+  when: db_fields_encryption_secret | length
+
+- name: Check for default DB fields encryption configuration
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: '{{ ansible_operator_meta.name }}-db-fields-encryption'
+  register: _default_db_fields_encryption
+  no_log: "{{ no_log }}"
+
+- name: Set DB fields encryption secret
+  ansible.builtin.set_fact:
+    _db_fields_encryption_secret: '{{ _custom_db_fields_encryption["resources"] | default([]) | length | ternary(_custom_db_fields_encryption, _default_db_fields_encryption) }}'
+  no_log: "{{ no_log }}"
+
+- block:
+    - name: Create DB fields encryption secret
+      kubernetes.core.k8s:
+        apply: true
+        definition: "{{ lookup('template', 'secrets/db_fields_encryption.yaml.j2') }}"
+      no_log: "{{ no_log }}"
+
+    - name: Read DB fields encryption secret
+      kubernetes.core.k8s_info:
+        kind: Secret
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        name: '{{ ansible_operator_meta.name }}-db-fields-encryption'
+      register: _generated_db_fields_encryption
+      no_log: "{{ no_log }}"
+
+  when: not _db_fields_encryption_secret['resources'] | default([]) | length
+
+- name: Set DB fields encryption secret
+  ansible.builtin.set_fact:
+    db_fields_encryption: '{{ _generated_db_fields_encryption["resources"] | default([]) | length | ternary(_generated_db_fields_encryption, _db_fields_encryption_secret)  }}'
+  no_log: "{{ no_log }}"
+
+- name: Store DB fields encryption secret name
+  ansible.builtin.set_fact:
+    db_fields_encryption_secret_name: "{{ db_fields_encryption['resources'][0]['metadata']['name'] }}"
+  no_log: "{{ no_log }}"
