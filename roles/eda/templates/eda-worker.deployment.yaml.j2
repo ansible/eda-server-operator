@@ -88,6 +88,27 @@ spec:
               key: password
         - name: EDA_MQ_HOST
           value: {{ ansible_operator_meta.name }}-redis-svc
+{% if automation_host_connection_secrets is defined %}
+        - name: EDA_CONTROLLER_URL
+          valueFrom:
+            secretKeyRef:
+              name: '{{ automation_host_connection_secrets[0] }}'
+              key: url
+        - name: EDA_CONTROLLER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: '{{ automation_host_connection_secrets[0] }}'
+              key: token
+        - name: EDA_CONTROLLER_SSL_VERIFY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ automation_host_connection_secrets[0] }}'
+              key: ssl_verify
+{% endif %}
+        - name: EDA_WEBSOCKET_SERVER_NAME
+          value: '{{ websocket_server_name }}'
+        - name: EDA_WEBSOCKET_SERVER_PORT
+          value: '{{ websocket_server_port }}'
         ports:
         - containerPort: 8000
 {% if combined_worker.resource_requirements is defined %}
