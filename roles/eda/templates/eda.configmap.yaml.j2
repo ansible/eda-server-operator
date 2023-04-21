@@ -140,7 +140,7 @@ data:
 
     REST_FRAMEWORK = {
         "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-        "DEFAULT_PAGINATION_CLASS": "aap_eda.api.pagination.DefaultPagination",  # noqa: E501
+        "DEFAULT_PAGINATION_CLASS": "aap_eda.api.pagination.DefaultPagination",
         "PAGE_SIZE": 20,
         "DEFAULT_AUTHENTICATION_CLASSES": [
             "rest_framework.authentication.SessionAuthentication",
@@ -148,6 +148,7 @@ data:
         ],
         "DEFAULT_PERMISSION_CLASSES": [
             "rest_framework.permissions.IsAuthenticated",
+            "aap_eda.api.permissions.RoleBasedPermission",
         ],
         "TEST_REQUEST_DEFAULT_FORMAT": "json",
     }
@@ -238,9 +239,23 @@ data:
         },
     }
 
-    {% for item in extra_settings | default([]) %}
-        {{ item.setting }} = {{ item.value }}
-    {% endfor %}
+    # ---------------------------------------------------------
+    # CONTROLLER SETTINGS
+    # ---------------------------------------------------------
+
+    EDA_CONTROLLER_URL = settings.get("CONTROLLER_URL", "default_controller_url")
+    EDA_CONTROLLER_TOKEN = settings.get(
+        "CONTROLLER_TOKEN", "default_controller_token"
+    )
+    EDA_CONTROLLER_SSL_VERIFY = settings.get("CONTROLLER_SSL_VERIFY", "yes")
+
+    # ---------------------------------------------------------
+    # DEPLOYMENT SETTINGS
+    # ---------------------------------------------------------
+
+    DEPLOYMENT_TYPE = settings.get("DEPLOYMENT_TYPE", "local")
+    WEBSOCKET_BASE_URL = settings.get("WEBSOCKET_BASE_URL", "ws://localhost:8000")
+    WEBSOCKET_SSL_VERIFY = settings.get("WEBSOCKET_SSL_VERIFY", "yes")
 
   nginx_conf: |
     events {
