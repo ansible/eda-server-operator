@@ -113,6 +113,8 @@ spec:
 {% endif %}
         - name: EDA_WEBSOCKET_BASE_URL
           value: 'ws://{{ websocket_server_name }}:8000'
+        - name: EDA_WEBSOCKET_SSL_VERIFY
+          value: '{{ websocket_ssl_verify }}'
         ports:
         - containerPort: 8000
 {% if combined_api.resource_requirements is defined %}

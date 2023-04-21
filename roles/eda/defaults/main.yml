@@ -24,6 +24,8 @@ _ui_image_version: latest
 #     kubernetes.io/arch: amd64
 #     kubernetes.io/os: linux
 
+websocket_ssl_verify: false
+
 api: {}
 _api:
   replicas: 1
