@@ -111,8 +111,8 @@ spec:
               name: '{{ automation_host_connection_secrets[0] }}'
               key: ssl_verify
 {% endif %}
-        - name: EDA_WEBSOCKET_URL
-          value: 'ws://{{ websocket_server_name }}:8000/api/eda/ws/ansible-rulebook'
+        - name: EDA_WEBSOCKET_BASE_URL
+          value: 'ws://{{ websocket_server_name }}:8000'
         ports:
         - containerPort: 8000
 {% if combined_api.resource_requirements is defined %}
