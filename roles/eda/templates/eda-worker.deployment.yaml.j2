@@ -107,8 +107,6 @@ spec:
 {% endif %}
         - name: EDA_WEBSOCKET_URL
           value: 'ws://{{ websocket_server_name }}:8000/api/eda/ws/ansible-rulebook'
-        - name: EDA_WEBSOCKET_PORT
-          value: '{{ websocket_server_port }}'
         ports:
         - containerPort: 8000
 {% if combined_worker.resource_requirements is defined %}
