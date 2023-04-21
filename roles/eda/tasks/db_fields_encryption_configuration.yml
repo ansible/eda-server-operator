@@ -12,7 +12,7 @@
   kubernetes.core.k8s_info:
     kind: Secret
     namespace: '{{ ansible_operator_meta.namespace }}'
-    name: '{{ ansible_operator_meta.name }}-db-fields-encryption'
+    name: '{{ ansible_operator_meta.name }}-db-fields-encryption-secret'
   register: _default_db_fields_encryption
   no_log: "{{ no_log }}"
 
