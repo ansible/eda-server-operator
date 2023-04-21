@@ -36,7 +36,7 @@ _api:
 
 worker: {}
 _worker:
-  replicas: 1
+  replicas: 2
   resource_requirements:
     requests:
       cpu: 200m

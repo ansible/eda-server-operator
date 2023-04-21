@@ -752,7 +752,7 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 1
+                    default: 2
                     description: 'Size is the size of number of eda-worker replicas.
                       Default: 1'
                     format: int32
