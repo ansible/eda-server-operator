@@ -57,6 +57,18 @@ spec:
         imagePullPolicy: '{{ image_pull_policy }}'
         ports:
         - containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          failureThreshold: 1
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          failureThreshold: 1
+          periodSeconds: 10
 {% if combined_ui.resource_requirements is defined %}
         resources: {{ combined_ui.resource_requirements }}
 {% endif %}

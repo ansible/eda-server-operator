@@ -58,6 +58,16 @@ spec:
 {% if combined_database.postgres_extra_args %}
           args: {{ combined_database.postgres_extra_args }}
 {% endif %}
+          readinessProbe:
+            exec:
+              command: ["bash", "-c", "psql -w -U $POSTGRESQL_USER -d $POSTGRESQL_DATABASE -c \"SELECT 1\""]
+            initialDelaySeconds: 15
+            timeoutSeconds: 2
+          livenessProbe:
+            exec:
+              command: ["bash", "-c", "psql -w -U $POSTGRESQL_USER -d $POSTGRESQL_DATABASE -c \"SELECT 1\""]
+            initialDelaySeconds: 45
+            timeoutSeconds: 2
           env:
             - name: POSTGRESQL_DATABASE
               valueFrom:
