@@ -49,33 +49,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: API Image
-        path: api_image
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: API Image Version
-        path: api_image_version
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: UI Image
-        path: ui_image
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: UI Image Version
-        path: ui_image_version
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Redis Image
-        path: redis_image
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Redis Image Version
-        path: redis_image_version
       - displayName: PostgreSQL Image
         path: postgres_image
         x-descriptors:
@@ -204,6 +177,10 @@ spec:
       kind: EDA
       name: edas.eda.ansible.com
       specDescriptors:
+      - displayName: Automation Host Connection Secrets
+        path: automation_host_connection_secrets
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
       - displayName: Admin Account Username
         path: admin_user
         x-descriptors:
@@ -306,6 +283,36 @@ spec:
         path: database.priority_class
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: API Image
+        path: api_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: API Image Version
+        path: api_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: UI Image
+        path: ui_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: UI Image Version
+        path: ui_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Redis Image
+        path: redis_image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Redis Image Version
+        path: redis_image_version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Defines desired state of eda-api deployment resources
         displayName: API deployment configuration
         path: api
