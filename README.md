@@ -5,46 +5,93 @@
 
 An [EDA Server](https://github.com/ansible/eda-server) operator for Kubernetes built with [Operator SDK](https://github.com/operator-framework/operator-sdk) and Ansible.
 
-## Purpose
+## Overview
 
-This operator is meant to provide a more Kubernetes-native installation method for EDA Server via an EDA Custom Resource Definition (CRD). In the future, this operator will grow to be able to maintain the full lifecycle of an EDA Server deployment. Currently, it can handle fresh installs and upgrades.
+This operator is meant to provide a more Kubernetes-native installation method for EDA Server via an EDA Custom Resource Definition (CRD). In the future, this operator will grow to be able to maintain the full life-cycle of an EDA Server deployment. Currently, it can handle fresh installs and upgrades.
 
-## Install
+### Prerequisites
 
-On the k8s or Openshift variant of your choice, you can install the EDA Server Operator directly from this repo with kustomize.  This can be done by first creating a `kustomization.yaml` file. 
-th the followign contents:
+* Install the kubernetes-based cluster of your choice:
+  * [Openshift](https://docs.openshift.com/container-platform/4.11/installing/index.html)
+  * [K8s](https://kubernetes.io/docs/setup/)
+  * [CodeReady containers](https://access.redhat.com/documentation/en-us/red_hat_openshift_local/2.5)
+  * [minikube](https://minikube.sigs.k8s.io/docs/start/)
+* Deploy AWX using the [awx-operator](https://github.com/ansible/awx-operator#basic-install)
+* [Create an OAuth2 token](./docs/create-awx-token.md) for your user in the AWX UI
 
-```
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-resources:
-  - config/default
+## Installing the Operator
 
-# Set the image tags to match the git version from above
-images:
-  - name: quay.io/chadams/eda-server-operator
-    newTag: dev
-
-# Specify a custom namespace in which to install EDA
-namespace: eda
-```
-
-Then kustomize and apply it by running:
+1. Clone the awx-resource-operator
 
 ```
-kustomize build . | kubectl apply -f -
+git clone git@github.com:ansible/awx-resource-operator.git
 ```
 
-Once your operator pod comes up, you can create an EDA Server resource by applying the folowing yaml:
+2. Log in to your K8s or Openshift cluster.
 
 ```
+kubectl login <cluster-url>
+```
+
+3. Run the `make deploy` target
+
+```
+NAMESPACE=awx IMG=quay.io/ansible/eda-server-operator:latest make deploy
+```
+
+> Note: You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
+
+4. Create an access token in your AWX instance using [these docs](./docs/create-awx-token.md).
+
+5. Create a k8s secret with credentials to your AWX or Controller instance. For example, create a file called `automation-host-connection-secret.yml` with the following yaml, then modify it to include your specific credentials. 
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: awx-connection-secret
+stringData:
+  url: 'https://awx.testing.com'
+  token: 'my-awx-user-token-value'
+  ssl_verify: 'yes'
+
+```
+
+> Note: Currently, EDA Server only supports configuring one automation server, in the future, it will be possible to configure multiple.
+
+6. Once your operator pod comes up, you can create an EDA Server resource by applying the following YAML:
+
+> **Warning**
+> At the moment, the quay.io/ansible/eda-server:main image is in a private registry.  To use it, you will need to [create and configure a pull secret](#configuring-an-image-pull-secret).
+
+```yaml
 apiVersion: eda.ansible.com/v1alpha1
 kind: EDA
 metadata:
   name: my-eda
 spec:
-  no_log: true
+  automation_host_connection_secrets:
+    - awx-connection-secret
 ```
+
+If you are using Openshift, you can take advantage of automatic Route configuration an EDA custom resource like this:
+
+```yaml
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda-demo
+spec:
+  automation_host_connection_secrets:
+    - awx-connection-secret
+  service_type: ClusterIP
+  ingress_type: Route
+  image_pull_secrets:
+    - pull_secret_name
+```
+
+
 
 
 ### Advanced Configuration
@@ -82,3 +129,29 @@ spec:
 ```
 
 **Note**: The `*_image` and `*_image_version` variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
+
+
+#### Configuring an image pull secret
+
+1. Log in with that token, or username/password, then create a pull secret from the docker/config.json
+
+```bash
+docker login quay.io -u <user> -p <token>
+```
+
+2. Then, create a k8s secret from your .docker/config.json file.
+
+```bash
+kubectl create secret generic quay-pull-cred \
+  --from-file=.dockerconfigjson=.docker/config.json \
+  --type=kubernetes.io/dockerconfigjson
+```
+
+3. Add that image pull secret to your EDA spec
+
+```yaml
+---
+spec:
+  image_pull_secrets:
+    - quay-pull-cred
+```
