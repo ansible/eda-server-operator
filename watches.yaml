@@ -2,7 +2,7 @@
 - version: v1alpha1
   group: eda.ansible.com
   kind: EDA
-  role: eda
+  playbook: playbooks/eda.yml
 
 - version: v1alpha1
   group: eda.ansible.com

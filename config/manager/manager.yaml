@@ -103,4 +103,6 @@ spec:
             cpu: 10m
             memory: 256Mi
       serviceAccountName: controller-manager
+      imagePullSecrets:
+      - name: redhat-operators-pull-secret
       terminationGracePeriodSeconds: 10
