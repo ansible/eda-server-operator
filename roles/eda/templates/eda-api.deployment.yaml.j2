@@ -117,6 +117,20 @@ spec:
           value: '{{ websocket_ssl_verify }}'
         ports:
         - containerPort: 8000
+        readinessProbe:
+          httpGet:
+            path: /_healthz
+            port: 8000
+          failureThreshold: 1
+          periodSeconds: 10
+          initialDelaySeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /_healthz
+            port: 8000
+          failureThreshold: 1
+          periodSeconds: 10
+          initialDelaySeconds: 30
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
