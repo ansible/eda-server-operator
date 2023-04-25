@@ -60,12 +60,12 @@ spec:
 {% endif %}
           readinessProbe:
             exec:
-              command: ["bash", "-c", "psql -w -U $POSTGRESQL_USER -d $POSTGRESQL_DATABASE -c \"SELECT 1\""]
+              command: ["bash", "-c", "pg_isready -p {{ eda_postgres_port | default('5432')}} -d $POSTGRESQL_DATABASE"]
             initialDelaySeconds: 15
             timeoutSeconds: 2
           livenessProbe:
             exec:
-              command: ["bash", "-c", "psql -w -U $POSTGRESQL_USER -d $POSTGRESQL_DATABASE -c \"SELECT 1\""]
+              command: ["bash", "-c", "pg_isready -p {{ eda_postgres_port | default('5432')}} -d $POSTGRESQL_DATABASE"]
             initialDelaySeconds: 45
             timeoutSeconds: 2
           env:
