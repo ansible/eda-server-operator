@@ -27,15 +27,15 @@
         apply: true
         definition: "{{ lookup('template', 'secrets/db_fields_encryption.yaml.j2') }}"
       no_log: "{{ no_log }}"
+      wait: yes
 
     - name: Read DB fields encryption secret
       kubernetes.core.k8s_info:
         kind: Secret
         namespace: '{{ ansible_operator_meta.namespace }}'
-        name: '{{ ansible_operator_meta.name }}-db-fields-encryption'
+        name: '{{ ansible_operator_meta.name }}-db-fields-encryption-secret'
       register: _generated_db_fields_encryption
       no_log: "{{ no_log }}"
-
   when: not _db_fields_encryption_secret['resources'] | default([]) | length
 
 - name: Set DB fields encryption secret
