@@ -21,10 +21,10 @@ This operator is meant to provide a more Kubernetes-native installation method f
 
 ## Installing the Operator
 
-1. Clone the awx-resource-operator
+1. Clone the eda-server-operator
 
 ```
-git clone git@github.com:ansible/awx-resource-operator.git
+git clone git@github.com:ansible/eda-server-operator.git
 ```
 
 2. Log in to your K8s or Openshift cluster.
@@ -36,7 +36,7 @@ kubectl login <cluster-url>
 3. Run the `make deploy` target
 
 ```
-NAMESPACE=awx IMG=quay.io/ansible/eda-server-operator:latest make deploy
+NAMESPACE=eda IMG=quay.io/ansible/eda-server-operator:latest make deploy
 ```
 
 > **Note** You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
