@@ -39,7 +39,7 @@ kubectl login <cluster-url>
 NAMESPACE=awx IMG=quay.io/ansible/eda-server-operator:latest make deploy
 ```
 
-> Note: You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
+> **Note** You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
 
 4. Create an access token in your AWX instance using [these docs](./docs/create-awx-token.md).
 
@@ -58,7 +58,7 @@ stringData:
 
 ```
 
-> Note: Currently, EDA Server only supports configuring one automation server, in the future, it will be possible to configure multiple.
+> **Note** Currently, EDA Server only supports configuring one automation server, in the future, it will be possible to configure multiple.
 
 6. Once your operator pod comes up, you can create an EDA Server resource by applying the following YAML:
 
@@ -128,7 +128,7 @@ spec:
     - pull_secret_name
 ```
 
-**Note**: The `*_image` and `*_image_version` variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
+  > **Note**: The `*_image` and `*_image_version` variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
 
 
 #### Configuring an image pull secret
