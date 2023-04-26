@@ -1,7 +1,0 @@
----
-- name: Fail if automation_host_connection_secrets is not (only one should be set)
-  assert:
-    that:
-      - automation_host_connection_secrets is defined
-      - automation_host_connection_secrets | length == 1
-    fail_msg: "Please set a single automation server connection secret to be used via the automation_host_connection_secrets parameter." #noqa

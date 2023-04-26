@@ -177,8 +177,12 @@ spec:
       kind: EDA
       name: edas.eda.ansible.com
       specDescriptors:
-      - displayName: Automation Host Connection Secrets
-        path: automation_host_connection_secrets
+      - displayName: Automation Server URL
+        path: automation_server_url
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Automation Server SSL Verify
+        path: automation_server_ssl_verify
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
       - displayName: Admin Account Username
