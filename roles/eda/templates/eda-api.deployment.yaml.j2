@@ -94,23 +94,10 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
-{% if automation_host_connection_secrets is defined %}
         - name: EDA_CONTROLLER_URL
-          valueFrom:
-            secretKeyRef:
-              name: '{{ automation_host_connection_secrets[0] }}'
-              key: url
-        - name: EDA_CONTROLLER_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: '{{ automation_host_connection_secrets[0] }}'
-              key: token
+          value: "{{ automation_server_url }}"
         - name: EDA_CONTROLLER_SSL_VERIFY
-          valueFrom:
-            secretKeyRef:
-              name: '{{ automation_host_connection_secrets[0] }}'
-              key: ssl_verify
-{% endif %}
+          value: "{{ automation_server_ssl_verify | default('yes')}}"
         - name: EDA_WEBSOCKET_BASE_URL
           value: 'ws://{{ websocket_server_name }}:8000'
         - name: EDA_WEBSOCKET_SSL_VERIFY

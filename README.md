@@ -43,24 +43,7 @@ NAMESPACE=eda IMG=quay.io/ansible/eda-server-operator:latest make deploy
 
 4. Create an access token in your AWX instance using [these docs](./docs/create-awx-token.md).
 
-5. Create a k8s secret with credentials to your AWX or Controller instance. For example, create a file called `automation-host-connection-secret.yml` with the following yaml, then modify it to include your specific credentials. 
-
-```yaml
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: awx-connection-secret
-stringData:
-  url: 'https://awx.testing.com'
-  token: 'my-awx-user-token-value'
-  ssl_verify: 'yes'
-
-```
-
-> **Note** Currently, EDA Server only supports configuring one automation server, in the future, it will be possible to configure multiple.
-
-6. Once your operator pod comes up, you can create an EDA Server resource by applying the following YAML:
+5. Once your operator pod comes up, you can create an EDA Server resource by applying the following YAML:
 
 > **Warning**
 > At the moment, the quay.io/ansible/eda-server:main image is in a private registry.  To use it, you will need to [create and configure a pull secret](#configuring-an-image-pull-secret).
@@ -71,8 +54,8 @@ kind: EDA
 metadata:
   name: my-eda
 spec:
-  automation_host_connection_secrets:
-    - awx-connection-secret
+  automation_server_url: https://awx-host
+  automation_server_ssl_verify: yes
 ```
 
 If you are using Openshift, you can take advantage of automatic Route configuration an EDA custom resource like this:
@@ -83,8 +66,8 @@ kind: EDA
 metadata:
   name: eda-demo
 spec:
-  automation_host_connection_secrets:
-    - awx-connection-secret
+  automation_server_url: https://awx-host
+  automation_server_ssl_verify: yes
   service_type: ClusterIP
   ingress_type: Route
   image_pull_secrets:

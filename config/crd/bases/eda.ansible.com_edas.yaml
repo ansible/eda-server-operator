@@ -39,11 +39,12 @@ spec:
                 type: array
                 items:
                   type: string
-              automation_host_connection_secrets:
-                description: AWX automation hosts to run ansible jobs against
-                type: array
-                items:
-                  type: string
+              automation_server_url:
+                description: URL of the AWX automation host to run ansible jobs against
+                type: string
+              automation_server_ssl_verify:
+                description: SSL Verify (yes, no) for the AWX automation host
+                type: string
               image_pull_policy:
                 description: The image pull policy
                 type: string
@@ -119,6 +120,7 @@ spec:
                               type: string
                           required:
                           - name
+                          - automation_server_url
                           type: object
                         type: array
                         x-kubernetes-list-map-keys:

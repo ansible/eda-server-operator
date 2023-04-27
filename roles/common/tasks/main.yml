@@ -11,6 +11,3 @@
 
 - name: Patch Labels
   include_tasks: patch_labels.yml
-
-- name: Preflight Checks
-  include_tasks: pre-checks.yml
