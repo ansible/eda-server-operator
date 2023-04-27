@@ -254,7 +254,7 @@ data:
     # ---------------------------------------------------------
 
     DEPLOYMENT_TYPE = settings.get("DEPLOYMENT_TYPE", "k8s")
-    WEBSOCKET_BASE_URL = settings.get("WEBSOCKET_BASE_URL", "ws://localhost:8000")
+    WEBSOCKET_BASE_URL = settings.get("WEBSOCKET_BASE_URL", "ws://localhost:8001")
     WEBSOCKET_SSL_VERIFY = settings.get("WEBSOCKET_SSL_VERIFY", "yes")
 
   nginx_conf: |
@@ -273,7 +273,7 @@ data:
             server_tokens off;
             root /opt/app-root/ui/eda;
             location ~ ^/api/eda/v[0-9]+/ws[0-9a-z-]+ {
-                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_pass http://{{ ansible_operator_meta.name }}-api:8001;
                 proxy_set_header X-Forwarded-Proto $scheme;
                 proxy_set_header X-Forwarded-Port $server_port;
                 proxy_set_header Host $http_host;

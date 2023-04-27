@@ -118,6 +118,13 @@ spec:
           failureThreshold: 1
           periodSeconds: 10
           initialDelaySeconds: 30
+      - name: daphne
+        image: {{ _api_image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        args:
+        - /bin/bash
+        - -c
+        - daphne -b 0.0.0.0 -p 8001 aap_eda.asgi:application
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
