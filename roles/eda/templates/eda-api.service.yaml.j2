@@ -23,7 +23,7 @@ metadata:
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-api'
+    app.kubernetes.io/component: '{{ deployment_type }}-daphne'
 spec:
   ports:
   - port: 8001
