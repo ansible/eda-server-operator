@@ -15,3 +15,20 @@ spec:
   selector:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-api'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ ansible_operator_meta.name }}-daphne"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-daphne'
+spec:
+  ports:
+  - port: 8001
+    protocol: TCP
+    targetPort: 8001
+  selector:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-api'
