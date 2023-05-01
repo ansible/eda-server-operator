@@ -1,4 +1,4 @@
 ---
 # vars file for EDA
 
-websocket_server_name: "{{ ansible_operator_meta.name }}-api"
+websocket_server_name: "{{ ansible_operator_meta.name }}-daphne"
