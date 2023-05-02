@@ -120,6 +120,14 @@ spec:
           failureThreshold: 1
           periodSeconds: 10
           initialDelaySeconds: 30
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_api.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-settings
+            mountPath: /app/src/src/aap_eda/settings/default.py
+            subPath: default.py
+            readOnly: true
       - name: daphne
         image: {{ _api_image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -172,7 +180,6 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
-
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}

@@ -106,4 +106,20 @@ spec:
 {% if combined_worker.resource_requirements is defined %}
         resources: {{ combined_worker.resource_requirements }}
 {% endif %}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-settings
+            mountPath: /app/src/src/aap_eda/settings/default.py
+            subPath: default.py
+            readOnly: true
+          - name: "{{ ansible_operator_meta.name }}-media-data"
+            mountPath: "{{ media_dir }}"
       restartPolicy: Always
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-settings
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: settings
+                path: default.py
+        - name: {{ ansible_operator_meta.name }}-media-data
+          emptyDir: {}
