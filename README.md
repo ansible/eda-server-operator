@@ -124,7 +124,7 @@ docker login quay.io -u <user> -p <token>
 2. Then, create a k8s secret from your .docker/config.json file.
 
 ```bash
-kubectl create secret generic quay-pull-cred \
+kubectl create secret generic redhat-operators-pull-secret \
   --from-file=.dockerconfigjson=.docker/config.json \
   --type=kubernetes.io/dockerconfigjson
 ```
@@ -135,5 +135,5 @@ kubectl create secret generic quay-pull-cred \
 ---
 spec:
   image_pull_secrets:
-    - quay-pull-cred
+    - redhat-operators-pull-secret
 ```
