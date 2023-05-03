@@ -38,6 +38,7 @@ kubectl login <cluster-url>
 ```
 NAMESPACE=eda IMG=quay.io/ansible/eda-server-operator:latest make deploy
 ```
+> **Note** The `latest` tag is the latest _released_ (tagged) version. The deploy with the latest code in `main` branch, use `IMG=quay.io/ansible/eda-server-operator:main` instead.
 
 > **Note** You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
 
@@ -73,8 +74,6 @@ spec:
   image_pull_secrets:
     - pull_secret_name
 ```
-
-
 
 
 ### Advanced Configuration
