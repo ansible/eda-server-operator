@@ -33,7 +33,7 @@
     name: "{{ ansible_operator_meta.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
     status:
-      dbEncryptionFieldsSecret: "{{ db_fields_encryption_secret_name }}"
+      dbFieldsEncryptionSecret: "{{ db_fields_encryption_secret_name }}"
 
 - block:
     - name: Retrieve instance version
