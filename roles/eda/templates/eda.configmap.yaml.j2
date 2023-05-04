@@ -256,6 +256,24 @@ data:
     DEPLOYMENT_TYPE = settings.get("DEPLOYMENT_TYPE", "k8s")
     WEBSOCKET_BASE_URL = settings.get("WEBSOCKET_BASE_URL", "ws://localhost:8001")
     WEBSOCKET_SSL_VERIFY = settings.get("WEBSOCKET_SSL_VERIFY", "yes")
+    PODMAN_SOCKET_URL = settings.get("PODMAN_SOCKET_URL", None)
+
+    # ---------------------------------------------------------
+    # RULEBOOK LIVENESS SETTINGS
+    # ---------------------------------------------------------
+
+    RULEBOOK_LIVENESS_CHECK_SECONDS = settings.get(
+        "RULEBOOK_LIVENESS_CHECK_SECONDS", 300
+    )
+    RULEBOOK_LIVENESS_TIMEOUT_SECONDS = settings.get(
+        "RULEBOOK_LIVENESS_TIMEOUT_SECONDS", 610
+    )
+
+    # ---------------------------------------------------------
+    # RULEBOOK ENGINE LOG LEVEL
+    # ---------------------------------------------------------
+    ANSIBLE_RULEBOOK_LOG_LEVEL = settings.get("ANSIBLE_RULEBOOK_LOG_LEVEL", "-v")
+    ANSIBLE_RULEBOOK_FLUSH_AFTER = settings.get("ANSIBLE_RULEBOOK_FLUSH_AFTER", 1)
 
   nginx_conf: |
     events {
