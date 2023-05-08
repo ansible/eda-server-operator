@@ -53,7 +53,7 @@ spec:
 {% endif %}
       containers:
       - name: eda-api
-        image: {{ _api_image }}
+        image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
@@ -132,7 +132,7 @@ spec:
             subPath: default.py
             readOnly: true
       - name: daphne
-        image: {{ _api_image }}
+        image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash

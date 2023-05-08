@@ -54,7 +54,7 @@ spec:
 {% endif %}
       containers:
       - name: eda-worker
-        image: {{ _api_image }}
+        image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash

@@ -53,7 +53,7 @@ spec:
 {% endif %}
       containers:
       - name: eda-ui
-        image: {{ _ui_image }}
+        image: {{ _image_web }}
         imagePullPolicy: '{{ image_pull_policy }}'
         ports:
         - containerPort: 8080
