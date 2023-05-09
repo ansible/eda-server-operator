@@ -101,10 +101,10 @@ Example of customization could be:
 ---
 spec:
   ...
-  api_image: myorg/my-custom-eda
-  api_image_version: latest
-  ui_image: myorg/my-custom-eda
-  ui_image_version: latest
+  image: myorg/my-custom-eda
+  image_version: latest
+  image_web: myorg/my-custom-eda
+  image_web_version: latest
   image_pull_policy: Always
   image_pull_secrets:
     - pull_secret_name
