@@ -33,6 +33,8 @@ spec:
             description: Spec defines the desired state of EDA
             type: object
             x-kubernetes-preserve-unknown-fields: true
+            required:
+            - automation_server_url
             properties:
               additional_labels:
                 description: Additional labels defined on the resource, which should be propagated to child resources
@@ -120,7 +122,6 @@ spec:
                               type: string
                           required:
                           - name
-                          - automation_server_url
                           type: object
                         type: array
                         x-kubernetes-list-map-keys:
