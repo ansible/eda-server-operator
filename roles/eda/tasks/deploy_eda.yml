@@ -16,6 +16,16 @@
   set_fact:
     eda_api_pod_name: "{{ eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
 
+- name: Run DB Migrations k8s job
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'migration-job.yaml.j2') }}"
+    wait: yes
+    wait_condition:
+      status: "True"
+      type: Complete
+  register: migration_job_result
+
 - name: Apply deployment resources
   k8s:
     apply: yes

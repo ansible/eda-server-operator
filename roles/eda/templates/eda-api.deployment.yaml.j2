@@ -59,8 +59,7 @@ spec:
         - /bin/bash
         - -c
         - >-
-          aap-eda-manage migrate
-          && aap-eda-manage create_initial_data
+          aap-eda-manage create_initial_data
           && aap-eda-manage runserver 0.0.0.0:8000
         env:
         - name: EDA_DEPLOYMENT_TYPE
