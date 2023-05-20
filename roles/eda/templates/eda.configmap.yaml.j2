@@ -269,11 +269,22 @@ data:
         "RULEBOOK_LIVENESS_TIMEOUT_SECONDS", 610
     )
 
+    ACTIVATION_POD_RESOURCE_REQUESTS = settings.get(
+        "ACTIVATION_POD_RESOURCE_REQUESTS", {"cpu": "50m", "memory": "100Mi"}
+    )
+    ACTIVATION_POD_RESOURCE_LIMITS = settings.get(
+        "ACTIVATION_POD_RESOURCE_LIMITS", {}
+    )
+
     # ---------------------------------------------------------
     # RULEBOOK ENGINE LOG LEVEL
     # ---------------------------------------------------------
     ANSIBLE_RULEBOOK_LOG_LEVEL = settings.get("ANSIBLE_RULEBOOK_LOG_LEVEL", "-v")
     ANSIBLE_RULEBOOK_FLUSH_AFTER = settings.get("ANSIBLE_RULEBOOK_FLUSH_AFTER", 1)
+
+{% for item in extra_settings | default([]) %}
+    {{ item.setting }} = {{ item.value }}
+{% endfor %}
 
   nginx_conf: |
     events {
