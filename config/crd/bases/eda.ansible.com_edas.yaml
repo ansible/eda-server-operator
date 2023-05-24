@@ -751,7 +751,7 @@ spec:
                 type: object
               worker:
                 default:
-                  replicas: 1
+                  replicas: 5
                 description: Defines desired state of eda-worker resources
                 properties:
                   node_selector:
