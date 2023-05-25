@@ -41,8 +41,8 @@ _worker:
   replicas: 5
   resource_requirements:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 25m
+      memory: 64Mi
   node_selector: ''
   tolerations: ''
 

@@ -121,7 +121,7 @@ spec:
 docker login quay.io -u <user> -p <token>
 ```
 
-2. Then, create a k8s secret from your .docker/config.json file.
+2. Then, create a k8s secret from your .docker/config.json file. This pull secret should be created in the same namespace you are installing the EDA Operator.
 
 ```bash
 kubectl create secret generic redhat-operators-pull-secret \
