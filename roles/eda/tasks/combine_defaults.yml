@@ -2,6 +2,6 @@
 
 - name: Combine default and custom variables from the CR for each component
   set_fact:
-    combined_api: "{{ api | combine ( _api ) }}"
-    combined_ui: "{{ ui | combine ( _ui ) }}"
-    combined_worker: "{{ worker | combine ( _worker ) }}"
+    combined_api: "{{ _api | combine (api, recursive=True ) }}"
+    combined_ui: "{{ _ui | combine (ui, recursive=True) }}"
+    combined_worker: "{{ _worker | combine (worker, recursive=True) }}"
