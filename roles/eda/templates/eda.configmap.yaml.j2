@@ -28,6 +28,9 @@ data:
         else ALLOWED_HOSTS
     )
 
+    # Session settings	
+    SESSION_COOKIE_AGE = settings.get("SESSION_COOKIE_AGE", 1800)	
+    SESSION_SAVE_EVERY_REQUEST = True
 
     # Application definition
     INSTALLED_APPS = [
@@ -50,6 +53,7 @@ data:
     MIDDLEWARE = [
         "django.middleware.security.SecurityMiddleware",
         "django.contrib.sessions.middleware.SessionMiddleware",
+        "django.middleware.locale.LocaleMiddleware",
         "django.middleware.common.CommonMiddleware",
         "django.middleware.csrf.CsrfViewMiddleware",
         "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -117,9 +121,9 @@ data:
 
     LANGUAGE_CODE = "en-us"
 
-    TIME_ZONE = "UTC"
-
     USE_I18N = True
+
+    TIME_ZONE = "UTC"
 
     USE_TZ = True
 
@@ -143,7 +147,7 @@ data:
         "DEFAULT_PAGINATION_CLASS": "aap_eda.api.pagination.DefaultPagination",
         "PAGE_SIZE": 20,
         "DEFAULT_AUTHENTICATION_CLASSES": [
-            "rest_framework.authentication.SessionAuthentication",
+            "aap_eda.api.authentication.SessionAuthentication",
             "rest_framework.authentication.BasicAuthentication",
         ],
         "DEFAULT_PERMISSION_CLASSES": [
@@ -257,6 +261,10 @@ data:
     WEBSOCKET_BASE_URL = settings.get("WEBSOCKET_BASE_URL", "ws://localhost:8001")
     WEBSOCKET_SSL_VERIFY = settings.get("WEBSOCKET_SSL_VERIFY", "yes")
     PODMAN_SOCKET_URL = settings.get("PODMAN_SOCKET_URL", None)
+    PODMAN_MEM_LIMIT = settings.get("PODMAN_MEM_LIMIT", "200m")	
+    PODMAN_ENV_VARS = settings.get("PODMAN_ENV_VARS", {})	
+    PODMAN_MOUNTS = settings.get("PODMAN_MOUNTS", [])	
+    PODMAN_EXTRA_ARGS = settings.get("PODMAN_EXTRA_ARGS", {})
 
     # ---------------------------------------------------------
     # RULEBOOK LIVENESS SETTINGS
@@ -268,6 +276,16 @@ data:
     RULEBOOK_LIVENESS_TIMEOUT_SECONDS = settings.get(
         "RULEBOOK_LIVENESS_TIMEOUT_SECONDS", 610
     )
+
+    ACTIVATION_RESTART_SECONDS_ON_COMPLETE = settings.get(	
+      "ACTIVATION_RESTART_SECONDS_ON_COMPLETE", 0	
+    )	
+    ACTIVATION_RESTART_SECONDS_ON_FAILURE = settings.get(	
+      "ACTIVATION_RESTART_SECONDS_ON_FAILURE", 60	
+    )	
+    ACTIVATION_MAX_RESTARTS_ON_FAILURE = settings.get(	
+      "ACTIVATION_MAX_RESTARTS_ON_FAILURE", 5	
+    )	
 
     ACTIVATION_POD_RESOURCE_REQUESTS = settings.get(
         "ACTIVATION_POD_RESOURCE_REQUESTS", {"cpu": "50m", "memory": "100Mi"}
