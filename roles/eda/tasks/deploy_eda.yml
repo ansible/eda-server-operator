@@ -10,11 +10,11 @@
       - "app.kubernetes.io/component={{ deployment_type }}-api"
     field_selectors:
       - status.phase=Running
-  register: eda_api_pod
+  register: _eda_api_pod
 
 - name: Set the resource pod name as a variable.
   set_fact:
-    eda_api_pod_name: "{{ eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
+    _eda_api_pod_name: "{{ _eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
 
 - name: Run DB Migrations k8s job
   k8s:
@@ -24,7 +24,17 @@
     wait_condition:
       status: "True"
       type: Complete
-  register: migration_job_result
+  when: not _eda_api_pod_name
+
+- name: Run Migrations in API pod if available
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ _eda_api_pod_name }}"
+    command: >-
+      aap-eda-manage migrate
+  register: _migrations
+  changed_when: not "No migrations to apply" in _migrations.stdout
+  when: _eda_api_pod_name
 
 - name: Apply deployment resources
   k8s:
@@ -41,3 +51,24 @@
     - 'eda-worker.service'
     - 'eda-worker.deployment'
   register: this_deployment_result
+
+- name: Check for API Pod
+  k8s_info:
+    kind: Pod
+    api_version: v1
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/name={{ ansible_operator_meta.name }}"
+      - "app.kubernetes.io/managed-by={{ deployment_type }}-operator"
+      - "app.kubernetes.io/component={{ deployment_type }}-api"
+    field_selectors:
+      - status.phase=Running
+  register: eda_api_pod
+  until:
+    - "eda_api_pod['resources'] | length"
+    - "eda_api_pod['resources'][0]['status']['phase'] == 'Running'"
+    - "eda_api_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
+
+- name: Set the resource pod name as a variable.
+  set_fact:
+    eda_api_pod_name: "{{ eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
