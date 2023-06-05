@@ -11,7 +11,7 @@
   k8s:
     apply: yes
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
-    wait: yes
+    wait: no
   register: postgres_resources_result
   loop:
     - 'postgres.service'

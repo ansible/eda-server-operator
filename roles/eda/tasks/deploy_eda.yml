@@ -36,13 +36,18 @@
   changed_when: not "No migrations to apply" in _migrations.stdout
   when: _eda_api_pod_name
 
+- name: Apply ConfigMap resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'eda.configmap.yaml.j2') }}"
+    wait: yes
+
 - name: Apply deployment resources
   k8s:
     apply: yes
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
-    wait: yes
+    wait: no
   loop:
-    - 'eda.configmap'
     - 'eda-api.service'
     - 'eda-api.deployment'
     - 'eda-ui.service'
@@ -50,7 +55,6 @@
     - 'eda-ui.ingress'
     - 'eda-worker.service'
     - 'eda-worker.deployment'
-  register: this_deployment_result
 
 - name: Check for API Pod
   k8s_info:
