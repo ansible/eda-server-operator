@@ -2,7 +2,7 @@
 # tasks file for EDA
 
 - name: Create EDA ServiceAccount
-  k8s:
+  kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
   loop:

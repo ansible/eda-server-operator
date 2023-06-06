@@ -3,7 +3,7 @@
 - name: Import eda_object variables
   block:
   - name: Get EDA object definition from pvc
-    k8s_exec:
+    kubernetes.core.k8s_exec:
       namespace: "{{ backup_pvc_namespace }}"
       pod: "{{ ansible_operator_meta.name }}-db-management"
       command: >-

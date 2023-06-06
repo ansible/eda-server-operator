@@ -1394,6 +1394,7 @@ spec:
                 - NodePort
                 - nodeport
               ingress_type:
+                default: Route
                 description: The ingress type to use to reach the deployed instance
                 type: string
                 enum:

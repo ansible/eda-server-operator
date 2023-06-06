@@ -61,7 +61,7 @@ additional_labels: []
 
 
 service_type: ClusterIP
-ingress_type: none
+ingress_type: Route
 ingress_class_name: ''
 ingress_path: '/'
 ingress_path_type: 'Prefix'

@@ -37,7 +37,7 @@
 
 - block:
     - name: Retrieve instance version
-      k8s_exec:
+      kubernetes.core.k8s_exec:
         namespace: "{{ ansible_operator_meta.namespace }}"
         pod: "{{ eda_api_pod_name }}"
         container: "eda-api"
@@ -69,7 +69,7 @@
 
 - block:
     - name: Retrieve route URL
-      k8s_info:
+      kubernetes.core.k8s_info:
         api_version: 'route.openshift.io/v1'
         kind: Route
         namespace: '{{ ansible_operator_meta.namespace }}'

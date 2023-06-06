@@ -39,7 +39,7 @@ data:
             listen [::]:8080;
             server_name _;
             server_tokens off;
-            root /opt/app-root/ui/eda;
+            root /var/lib/ansible-automation-platform/eda/ui;
 
             location ~ ^/api/eda/v[0-9]+/ {
                 proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;

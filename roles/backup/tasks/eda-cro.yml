@@ -1,7 +1,7 @@
 ---
 
 - name: Get EDA custom resource object
-  k8s_info:
+  kubernetes.core.k8s_info:
     version: v1alpha1
     kind: EDA
     namespace: '{{ ansible_operator_meta.namespace }}'
@@ -29,7 +29,7 @@
       previous_deployment_name: "{{ this_eda['resources'][0]['metadata']['name'] }}"
 
 - name: Write eda object to pvc
-  k8s_cp:
+  kubernetes.core.k8s_cp:
     namespace: "{{ backup_pvc_namespace }}"
     pod: "{{ ansible_operator_meta.name }}-db-management"
     remote_path: "{{ backup_dir  }}/eda_object"

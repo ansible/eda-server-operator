@@ -1,6 +1,6 @@
 ---
 - name: Delete any existing management pod
-  k8s:
+  kubernetes.core.k8s:
     name: "{{ ansible_operator_meta.name }}-db-management"
     kind: Pod
     namespace: "{{ backup_pvc_namespace }}"
@@ -10,7 +10,7 @@
 
 # Check to make sure provided pvc exists, error loudly if not.  Otherwise, the management pod will just stay in pending state forever.
 - name: Check provided PVC exists
-  k8s_info:
+  kubernetes.core.k8s_info:
     name: "{{ backup_pvc }}"
     kind: PersistentVolumeClaim
     namespace: "{{ backup_pvc_namespace }}"
@@ -46,12 +46,12 @@
 
 - block:
     - name: Create PVC for backup
-      k8s:
+      kubernetes.core.k8s:
         kind: PersistentVolumeClaim
         definition: "{{ lookup('template', 'backup_pvc.yml.j2') }}"
 
     - name: Remove PVC ownerReference
-      k8s:
+      kubernetes.core.k8s:
         definition:
           apiVersion: v1
           kind: PersistentVolumeClaim
@@ -78,7 +78,7 @@
     _postgres_image: "{{ _custom_postgres_image | default(lookup('env', 'RELATED_IMAGE_EDA_POSTGRES')) | default(_default_postgres_image, true) }}"
 
 - name: Create management pod from templated deployment config
-  k8s:
+  kubernetes.core.k8s:
     name: "{{ ansible_operator_meta.name }}-db-management"
     kind: Deployment
     state: present
@@ -86,7 +86,7 @@
     wait: true
 
 - name: Look up details for this deployment
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_version: "{{ api_version }}"
     kind: "EDA"
     name: "{{ deployment_name }}"

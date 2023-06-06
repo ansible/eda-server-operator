@@ -1,7 +1,7 @@
 ---
 
 - name: Redis Deployment & Service
-  k8s:
+  kubernetes.core.k8s:
     state: present
     apply: yes
     wait: no

@@ -69,6 +69,8 @@ spec:
             initialDelaySeconds: 45
             timeoutSeconds: 2
           env:
+            - name: POSTGRESQL_MAX_CONNECTIONS
+              value: '1024'
             - name: POSTGRESQL_DATABASE
               valueFrom:
                 secretKeyRef:

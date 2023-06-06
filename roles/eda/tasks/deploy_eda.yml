@@ -1,6 +1,6 @@
 ---
 - name: Get the current resource pod information.
-  k8s_info:
+  kubernetes.core.k8s_info:
     api_version: v1
     kind: Pod
     namespace: '{{ ansible_operator_meta.namespace }}'
@@ -17,7 +17,7 @@
     _eda_api_pod_name: "{{ _eda_api_pod['resources'][0]['metadata']['name'] | default('') }}"
 
 - name: Run DB Migrations k8s job
-  k8s:
+  kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', 'migration-job.yaml.j2') }}"
     wait: yes
@@ -37,13 +37,13 @@
   when: _eda_api_pod_name
 
 - name: Apply ConfigMap resources
-  k8s:
+  kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', 'eda.configmap.yaml.j2') }}"
     wait: yes
 
 - name: Apply deployment resources
-  k8s:
+  kubernetes.core.k8s:
     apply: yes
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
     wait: no
@@ -57,7 +57,7 @@
     - 'eda-worker.deployment'
 
 - name: Check for API Pod
-  k8s_info:
+  kubernetes.core.k8s_info:
     kind: Pod
     api_version: v1
     namespace: "{{ ansible_operator_meta.namespace }}"
