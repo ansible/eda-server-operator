@@ -8,13 +8,13 @@
   include_role:
     name: common
 
-- name: Setup PostgreSQL Database
-  include_role:
-    name: postgres
-
 - name: Setup Redis
   include_role:
     name: redis
+
+- name: Setup PostgreSQL Database
+  include_role:
+    name: postgres
 
 - name: Set EDA app images
   include_tasks: set_images.yml
