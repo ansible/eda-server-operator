@@ -106,6 +106,9 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         ports:
         - containerPort: 8000
         readinessProbe:
@@ -125,11 +128,6 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
-        volumeMounts:
-          - name: {{ ansible_operator_meta.name }}-settings
-            mountPath: /app/src/src/aap_eda/settings/default.py
-            subPath: default.py
-            readOnly: true
       - name: daphne
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -182,19 +180,10 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
-        volumeMounts:
-          - name: {{ ansible_operator_meta.name }}-settings
-            mountPath: /app/src/src/aap_eda/settings/default.py
-            subPath: default.py
-            readOnly: true
       restartPolicy: Always
-      volumes:
-        - name: {{ ansible_operator_meta.name }}-settings
-          configMap:
-            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
-            items:
-              - key: settings
-                path: default.py
