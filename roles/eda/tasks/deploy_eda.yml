@@ -24,7 +24,7 @@
     wait_condition:
       status: "True"
       type: Complete
-  when: not _eda_api_pod_name
+  when: not _eda_api_pod_name | length
 
 - name: Run Migrations in API pod if available
   kubernetes.core.k8s_exec:
@@ -34,7 +34,7 @@
       aap-eda-manage migrate
   register: _migrations
   changed_when: not "No migrations to apply" in _migrations.stdout
-  when: _eda_api_pod_name
+  when: _eda_api_pod_name | length
 
 - name: Apply ConfigMap resources
   kubernetes.core.k8s:
