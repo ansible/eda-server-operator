@@ -12,6 +12,12 @@ spec:
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
       ttlSecondsAfterFinished: 600
+{% if image_pull_secrets | length > 0 %}
+      imagePullSecrets:
+{% for secret in image_pull_secrets %}
+        - name: {{ secret }}
+{% endfor %}
+{% endif %}
       containers:
         - name: eda-migrations
           image: {{ _image }}
