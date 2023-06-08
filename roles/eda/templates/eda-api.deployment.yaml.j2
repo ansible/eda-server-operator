@@ -33,6 +33,7 @@ spec:
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
         app.kubernetes.io/component: '{{ deployment_type }}-api'
     spec:
+        serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if image_pull_secrets | length > 0 %}
       imagePullSecrets:
 {% for secret in image_pull_secrets %}
