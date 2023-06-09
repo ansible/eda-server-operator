@@ -52,6 +52,91 @@ spec:
       topologySpreadConstraints:
         {{ combined_api.topology_spread_constraints | indent(width=8) }}
 {% endif %}
+      initContainers:
+      - name: eda-migrations
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command: ['aap-eda-manage', 'migrate']
+        env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+          volumeMounts:
+            - name: {{ ansible_operator_meta.name }}-settings
+              mountPath: /app/src/src/aap_eda/settings/default.py
+              subPath: default.py
+              readOnly: true
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_api.resource_requirements }}
+{% endif %}
+      - name: eda-initial-data
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command: ['aap-eda-manage', 'create_initial_data']
+        env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+          volumeMounts:
+            - name: {{ ansible_operator_meta.name }}-settings
+              mountPath: /app/src/src/aap_eda/settings/default.py
+              subPath: default.py
+              readOnly: true
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_api.resource_requirements }}
+{% endif %}
       containers:
       - name: eda-api
         image: {{ _image }}
@@ -59,9 +144,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - >-
-          aap-eda-manage create_initial_data
-          && aap-eda-manage runserver 0.0.0.0:8000
+        - aap-eda-manage runserver 0.0.0.0:8000
         env:
         - name: EDA_DEPLOYMENT_TYPE
           value: 'k8s'
@@ -188,3 +271,10 @@ spec:
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
       restartPolicy: Always
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-settings
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: settings
+                path: default.py
