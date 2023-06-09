@@ -24,7 +24,7 @@
             name: redhat-operators-pull-secret
             namespace: '{{ ansible_operator_meta.namespace }}'
           stringData:
-            operator: awx
+            operator: eda
       when:
         - (_rh_ops_secret is not defined) or not (_rh_ops_secret['resources'] | length)
   roles:
