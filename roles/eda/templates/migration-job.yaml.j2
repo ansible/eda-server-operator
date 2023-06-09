@@ -57,6 +57,9 @@ spec:
                 mountPath: /app/src/src/aap_eda/settings/default.py
                 subPath: default.py
                 readOnly: true
+{% if combined_api.resource_requirements is defined %}
+          resources: {{ combined_api.resource_requirements }}
+{% endif %}
       restartPolicy: Never
       volumes:
         - name: {{ ansible_operator_meta.name }}-settings
