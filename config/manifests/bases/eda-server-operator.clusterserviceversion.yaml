@@ -558,6 +558,42 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      statusDescriptors:
+      - description: Admin password for the instance deployed
+        displayName: Admin Password
+        path: adminPasswordSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Admin user for the instance deployed
+        displayName: Admin User
+        path: adminUser
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Database Configuration secret name of the deployed instance
+        displayName: Database Configuration
+        path: databaseConfigurationSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Database Fields Encryption secret name of the deployed instance
+        displayName: Database Fields Encryption
+        path: dbFieldsEncryptionSecret
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes:Secret
+      - description: Image of the instance deployed
+        displayName: Image
+        path: image
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Version of the instance deployed
+        displayName: Version
+        path: version
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - description: Route to access the instance deployed
+        displayName: URL
+        path: URL
+        x-descriptors:
+        - urn:alm:descriptor:org.w3:link
       version: v1alpha1
   description: |
     An ansible operator for managing the lifecycle of an Event-Driven Ansible
