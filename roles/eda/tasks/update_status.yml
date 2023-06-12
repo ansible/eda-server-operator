@@ -1,5 +1,5 @@
 ---
-- name: Update admin password status
+- name: Update custom resource status
   operator_sdk.util.k8s_status:
     api_version: '{{ api_version }}'
     kind: "{{ kind }}"
@@ -7,33 +7,10 @@
     namespace: "{{ ansible_operator_meta.namespace }}"
     status:
       adminPasswordSecret: "{{ __admin_password_secret['resources'][0]['metadata']['name'] }}"
-
-- name: Update admin user status
-  operator_sdk.util.k8s_status:
-    api_version: '{{ api_version }}'
-    kind: "{{ kind }}"
-    name: "{{ ansible_operator_meta.name }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    status:
       adminUser: "{{ admin_user }}"
-
-- name: Update postgres configuration status
-  operator_sdk.util.k8s_status:
-    api_version: '{{ api_version }}'
-    kind: "{{ kind }}"
-    name: "{{ ansible_operator_meta.name }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    status:
       databaseConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
-
-- name: Update DB fields encryption status
-  operator_sdk.util.k8s_status:
-    api_version: '{{ api_version }}'
-    kind: "{{ kind }}"
-    name: "{{ ansible_operator_meta.name }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    status:
       dbFieldsEncryptionSecret: "{{ db_fields_encryption_secret_name }}"
+      image: "{{ _image }}"
 
 - block:
     - name: Retrieve instance version
@@ -57,15 +34,6 @@
         status:
           version: "{{ instance_version.stdout | trim }}"
   when: eda_api_pod_name | length
-
-- name: Update image status
-  operator_sdk.util.k8s_status:
-    api_version: '{{ api_version }}'
-    kind: "{{ kind }}"
-    name: "{{ ansible_operator_meta.name }}"
-    namespace: "{{ ansible_operator_meta.namespace }}"
-    status:
-      image: "{{ _image }}"
 
 - block:
     - name: Retrieve route URL
