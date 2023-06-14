@@ -60,6 +60,9 @@ spec:
         - /bin/bash
         - -c
         - aap-eda-manage rqworker --with-scheduler --worker-class aap_eda.core.tasking.Worker
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
         - name: EDA_DB_HOST
           valueFrom:
@@ -101,9 +104,6 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
-        envFrom:
-          - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         ports:
         - containerPort: 8000
 {% if combined_worker.resource_requirements is defined %}

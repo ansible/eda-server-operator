@@ -57,6 +57,9 @@ spec:
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         command: ['aap-eda-manage', 'migrate']
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
         - name: EDA_DEPLOYMENT_TYPE
           value: 'k8s'
@@ -87,11 +90,11 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
-          volumeMounts:
-            - name: {{ ansible_operator_meta.name }}-settings
-              mountPath: /app/src/src/aap_eda/settings/default.py
-              subPath: default.py
-              readOnly: true
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
@@ -99,6 +102,9 @@ spec:
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         command: ['aap-eda-manage', 'create_initial_data']
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
         - name: EDA_DEPLOYMENT_TYPE
           value: 'k8s'
@@ -129,11 +135,11 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
-          volumeMounts:
-            - name: {{ ansible_operator_meta.name }}-settings
-              mountPath: /app/src/src/aap_eda/settings/default.py
-              subPath: default.py
-              readOnly: true
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
@@ -145,6 +151,9 @@ spec:
         - /bin/bash
         - -c
         - aap-eda-manage runserver 0.0.0.0:8000
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
         - name: EDA_DEPLOYMENT_TYPE
           value: 'k8s'
@@ -190,9 +199,6 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
-        envFrom:
-          - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         ports:
         - containerPort: 8000
         readinessProbe:
@@ -219,6 +225,9 @@ spec:
         - /bin/bash
         - -c
         - daphne -b 0.0.0.0 -p 8001 aap_eda.asgi:application
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
         - name: EDA_DEPLOYMENT_TYPE
           value: 'k8s'
@@ -264,17 +273,7 @@ spec:
           value: 'ws://{{ websocket_server_name }}:8001'
         - name: EDA_WEBSOCKET_SSL_VERIFY
           value: '{{ websocket_ssl_verify }}'
-        envFrom:
-          - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
       restartPolicy: Always
-      volumes:
-        - name: {{ ansible_operator_meta.name }}-settings
-          configMap:
-            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
-            items:
-              - key: settings
-                path: default.py
