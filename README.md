@@ -3,11 +3,15 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-Ansible-yellow.svg)](https://docs.ansible.com/ansible/latest/community/code_of_conduct.html) 
 
-An [EDA Server](https://github.com/ansible/eda-server) operator for Kubernetes built with [Operator SDK](https://github.com/operator-framework/operator-sdk) and Ansible.
+A Kubernetes operator for Kubernetes built with [Operator SDK](https://github.com/operator-framework/operator-sdk) and Ansible for deploying and maintaining the lifecycle of your [EDA Server](https://github.com/ansible/eda-server) application.
 
 ## Overview
 
 This operator is meant to provide a more Kubernetes-native installation method for EDA Server via an EDA Custom Resource Definition (CRD). In the future, this operator will grow to be able to maintain the full life-cycle of an EDA Server deployment. Currently, it can handle fresh installs and upgrades.
+
+## Contributing
+
+Please visit [our contributing guide](https://github.com/ansible/eda-server-operator/blob/devel/CONTRIBUTING.md) which has details about how to set up your development environment.
 
 ### Prerequisites
 
@@ -19,44 +23,70 @@ This operator is meant to provide a more Kubernetes-native installation method f
 * Deploy AWX using the [awx-operator](https://github.com/ansible/awx-operator#basic-install)
 * [Create an OAuth2 token](./docs/create-awx-token.md) for your user in the AWX UI
 
-## Installing the Operator
+## Install the EDA Server Operator
 
-1. Clone the eda-server-operator
+Before you begin, you need to have a k8s cluster up. If you don't already have a k8s cluster, you can use minikube to start a lightweight k8s cluster locally by following these [minikube test cluster docs](./docs/minikube-test-cluster.md).
 
-```
-git clone git@github.com:ansible/eda-server-operator.git
-```
+Once you have a running Kubernetes cluster, you can deploy EDA Server Operator into your cluster using [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/). Since kubectl version 1.14 kustomize functionality is built-in (otherwise, follow the instructions here to install the latest version of Kustomize: https://kubectl.docs.kubernetes.io/installation/kustomize/)
 
-2. Log in to your K8s or Openshift cluster.
-
-```
-kubectl login <cluster-url>
-```
-
-3. Run the `make deploy` target
-
-```
-NAMESPACE=eda IMG=quay.io/ansible/eda-server-operator:latest make deploy
-```
-> **Note** The `latest` tag is the latest _released_ (tagged) version. The deploy with the latest code in `main` branch, use `IMG=quay.io/ansible/eda-server-operator:main` instead.
-
-> **Note** You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For directions on how to install this way, see the [kustomize install docs](./docs/kustomize-install.md).
-
-4. Create an access token in your AWX instance using [these docs](./docs/create-awx-token.md).
-
-5. Once your operator pod comes up, you can create an EDA Server resource by applying the following YAML:
-
-> **Warning**
-> At the moment, the quay.io/ansible/eda-server:main image is in a private registry.  To use it, you will need to [create and configure a pull secret](#configuring-an-image-pull-secret).
+First, create a file called `kustomization.yaml` with the following content:
 
 ```yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - config/default
+
+# Set the image tags to match the git version from above
+images:
+  - name: quay.io/ansible/eda-server-operator
+    newTag: 0.0.1
+
+# Specify a custom namespace in which to install EDA
+namespace: eda
+```
+
+You can use kustomize directly to dynamically modify things like the operator deployment at deploy time.  For more info, see the [kustomize install docs](./docs/kustomize-install.md).
+
+
+
+Install the manifests by running this:
+
+```bash
+$ kubectl apply -k .
+```
+
+Check that your operator pod is running, this may take about a minute.
+
+```bash
+$ kubectl get pods
+```
+
+## Deploy EDA
+
+EDA is designed to be used alongside the [AWX project](https://github.com/ansible/awx) to trigger automation jobs in AWX. There is some configuration that needs to be done in AWX first so that EDA can  AWX.
+
+1. Create an access token in your AWX instance using [these docs](./docs/create-awx-token.md).
+
+2. Now that your operator pod is up and running, you can create an EDA Server resource by applying the following YAML:
+
+> **Warning**
+> At the moment, If you are using custom image eda-server and eda-ui images that are in a private registry, you will need to [create and configure a pull secret](#configuring-an-image-pull-secret).
+
+```yaml
+# eda.yaml
 apiVersion: eda.ansible.com/v1alpha1
 kind: EDA
 metadata:
   name: my-eda
 spec:
   automation_server_url: https://awx-host
-  automation_server_ssl_verify: yes
+```
+
+3. Now apply this yaml
+
+```bash
+$ kubectl apply -f eda.yaml
 ```
 
 If you are using Openshift, you can take advantage of automatic Route configuration an EDA custom resource like this:
@@ -68,7 +98,6 @@ metadata:
   name: eda-demo
 spec:
   automation_server_url: https://awx-host
-  automation_server_ssl_verify: yes
   service_type: ClusterIP
   ingress_type: Route
   image_pull_secrets:

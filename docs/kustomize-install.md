@@ -1,6 +1,6 @@
 # Install EDA Server Operator with Kustomize
 
-Some folks may prefer to install the EDA Server Operator using kustomize directly with a personalized kustomize file.  This allows you to easily modify configuration files including the operator's manager deployment itself. To do so, follow the instructions below.  
+Some folks may prefer to install the EDA Server Operator using [kustomize](https://kustomize.io/) directly with a personalized kustomize file. This allows you to easily modify configuration files including the operator's manager deployment itself. To do so, follow the instructions below.
 
 
 1. Create a `kustomization.yaml` file with the the following contents. Be sure to change `newTag` to the latest released tag, or the tag you would like to deploy.
@@ -25,10 +25,7 @@ namespace: eda
 ```
 kustomize build . | kubectl apply -f -
 ```
-
-For more information on how to use kustomize to modify configuration files dynamically, see these docs:
-* Kustomize documentation - https://kustomize.io/
-* Using Kustomize to deploy an ansible-operator - https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial/
+> **TIP:** If you need to change any of the default settings for the operator (such as resources.limits), you can add [patches](https://kubectl.docs.kubernetes.io/references/kustomize/kustomization/patches/) at the bottom of your kustomization.yaml file. There is also some useful information in [this ansible operator turotial](https://sdk.operatorframework.io/docs/building-operators/ansible/tutorial).
 
 
 ### Install Latest
