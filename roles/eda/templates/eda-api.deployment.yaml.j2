@@ -150,7 +150,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - aap-eda-manage runserver 0.0.0.0:8000
+        - gunicorn --bind 0.0.0.0:8000 --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'

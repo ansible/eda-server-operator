@@ -90,6 +90,14 @@ spec:
                   replicas: 1
                 description: Defines desired state of eda-api resources
                 properties:
+                  gunicorn_workers:
+                    default: 2
+                    description: 'The number of gunicorn workers for the api.
+                      Default: 2'
+                    format: int32
+                    minimum: 1
+                    nullable: false
+                    type: integer
                   node_selector:
                     additionalProperties:
                       type: string
