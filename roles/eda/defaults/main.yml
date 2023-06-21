@@ -28,6 +28,7 @@ websocket_ssl_verify: false
 
 api: {}
 _api:
+  gunicorn_workers: 2
   replicas: 1
   resource_requirements:
     requests:
