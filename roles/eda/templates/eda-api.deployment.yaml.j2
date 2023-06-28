@@ -150,7 +150,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:8000 --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
+        - gunicorn --bind 127.0.0.1:8000 --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
@@ -224,7 +224,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - daphne -b 0.0.0.0 -p 8001 aap_eda.asgi:application
+        - daphne -b 127.0.0.1 -p 8001 aap_eda.asgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
