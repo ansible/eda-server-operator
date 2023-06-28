@@ -323,6 +323,12 @@ spec:
         path: api
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of gunicorn workers for the API.
+        displayName: Gunicorn API workers
+        path: api.gunicorn_workers
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:number
       - displayName: API server resource requirements
         path: api.resource_requirements
         x-descriptors:
