@@ -1305,7 +1305,7 @@ spec:
                     type: object
                   postgres_data_path:
                     description: 'Registry path to the PostgreSQL container to use.
-                      Default: "/var/lib/postgresql/data/pgdata"'
+                      Default: "/var/lib/pgsql/data/userdata"'
                     type: string
                   postgres_extra_args:
                     description: Arguments to pass to postgres process
