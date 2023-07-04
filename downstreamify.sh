@@ -25,13 +25,6 @@ sed -i -e "s|/opt/app-root/ui/eda;|/var/lib/ansible-automation-platform/eda/ui;|
 # Swap out media_root path
 sed -i -e "s|media_dir: /var/lib/eda/files|media_dir: /var/lib/ansible-automation-platform/eda/media|g" roles/eda/vars/main.yml
 
-# Swap out postgres data path
-
-#  /var/lib/postgresql/data/pgdata/PG_VERSION      < Upstream postgres path
-#  /var/lib/pgsql/data/userdata/PG_VERSION         < Downstream postgresql-12 path (and 13)
-
-sed -i -e "s|/var/lib/postgresql/data/pgdata|/var/lib/pgsql/data/userdata|g" ./roles/eda/defaults/main.yml
-
 # Set default postgresql max_connections to 1024
 if ! grep -qF 'name: POSTGRESQL_MAX_CONNECTIONS' roles/postgres/templates/postgres.statefulset.yaml.j2; then
   sed -i -e "/name: POSTGRESQL_DATABASE$/i \\
