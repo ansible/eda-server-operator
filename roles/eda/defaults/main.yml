@@ -57,6 +57,16 @@ _activation_worker:
   node_selector: ''
   tolerations: ''
 
+scheduler: {}
+_scheduler:
+  replicas: 1
+  resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+  node_selector: ''
+  tolerations: ''
+
 ui: {}
 _ui:
   replicas: 1
