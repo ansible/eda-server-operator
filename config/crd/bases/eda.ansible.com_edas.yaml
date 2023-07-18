@@ -1474,6 +1474,9 @@ spec:
               db_fields_encryption_secret:
                 description: Secret where the DB fields encryption key can be found. If not specified, one will be generated.
                 type: string
+              hostname:
+                description: The hostname of the instance
+                type: string
               admin_user:
                 description: Username to use for the admin account
                 type: string
