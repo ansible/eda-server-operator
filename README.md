@@ -115,8 +115,8 @@ There are a few variables that are customizable for eda the image management.
 | ---------------------- | ------------------------- | --------------------------------------  |
 | image                  | Path of the image to pull | quay.io/ansible/eda-server              |
 | image_version          | Image version to pull     | main                                    |
-| image                  | Path of the image to pull | quay.io/ansible/eda-ui                  |
-| image_version          | Image version to pull     | latest                                  |
+| image_web              | Path of the image to pull | quay.io/ansible/eda-ui                  |
+| image_web_version      | Image version to pull     | latest                                  |
 | image_pull_policy      | The pull policy to adopt  | IfNotPresent                            |
 | image_pull_secrets     | The pull secrets to use   | None                                    |
 | redis_image            | Path of the image to pull | redis                                   |
