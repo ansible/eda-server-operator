@@ -59,6 +59,12 @@ spec:
   automation_server_ssl_verify: yes
 ```
 
+Once deployed, the EDA instance will be accessible by running:
+
+```
+$ minikube service -n eda eda-demo-service --url
+```
+
 If you are using Openshift, you can take advantage of automatic Route configuration an EDA custom resource like this:
 
 ```yaml
@@ -75,10 +81,23 @@ spec:
     - pull_secret_name
 ```
 
+If using Openshift, EDA instance will be accessible by running:
 
-### Advanced Configuration
+```
+$ oc get route -n eda eda-demo
+```
 
-#### Deploying a specific version of EDA
+By default, the admin user is `admin` and the password is available in the `<resourcename>-admin-password` secret. To retrieve the admin password, run:
+
+```bash
+$ kubectl get secret eda-demo-admin-password -o jsonpath="{.data.password}" | base64 --decode ; echo
+yDL2Cx5Za94g9MvBP6B73nzVLlmfgPjR
+```
+
+
+## Advanced Configuration
+
+### Deploying a specific version of EDA
 
 There are a few variables that are customizable for eda the image management.
 
@@ -110,10 +129,10 @@ spec:
     - pull_secret_name
 ```
 
-  > **Note**: The `*_image` and `*_image_version` variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
+  > **Note**: The `image` and `image_version` style variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported even though it will likely work and can be useful for pinning a version. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
 
 
-#### Configuring an image pull secret
+### Configuring an image pull secret
 
 1. Log in with that token, or username/password, then create a pull secret from the docker/config.json
 
@@ -136,4 +155,69 @@ kubectl create secret generic redhat-operators-pull-secret \
 spec:
   image_pull_secrets:
     - redhat-operators-pull-secret
+```
+
+### Admin user account configuration
+
+There are three variables that are customizable for the admin user account creation.
+
+| Name                  | Description                                  | Default          |
+| --------------------- | -------------------------------------------- | ---------------- |
+| admin_user            | Name of the admin user                       | admin            |
+| admin_password_secret | Secret that contains the admin user password | Empty string     |
+
+
+> :warning: **admin_password_secret must be a Kubernetes secret and not your text clear password**.
+
+If `admin_password_secret` is not provided, the operator will look for a secret named `<resourcename>-admin-password` for the admin password. If it is not present, the operator will generate a password and create a Secret from it named `<resourcename>-admin-password`.
+
+To retrieve the admin password, run `kubectl get secret <resourcename>-admin-password -o jsonpath="{.data.password}" | base64 --decode ; echo`
+
+The secret that is expected to be passed should be formatted as follow:
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <resourcename>-admin-password
+  namespace: <target namespace>
+stringData:
+  password: mysuperlongpassword
+```
+
+
+### Database Fields Encryption Configuration
+
+This encryption key is used to encrypt sensitive data in the database.
+
+| Name                        | Description                                           | Default          |
+| --------------------------- | ----------------------------------------------------- | ---------------- |
+| db_fields_encryption_secret | Secret that contains the symmetric key for encryption | Generated        |
+
+
+> :warning: **db_fields_encryption_secret must be a Kubernetes secret and not your text clear secret value**.
+
+If `db_fields_encryption_secret` is not provided, the operator will look for a secret named `<resourcename>-db-fields-encryption-secret` for the encryption key. If it is not present, the operator will generate a secret value and create a Secret containing it named `<resourcename>-db-fields-encryption-secret`. It is important to not delete this secret as it will be needed for upgrades and if the pods get scaled down at any point. If you are using a GitOps flow, you will want to pass a secret key secret and not depend on the generated one.
+
+The secret should be formatted as follow:
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: custom-awx-db-encryption-secret
+  namespace: <target namespace>
+stringData:
+  secret_key: supersecuresecretkey
+```
+
+Then specify the name of the k8s secret on the AWX spec:
+
+```yaml
+---
+spec:
+  ...
+  db_fields_encryption_secret: custom-awx-db-encryption-secret
 ```
