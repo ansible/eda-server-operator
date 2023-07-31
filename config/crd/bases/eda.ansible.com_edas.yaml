@@ -42,10 +42,10 @@ spec:
                 items:
                   type: string
               automation_server_url:
-                description: URL of the AWX automation host to run ansible jobs against
+                description: URL of the Automation Controller instance to run ansible jobs against
                 type: string
               automation_server_ssl_verify:
-                description: SSL Verify (yes, no) for the AWX automation host
+                description: SSL Verify (yes, no) for the Automation Controller instance
                 type: string
               image_pull_policy:
                 description: The image pull policy
