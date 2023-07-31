@@ -101,7 +101,7 @@ rules:
     resources:
       - pods/exec
       - pods/attach
-      - pods/log  # log & attach rules needed to be able to grant them to AWX service account
+      - pods/log  # log & attach rules needed to be able to grant them to EDA service account
     verbs:
       - create
       - get

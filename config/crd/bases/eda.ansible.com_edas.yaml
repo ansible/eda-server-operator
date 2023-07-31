@@ -42,10 +42,10 @@ spec:
                 items:
                   type: string
               automation_server_url:
-                description: URL of the AWX automation host to run ansible jobs against
+                description: URL of the Automation Controller instance to run ansible jobs against
                 type: string
               automation_server_ssl_verify:
-                description: SSL Verify (yes, no) for the AWX automation host
+                description: SSL Verify (yes, no) for the Automation Controller instance
                 type: string
               image_pull_policy:
                 description: The image pull policy
@@ -1149,9 +1149,6 @@ spec:
                           to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                         type: object
                     type: object
-                  redis_storage_class:
-                    description: Storage class to use for the Redis PVC
-                    type: string
                   strategy:
                     description: The deployment strategy to use to replace existing
                       pods with new ones.
@@ -1473,6 +1470,9 @@ spec:
                 type: array
               db_fields_encryption_secret:
                 description: Secret where the DB fields encryption key can be found. If not specified, one will be generated.
+                type: string
+              hostname:
+                description: The hostname of the instance
                 type: string
               admin_user:
                 description: Username to use for the admin account

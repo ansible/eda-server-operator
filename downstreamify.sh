@@ -67,4 +67,7 @@ for file in "${files[@]}"; do
     sed -i -e "/ingress_type:/a \\
                 default:\ Route" ${file};
   fi
+
+  # Swap AWX Refs
+  sed -i -e "s|AWX automation host|Automation Controller instance|g" ${file};
 done

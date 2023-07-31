@@ -186,6 +186,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Hostname
+        path: hostname
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:text
       - displayName: Admin Account Username
         path: admin_user
         x-descriptors:
@@ -443,14 +448,14 @@ spec:
         path: redis.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: The deployment strategy to use to replace existing pods with
+      - description: Deployment strategy to use to replace existing pods with
           new ones.
         displayName: Strategy
         path: redis.strategy
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:updateStrategy
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: redis server resource requirements
+      - displayName: Redis deployment resource requirements
         path: redis.resource_requirements
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
