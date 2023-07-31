@@ -1149,9 +1149,6 @@ spec:
                           to an implementation-defined value. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
                         type: object
                     type: object
-                  redis_storage_class:
-                    description: Storage class to use for the Redis PVC
-                    type: string
                   strategy:
                     description: The deployment strategy to use to replace existing
                       pods with new ones.
