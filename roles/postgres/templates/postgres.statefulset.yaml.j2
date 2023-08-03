@@ -102,7 +102,7 @@ spec:
       spec:
         accessModes:
           - ReadWriteOnce
-{% if postgres_storage_class is defined %}
+{% if combined_database.postgres_storage_class is defined %}
         storageClassName: '{{ combined_database.postgres_storage_class }}'
 {% endif %}
         resources: {{ combined_database.storage_requirements }}
