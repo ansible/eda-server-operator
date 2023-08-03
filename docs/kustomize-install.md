@@ -1,6 +1,6 @@
-# Install EDA Server Operator with Kustomize
+# Install EDA Controller Operator with Kustomize
 
-Some folks may prefer to install the EDA Server Operator using [kustomize](https://kustomize.io/) directly with a personalized kustomize file. This allows you to easily modify configuration files including the operator's manager deployment itself. To do so, follow the instructions below.
+Some folks may prefer to install the EDA Controller Operator using [kustomize](https://kustomize.io/) directly with a personalized kustomize file. This allows you to easily modify configuration files including the operator's manager deployment itself. To do so, follow the instructions below.
 
 
 1. Create a `kustomization.yaml` file with the the following contents. Be sure to change `newTag` to the latest released tag, or the tag you would like to deploy.
