@@ -3,28 +3,37 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
+data:
+  # Operator specific settings
+  EDA_DEPLOYMENT_TYPE: "k8s"
+
+  # AWX Server
+  EDA_CONTROLLER_URL: "{{ automation_server_url }}"
+  EDA_CONTROLLER_SSL_VERIFY: "{{ automation_server_ssl_verify | default('yes')}}"
+
+  # EDA Server
+  EDA_ALLOWED_HOSTS: "['*']"
+  EDA_MQ_HOST: "{{ ansible_operator_meta.name }}-redis-svc"
+  EDA_WEBSOCKET_BASE_URL: "ws://{{ websocket_server_name }}:8001"
+  EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
+
+  # Custom user variables
+{% for item in extra_settings | default([]) %}
+  {{ item.setting | upper }}: "{{ item.value }}"
+{% endfor %}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
 data:
-  settings: |
-
-    # Operator specific settings
-    DEPLOYMENT_TYPE=k8s
-
-    # AWX Server
-    EDA_CONTROLLER_SSL_VERIFY=no
-
-    # EDA Server
-    EDA_WEBSOCKET_BASE_URL=ws://eda-api:8000
-    EDA_WEBSOCKET_SSL_VERIFY=no
-
-    # Custom user variables
-{% for item in extra_settings | default([]) %}
-    {{ item.setting | upper }}={{ item.value }}
-{% endfor %}
-
   nginx_conf: |
     events {
         worker_connections 1024;
