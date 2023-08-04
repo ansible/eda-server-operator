@@ -37,8 +37,18 @@ _api:
   node_selector: ''
   tolerations: ''
 
-worker: {}
-_worker:
+default_worker: {}
+_default_worker:
+  replicas: 5
+  resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+  node_selector: ''
+  tolerations: ''
+
+activation_worker: {}
+_activation_worker:
   replicas: 5
   resource_requirements:
     requests:
