@@ -1,0 +1,120 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ ansible_operator_meta.name }}-activation-worker"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+spec:
+  replicas: {{ combined_activation_worker.replicas }}
+{% if combined_activation_worker.strategy is defined %}
+  strategy:
+    type: {{ combined_activation_worker.strategy.type }}
+{% if combined_activation_worker.strategy.type == "Recreate" %}
+    rollingUpdate: null
+{% elif combined_activation_worker.strategy.type == "RollingUpdate" %}
+    rollingUpdate:
+      maxSurge:  {{ combined_activation_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_activation_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+{% endif %}
+{% endif %}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+  template:
+    metadata:
+      labels:
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+      annotations:
+        kubectl.kubernetes.io/default-container: 'eda-activation-worker'
+    spec:
+      serviceAccountName: '{{ ansible_operator_meta.name }}'
+{% if image_pull_secrets | length > 0 %}
+      imagePullSecrets:
+{% for secret in image_pull_secrets %}
+        - name: {{ secret }}
+{% endfor %}
+{% endif %}
+{% if combined_activation_worker.node_selector is defined %}
+      nodeSelector:
+        {{ combined_activation_worker.node_selector | indent(width=8) }}
+{% endif %}
+{% if combined_activation_worker.tolerations is defined %}
+      tolerations:
+        {{ combined_activation_worker.tolerations | indent(width=8) }}
+{% endif %}
+{% if combined_activation_worker.topology_spread_constraints is defined %} %}
+      topologySpreadConstraints:
+        {{ combined_activation_worker.topology_spread_constraints | indent(width=8) }}
+{% endif %}
+      containers:
+      - name: eda-activation-worker
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        args:
+        - /bin/bash
+        - -c
+        - aap-eda-manage rqworker --with-scheduler --worker-class aap_eda.core.tasking.ActivationWorker
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+        env:
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+        - name: EDA_MQ_HOST
+          value: {{ ansible_operator_meta.name }}-redis-svc
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
+        - name: EDA_CONTROLLER_URL
+          value: "{{ automation_server_url }}"
+        - name: EDA_CONTROLLER_SSL_VERIFY
+          value: "{{ automation_server_ssl_verify | default('yes')}}"
+        - name: EDA_WEBSOCKET_BASE_URL
+          value: 'ws://{{ websocket_server_name }}:8001'
+        - name: EDA_WEBSOCKET_SSL_VERIFY
+          value: '{{ websocket_ssl_verify }}'
+        ports:
+        - containerPort: 8000
+{% if combined_activation_worker.resource_requirements is defined %}
+        resources: {{ combined_activation_worker.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: "{{ ansible_operator_meta.name }}-media-data"
+            mountPath: "{{ media_dir }}"
+      restartPolicy: Always
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-media-data
+          emptyDir: {}

@@ -2,38 +2,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ ansible_operator_meta.name }}-worker"
+  name: "{{ ansible_operator_meta.name }}-default-worker"
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-worker'
+    app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
 spec:
-  replicas: {{ combined_worker.replicas }}
-{% if combined_worker.strategy is defined %}
+  replicas: {{ combined_default_worker.replicas }}
+{% if combined_default_worker.strategy is defined %}
   strategy:
-    type: {{ combined_worker.strategy.type }}
-{% if combined_worker.strategy.type == "Recreate" %}
+    type: {{ combined_default_worker.strategy.type }}
+{% if combined_default_worker.strategy.type == "Recreate" %}
     rollingUpdate: null
-{% elif combined_worker.strategy.type == "RollingUpdate" %}
+{% elif combined_default_worker.strategy.type == "RollingUpdate" %}
     rollingUpdate:
-      maxSurge:  {{ combined_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
-      maxUnavailable: {{ combined_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+      maxSurge:  {{ combined_default_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_default_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
 {% endif %}
 {% endif %}
   selector:
     matchLabels:
       app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
       app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
-      app.kubernetes.io/component: '{{ deployment_type }}-worker'
+      app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
   template:
     metadata:
       labels:
         {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
-        app.kubernetes.io/component: '{{ deployment_type }}-worker'
+        app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
       annotations:
-        kubectl.kubernetes.io/default-container: 'eda-worker'
+        kubectl.kubernetes.io/default-container: 'eda-default-worker'
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if image_pull_secrets | length > 0 %}
@@ -42,26 +42,26 @@ spec:
         - name: {{ secret }}
 {% endfor %}
 {% endif %}
-{% if combined_worker.node_selector is defined %}
+{% if combined_default_worker.node_selector is defined %}
       nodeSelector:
-        {{ combined_worker.node_selector | indent(width=8) }}
+        {{ combined_default_worker.node_selector | indent(width=8) }}
 {% endif %}
-{% if combined_worker.tolerations is defined %}
+{% if combined_default_worker.tolerations is defined %}
       tolerations:
-        {{ combined_worker.tolerations | indent(width=8) }}
+        {{ combined_default_worker.tolerations | indent(width=8) }}
 {% endif %}
-{% if combined_worker.topology_spread_constraints is defined %} %}
+{% if combined_default_worker.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
-        {{ combined_worker.topology_spread_constraints | indent(width=8) }}
+        {{ combined_default_worker.topology_spread_constraints | indent(width=8) }}
 {% endif %}
       containers:
-      - name: eda-worker
+      - name: eda-default-worker
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
         - -c
-        - aap-eda-manage rqworker --with-scheduler --worker-class aap_eda.core.tasking.Worker
+        - aap-eda-manage rqworker --with-scheduler --worker-class aap_eda.core.tasking.DefaultWorker
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
@@ -108,8 +108,8 @@ spec:
           value: '{{ websocket_ssl_verify }}'
         ports:
         - containerPort: 8000
-{% if combined_worker.resource_requirements is defined %}
-        resources: {{ combined_worker.resource_requirements }}
+{% if combined_default_worker.resource_requirements is defined %}
+        resources: {{ combined_default_worker.resource_requirements }}
 {% endif %}
         volumeMounts:
           - name: "{{ ansible_operator_meta.name }}-media-data"
