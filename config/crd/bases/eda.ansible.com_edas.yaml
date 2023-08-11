@@ -86,8 +86,6 @@ spec:
                 description: Redis container image tag or version to use
                 type: string
               api:
-                default:
-                  replicas: 1
                 description: Defines desired state of eda-api resources
                 properties:
                   gunicorn_workers:
@@ -426,8 +424,6 @@ spec:
                     type: array
                 type: object
               ui:
-                default:
-                  replicas: 1
                 description: Defines desired state of eda-ui resources
                 properties:
                   node_selector:
@@ -758,8 +754,6 @@ spec:
                     type: array
                 type: object
               default_worker:
-                default:
-                  replicas: 5
                 description: Defines desired state of eda-default-worker resources
                 properties:
                   node_selector:
@@ -1090,8 +1084,6 @@ spec:
                     type: array
                 type: object
               activation_worker:
-                default:
-                  replicas: 5
                 description: Defines desired state of eda-activation-worker resources
                 properties:
                   node_selector:
@@ -1100,9 +1092,9 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 2
+                    default: 5
                     description: 'Size is the size of number of eda-activation-worker replicas.
-                      Default: 1'
+                      Default: 5'
                     format: int32
                     minimum: 0
                     nullable: true
