@@ -39,7 +39,7 @@ _api:
 
 default_worker: {}
 _default_worker:
-  replicas: 5
+  replicas: 2
   resource_requirements:
     requests:
       cpu: 25m

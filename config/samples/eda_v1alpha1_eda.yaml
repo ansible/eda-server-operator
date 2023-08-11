@@ -20,13 +20,13 @@ spec:
         cpu: 150m
         memory: 256Mi
   default_worker:
-    replicas: 1
+    replicas: 2
     resource_requirements:
       requests:
         cpu: 150m
         memory: 256Mi
   activation_worker:
-    replicas: 1
+    replicas: 3
     resource_requirements:
       requests:
         cpu: 150m
