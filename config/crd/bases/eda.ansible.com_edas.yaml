@@ -2492,6 +2492,9 @@ spec:
               dbFieldsEncryptionSecret:
                 description: Database Fields Encryption secret name of the deployed instance
                 type: string
+              upgradedPostgresVersion:
+                description: Status to indicate that the database has been upgraded to the version in the status
+                type: string
               image:
                 description: URL of the image used for the deployed instance
                 type: string

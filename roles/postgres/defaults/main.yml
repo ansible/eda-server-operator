@@ -4,7 +4,7 @@ deployment_type: eda
 database_name: "{{ deployment_type }}"
 database_username: "{{ deployment_type }}"
 
-_postgres_image: quay.io/sclorg/postgresql-13-c9s
+_postgres_image: quay.io/sclorg/postgresql-15-c8s
 _postgres_image_version: latest
 
 # Add a nodeSelector for the Postgres pods.

@@ -13,6 +13,11 @@
 - name: Set variables to be used in Postgres templates
   import_tasks: set_variables.yml
 
+# Managed Database block
+- name: Check PostgreSQL version to determine if an upgrade is needed
+  import_tasks: check_postgres_version.yml
+  when: managed_database
+
 - name: Create managed Postgres StatefulSet if no external db is defined
   import_tasks: create_managed_postgres.yml
   when: managed_database

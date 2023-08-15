@@ -1,0 +1,162 @@
+---
+
+# Upgrade Posgres (Managed Databases only)
+#  * If postgres version is not supported_pg_version, and not an external postgres instance (when managed_database is yes),
+#    then run this playbook with include_tasks from database_configuration.yml
+#  * Data will be streamed via a pg_dump from the postgres 12/13 pod to the postgres supported_pg_version
+#    pod via a pg_restore.
+
+
+- name: Scale down Deployment for migration
+  include_tasks: scale_down_deployment.yml
+
+- name: Delete existing postgres configuration secret
+  k8s:
+    api_version: v1
+    kind: Secret
+    name: "{{ ansible_operator_meta.name }}-postgres-configuration"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    state: absent
+    wait: yes
+
+- name: Create Database configuration with new -postgres-{{ supported_pg_version }} hostname
+  k8s:
+    apply: true
+    definition: "{{ lookup('template', 'postgres_upgrade_secret.yaml.j2') }}"
+  no_log: "{{ no_log }}"
+
+- name: Set new database var to be used when configuring app credentials (resources_configuration.yml)
+  set_fact:
+    eda_postgres_host: "{{ ansible_operator_meta.name }}-postgres-{{ supported_pg_version }}"
+  no_log: "{{ no_log }}"
+
+- name: Create Database and StatefulSet if no database is specified
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: yes
+  loop:
+    - 'postgres.service'
+    - 'postgres.statefulset'
+  register: create_statefulset_result
+
+- name: Apply database resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: no
+  register: postgres_resources_result
+  loop:
+    - 'postgres.service'
+    - 'postgres.statefulset'
+  no_log: "{{ no_log }}"
+
+- name: Set postgres label if not defined by user
+  set_fact:
+    postgres_label_selector: "app.kubernetes.io/instance=postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}"
+  when: postgres_label_selector is not defined
+
+- name: Get new postgres pod information
+  k8s_info:
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "{{ postgres_label_selector }}"
+    field_selectors:
+      - status.phase=Running
+  register: postgres_pod
+  until:
+    - "postgres_pod['resources'] | length"
+    - "postgres_pod['resources'][0]['status']['phase'] == 'Running'"
+    - "postgres_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
+  delay: 5
+  retries: 60
+
+- name: Set the resource pod name as a variable.
+  set_fact:
+    postgres_pod_name: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+
+- name: Get the name of the service for the old postgres pod
+  k8s_info:
+    kind: Service
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component=database"
+      - "app.kubernetes.io/instance={{ old_postgres_pod.metadata.labels['app.kubernetes.io/instance'] }}"
+      - "app.kubernetes.io/managed-by=eda-operator"
+  register: old_postgres_svc
+
+- name: Set full resolvable host name for postgres pod
+  set_fact:
+    resolvable_db_host: "{{ old_postgres_svc['resources'][0]['metadata']['name'] }}.{{ ansible_operator_meta.namespace }}.svc"  # yamllint disable-line rule:line-length
+  no_log: "{{ no_log }}"
+
+- name: Set pg_dump command
+  set_fact:
+    pgdump: >-
+      pg_dump
+      -h {{ resolvable_db_host }}
+      -U {{ eda_postgres_user }}
+      -d {{ eda_postgres_database }}
+      -p {{ eda_postgres_port }}
+      -F custom
+  no_log: "{{ no_log }}"
+
+- name: Set pg_restore command
+  set_fact:
+    pg_restore: >-
+      pg_restore
+      -U {{ eda_postgres_user }}
+      -d {{ eda_postgres_database }}
+  no_log: "{{ no_log }}"
+
+- name: Stream backup from pg_dump to the new postgresql container
+  k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod_name }}"
+    command: |
+      bash -c """
+      set -e -o pipefail
+      PGPASSWORD='{{ eda_postgres_pass }}' {{ pgdump }} | PGPASSWORD='{{ eda_postgres_pass }}' {{ pg_restore }}
+      echo 'Successful'
+      """
+  no_log: "{{ no_log }}"
+  register: data_migration
+  failed_when: "'Successful' not in data_migration.stdout"
+
+- name: Set flag signifying that this instance has been migrated
+  set_fact:
+    upgraded_postgres_version: '{{ supported_pg_version }}'
+
+# Cleanup old Postgres resources
+- name: Remove old Postgres StatefulSet
+  k8s:
+    kind: StatefulSet
+    api_version: v1
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: "{{ item }}"
+    state: absent
+    wait: true
+  loop:
+    - "{{ ansible_operator_meta.name }}-postgres-13"
+
+- name: Remove old Postgres Service
+  k8s:
+    kind: Service
+    api_version: v1
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ ansible_operator_meta.name }}-postgres-13"
+
+- name: Remove old persistent volume claim
+  k8s:
+    kind: PersistentVolumeClaim
+    api_version: v1
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - "postgres-{{ ansible_operator_meta.name }}-postgres-13-0"
+  when: postgres_keep_pvc_after_upgrade
