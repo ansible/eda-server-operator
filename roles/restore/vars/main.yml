@@ -1,8 +1,8 @@
 ---
 
 deployment_type: "eda"
-supported_pg_version: 13
-_postgres_image: quay.io/sclorg/postgresql-13-c9s
+supported_pg_version: 15
+_postgres_image: quay.io/sclorg/postgresql-15-c8s
 _postgres_image_version: latest
 
 backup_api_version: '{{ deployment_type }}.ansible.com/v1alpha1'

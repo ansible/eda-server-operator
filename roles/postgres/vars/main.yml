@@ -1,4 +1,6 @@
 ---
 # vars file for PostgreSQL database
 
-supported_pg_version: 13
+supported_pg_version: 15
+_previous_upgraded_pg_version: 0
+old_postgres_pod: []
