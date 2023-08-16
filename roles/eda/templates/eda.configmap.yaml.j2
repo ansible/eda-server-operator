@@ -20,54 +20,10 @@ data:
   EDA_MQ_HOST: "{{ ansible_operator_meta.name }}-redis-svc"
   EDA_WEBSOCKET_BASE_URL: "ws://{{ websocket_server_name }}:8001"
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
+  EDA_PROTOCOL: "http"
+  EDA_HOST: "{{ ansible_operator_meta.name }}-api:8000"
 
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
 {% endfor %}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
-  namespace: '{{ ansible_operator_meta.namespace }}'
-  labels:
-    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
-data:
-  nginx_conf: |
-    events {
-        worker_connections 1024;
-    }
-    http {
-        include mime.types;
-        types {
-            application/manifest+json webmanifest;
-        }
-        server {
-            listen 8080 default_server;
-            listen [::]:8080;
-            server_name _;
-            server_tokens off;
-            root /var/lib/ansible-automation-platform/eda/ui;
-
-            location ~ ^/api/eda/v[0-9]+/ {
-                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X-Forwarded-Proto $scheme;
-                proxy_set_header X-Forwarded-Port $server_port;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            }
-
-            location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
-                add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable";
-                try_files $uri =404;
-            }
-
-            location / {
-                expires 5m;
-                add_header Cache-Control "public";
-                try_files $uri $uri/ /index.html =404;
-            }
-        }
-    }
