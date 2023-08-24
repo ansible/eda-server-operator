@@ -14,8 +14,8 @@ _redis:
   replicas: 1
   resource_requirements:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 50m
+      memory: 100Mi
   node_selector: ''
   tolerations: ''
 
