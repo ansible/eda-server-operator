@@ -2,7 +2,7 @@
 
 # -- Set Variables
 
-AAP_XY_VERSION=${AAP_XY_VERSION:-2.4}
+AAP_XY_VERSION=${AAP_XY_VERSION:-2.5}
 AAP_XY=$(echo $AAP_XY_VERSION | sed -e 's/\.//g')
 
 # -- Set Fully Qualified Domain Names for k8s modules
