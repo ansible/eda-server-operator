@@ -1,6 +1,6 @@
 ---
 deployment_type: "eda"
-_postgres_image: quay.io/sclorg/postgresql-13-c8s
+_postgres_image: quay.io/sclorg/postgresql-13-c9s
 _postgres_image_version: latest
 backup_complete: false
 database_type: "unmanaged"
