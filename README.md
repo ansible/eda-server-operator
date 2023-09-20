@@ -11,7 +11,7 @@ This operator is meant to provide a more Kubernetes-native installation method f
 
 ## Contributing
 
-Please visit [our contributing guide](https://github.com/ansible/eda-server-operator/blob/devel/CONTRIBUTING.md) which has details about how to set up your development environment.
+Please visit [our contributing guide](./CONTRIBUTING.md) which has details about how to set up your development environment.
 
 ### Prerequisites
 
