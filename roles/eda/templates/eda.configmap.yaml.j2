@@ -22,6 +22,7 @@ data:
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
   EDA_PROTOCOL: "http"
   EDA_HOST: "{{ ansible_operator_meta.name }}-api:8000"
+  EDA_SERVER: "http://{{ ansible_operator_meta.name }}-api:8000"
 
   # Custom user variables
 {% for item in extra_settings | default([]) %}
