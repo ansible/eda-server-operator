@@ -41,7 +41,9 @@ data:
   nginx_default_conf_template: |
     server {
         listen 8080;
+        {% if not ipv6_disabled %}
         listen [::]:8080;
+        {% endif %}
 
         server_name _;
         server_tokens off;

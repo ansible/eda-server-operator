@@ -145,3 +145,6 @@ db_fields_encryption_secret: ''
 admin_user: admin
 admin_email: test@example.com
 admin_password_secret: ''
+
+# Disable UI container's nginx ipv6 listener
+ipv6_disabled: false

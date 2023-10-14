@@ -201,6 +201,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
+      - displayName: Disable IPv6 listener?
+        path: ipv6_disabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: Name of the k8s secret the DB fields encryption key is stored
           in.
         displayName: DB Fields Encryption Key
