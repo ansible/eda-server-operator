@@ -77,3 +77,15 @@ spec:
 {% if combined_ui.resource_requirements is defined %}
         resources: {{ combined_ui.resource_requirements }}
 {% endif %}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-nginx-conf
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-nginx-conf
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: nginx_conf
+                path: nginx.conf

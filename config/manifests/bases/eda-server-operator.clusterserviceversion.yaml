@@ -518,8 +518,8 @@ spec:
         path: redis.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Deployment strategy to use to replace existing pods with
-          new ones.
+      - description: Deployment strategy to use to replace existing pods with new
+          ones.
         displayName: Strategy
         path: redis.strategy
         x-descriptors:
