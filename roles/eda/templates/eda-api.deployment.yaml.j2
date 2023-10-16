@@ -61,8 +61,12 @@ spec:
         command: ['aap-eda-manage', 'migrate']
         envFrom:
           - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
@@ -102,8 +106,12 @@ spec:
         command: ['aap-eda-manage', 'create_initial_data']
         envFrom:
           - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
@@ -147,8 +155,10 @@ spec:
         - gunicorn --bind 0.0.0.0:8000 --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
@@ -174,11 +184,23 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
+        - name: EDA_MQ_HOST
+          value: {{ ansible_operator_meta.name }}-redis-svc
         - name: EDA_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        - name: EDA_CONTROLLER_URL
+          value: "{{ automation_server_url }}"
+        - name: EDA_CONTROLLER_SSL_VERIFY
+          value: "{{ automation_server_ssl_verify | default('yes')}}"
+        - name: EDA_WEBSOCKET_BASE_URL
+          value: 'ws://{{ websocket_server_name }}:8001'
+        - name: EDA_WEBSOCKET_SSL_VERIFY
+          value: '{{ websocket_ssl_verify }}'
         ports:
         - containerPort: 8000
         readinessProbe:
@@ -207,8 +229,10 @@ spec:
         - daphne -b 0.0.0.0 -p 8001 aap_eda.asgi:application
         envFrom:
           - configMapRef:
-              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
         env:
+        - name: EDA_DEPLOYMENT_TYPE
+          value: 'k8s'
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
@@ -234,11 +258,23 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
+        - name: EDA_ALLOWED_HOSTS
+          value: "['*']"
+        - name: EDA_MQ_HOST
+          value: {{ ansible_operator_meta.name }}-redis-svc
         - name: EDA_SECRET_KEY
           valueFrom:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        - name: EDA_CONTROLLER_URL
+          value: "{{ automation_server_url }}"
+        - name: EDA_CONTROLLER_SSL_VERIFY
+          value: "{{ automation_server_ssl_verify | default('yes')}}"
+        - name: EDA_WEBSOCKET_BASE_URL
+          value: 'ws://{{ websocket_server_name }}:8001'
+        - name: EDA_WEBSOCKET_SSL_VERIFY
+          value: '{{ websocket_ssl_verify }}'
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
