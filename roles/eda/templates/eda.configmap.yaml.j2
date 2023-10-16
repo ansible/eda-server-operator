@@ -28,3 +28,87 @@ data:
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
 {% endfor %}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
+data:
+  nginx_conf: |
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include mime.types;
+
+        client_max_body_size 5M;
+        server_tokens off;
+
+        {% if route_tls_termination_mechanism | lower == 'passthrough' %}
+        server {
+            listen 8080 default_server;
+            listen [::]:8080 default_server;
+            server_name _;
+
+            # Redirect all HTTP links to the matching HTTPS page
+            return 301 https://$host:443$request_uri;
+        }
+        {% endif %}
+
+        server {
+            {% if route_tls_termination_mechanism | lower == 'passthrough' %}
+            # SSL configuration for passthrough TLS termination
+            listen 443 ssl;
+            listen [::]:443 ssl;
+            ssl_certificate /etc/ssl/nginx-selfsigned.crt;
+            ssl_certificate_key /etc/ssl/nginx-selfsigned.key;
+            ssl_session_cache shared:SSL:50m;
+            ssl_session_timeout 1d;
+            ssl_session_tickets off;
+            ssl_ciphers PROFILE=SYSTEM;
+            ssl_prefer_server_ciphers on;
+            {% else %}
+            listen 8080 default_server;
+            listen [::]:8080 default_server;
+            {% endif %}
+
+            server_name _;
+            access_log off;
+
+            include mime.types;
+
+            sendfile on;
+
+            root /usr/share/nginx/html;
+
+            location ~ ^/api/eda/v[0-9]+/ {
+                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
+            }
+
+            location ~ ^/api/eda/ws/[0-9a-z-]+ {
+                proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $http_upgrade;
+                proxy_set_header Connection "Upgrade";
+            }
+
+            location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
+                add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable";
+                try_files $uri =404;
+                gzip_static on;
+            }
+
+            location / {
+                expires off;
+                add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
+                try_files $uri /index.html =404;
+            }
+        }
+    }
