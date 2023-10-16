@@ -1,0 +1,110 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ ansible_operator_meta.name }}-default-worker"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
+spec:
+  replicas: {{ combined_default_worker.replicas }}
+{% if combined_default_worker.strategy is defined %}
+  strategy:
+    type: {{ combined_default_worker.strategy.type }}
+{% if combined_default_worker.strategy.type == "Recreate" %}
+    rollingUpdate: null
+{% elif combined_default_worker.strategy.type == "RollingUpdate" %}
+    rollingUpdate:
+      maxSurge:  {{ combined_default_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_default_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+{% endif %}
+{% endif %}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
+  template:
+    metadata:
+      labels:
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
+      annotations:
+        kubectl.kubernetes.io/default-container: 'eda-default-worker'
+    spec:
+      serviceAccountName: '{{ ansible_operator_meta.name }}'
+{% if image_pull_secrets | length > 0 %}
+      imagePullSecrets:
+{% for secret in image_pull_secrets %}
+        - name: {{ secret }}
+{% endfor %}
+{% endif %}
+{% if combined_default_worker.node_selector is defined %}
+      nodeSelector:
+        {{ combined_default_worker.node_selector | indent(width=8) }}
+{% endif %}
+{% if combined_default_worker.tolerations is defined %}
+      tolerations:
+        {{ combined_default_worker.tolerations | indent(width=8) }}
+{% endif %}
+{% if combined_default_worker.topology_spread_constraints is defined %} %}
+      topologySpreadConstraints:
+        {{ combined_default_worker.topology_spread_constraints | indent(width=8) }}
+{% endif %}
+      containers:
+      - name: eda-default-worker
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        args:
+        - /bin/bash
+        - -c
+        - aap-eda-manage rqworker --worker-class aap_eda.core.tasking.DefaultWorker
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+        env:
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
+        ports:
+        - containerPort: 8000
+{% if combined_default_worker.resource_requirements is defined %}
+        resources: {{ combined_default_worker.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: "{{ ansible_operator_meta.name }}-media-data"
+            mountPath: "{{ media_dir }}"
+      restartPolicy: Always
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-media-data
+          emptyDir: {}

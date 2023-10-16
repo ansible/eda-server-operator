@@ -32,18 +32,38 @@ _api:
   replicas: 1
   resource_requirements:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 50m
+      memory: 350Mi
   node_selector: ''
   tolerations: ''
 
-worker: {}
-_worker:
+default_worker: {}
+_default_worker:
+  replicas: 2
+  resource_requirements:
+    requests:
+      cpu: 25m
+      memory: 130Mi
+  node_selector: ''
+  tolerations: ''
+
+activation_worker: {}
+_activation_worker:
   replicas: 5
   resource_requirements:
     requests:
       cpu: 25m
-      memory: 64Mi
+      memory: 150Mi
+  node_selector: ''
+  tolerations: ''
+
+scheduler: {}
+_scheduler:
+  replicas: 1
+  resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 256Mi
   node_selector: ''
   tolerations: ''
 
@@ -52,8 +72,8 @@ _ui:
   replicas: 1
   resource_requirements:
     requests:
-      cpu: 200m
-      memory: 512Mi
+      cpu: 25m
+      memory: 64Mi
   node_selector: ''
   tolerations: ''
 

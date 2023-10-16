@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ ansible_operator_meta.name }}-scheduler"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
+    {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-scheduler'
+spec:
+  replicas: {{ combined_scheduler.replicas }}
+{% if combined_scheduler.strategy is defined %}
+  strategy:
+    type: {{ combined_scheduler.strategy.type }}
+{% if combined_scheduler.strategy.type == "Recreate" %}
+    rollingUpdate: null
+{% elif combined_scheduler.strategy.type == "RollingUpdate" %}
+    rollingUpdate:
+      maxSurge:  {{ combined_scheduler.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_scheduler.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+{% endif %}
+{% endif %}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-scheduler'
+  template:
+    metadata:
+      labels:
+        {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
+        {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
+        app.kubernetes.io/component: '{{ deployment_type }}-scheduler'
+    spec:
+      serviceAccountName: '{{ ansible_operator_meta.name }}'
+{% if image_pull_secrets | length > 0 %}
+      imagePullSecrets:
+{% for secret in image_pull_secrets %}
+        - name: {{ secret }}
+{% endfor %}
+{% endif %}
+{% if combined_scheduler.node_selector is defined %}
+      nodeSelector:
+        {{ combined_scheduler.node_selector | indent(width=8) }}
+{% endif %}
+{% if combined_scheduler.tolerations is defined %}
+      tolerations:
+        {{ combined_scheduler.tolerations | indent(width=8) }}
+{% endif %}
+{% if combined_scheduler.topology_spread_constraints is defined %} %}
+      topologySpreadConstraints:
+        {{ combined_scheduler.topology_spread_constraints | indent(width=8) }}
+{% endif %}
+      containers:
+      - name: eda-scheduler
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command:
+            - /bin/bash
+            - -c
+            - aap-eda-manage scheduler
+        envFrom:
+        - configMapRef:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+        env:
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
+{% if combined_worker.resource_requirements is defined %}
+        resources: {{ combined_worker.resource_requirements }}
+{% endif %}
+
+      restartPolicy: Always
+status: {}

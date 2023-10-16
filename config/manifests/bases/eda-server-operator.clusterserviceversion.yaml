@@ -399,39 +399,109 @@ spec:
         path: ui.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Defines desired state of eda-worker deployment resources
-        displayName: Worker deployment configuration
-        path: worker
+      - description: Defines desired state of eda-default-worker deployment resources
+        displayName: Default worker deployment configuration
+        path: default_worker
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Worker pod resource requirements
-        path: worker.resource_requirements
+      - displayName: Default worker pod resource requirements
+        path: default_worker.resource_requirements
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-      - description: The number of Worker replicas.
+      - description: The number of default worker replicas.
         displayName: Replicas
-        path: worker.replicas
+        path: default_worker.replicas
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:podCount
       - displayName: Node Selector
-        path: worker.node_selector
+        path: default_worker.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: The deployment strategy to use to replace existing pods with
           new ones.
         displayName: Strategy
-        path: worker.strategy
+        path: default_worker.strategy
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:updateStrategy
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Node tolerations for the worker pods.
+      - description: Node tolerations for the default worker pods.
         displayName: Tolerations
-        path: worker.tolerations
+        path: default_worker.tolerations
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Topology rule(s) for the pods.
         displayName: Topology Spread Constraints
-        path: worker.topology_spread_constraints
+        path: default_worker.topology_spread_constraints
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Defines desired state of eda-activation-worker deployment resources
+        displayName: Activation worker deployment configuration
+        path: activation_worker
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Activation worker pod resource requirements
+        path: activation_worker.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - description: The number of activation worker replicas.
+        displayName: Replicas
+        path: activation_worker.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - displayName: Node Selector
+        path: activation_worker.node_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: activation_worker.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Node tolerations for the activation worker pods.
+        displayName: Tolerations
+        path: activation_worker.tolerations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Topology rule(s) for the pods.
+        displayName: Topology Spread Constraints
+        path: activation_worker.topology_spread_constraints
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Defines desired state of eda-scheduler deployment resources
+        displayName: scheduler deployment configuration
+        path: scheduler
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: scheduler pod resource requirements
+        path: scheduler.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - description: The number of scheduler replicas.
+        displayName: Replicas
+        path: scheduler.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - displayName: Node Selector
+        path: scheduler.node_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: scheduler.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Node tolerations for the scheduler pods.
+        displayName: Tolerations
+        path: scheduler.tolerations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Topology rule(s) for the pods.
+        displayName: Topology Spread Constraints
+        path: scheduler.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of redis deployment resources

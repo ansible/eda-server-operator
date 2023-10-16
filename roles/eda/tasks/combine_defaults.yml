@@ -4,4 +4,6 @@
   set_fact:
     combined_api: "{{ _api | combine (api, recursive=True ) }}"
     combined_ui: "{{ _ui | combine (ui, recursive=True) }}"
-    combined_worker: "{{ _worker | combine (worker, recursive=True) }}"
+    combined_default_worker: "{{ _default_worker | combine (default_worker, recursive=True) }}"
+    combined_activation_worker: "{{ _activation_worker | combine (activation_worker, recursive=True) }}"
+    combined_scheduler: "{{ _scheduler | combine (scheduler, recursive=True) }}"

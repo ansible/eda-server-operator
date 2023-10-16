@@ -16,8 +16,11 @@
     - 'eda-ui.service'
     - 'eda-ui.deployment'
     - 'eda-ui.ingress'
-    - 'eda-worker.service'
-    - 'eda-worker.deployment'
+    - 'eda-default-worker.service'
+    - 'eda-default-worker.deployment'
+    - 'eda-activation-worker.service'
+    - 'eda-activation-worker.deployment'
+    - 'eda-scheduler.deployment'
 
 - name: Check for API Pod
   kubernetes.core.k8s_info:
