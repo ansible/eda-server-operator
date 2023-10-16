@@ -77,3 +77,15 @@ spec:
 {% if combined_ui.resource_requirements is defined %}
         resources: {{ combined_ui.resource_requirements }}
 {% endif %}
+        volumeMounts:
+          - name: {{ ansible_operator_meta.name }}-nginx-default-conf-template
+            mountPath: /etc/nginx/templates/default.conf.template
+            subPath: default.conf.template
+            readOnly: true
+      volumes:
+        - name: {{ ansible_operator_meta.name }}-nginx-default-conf-template
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
+            items:
+              - key: nginx_default_conf_template
+                path: default.conf.template
