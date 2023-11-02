@@ -72,11 +72,22 @@ data:
             location ~ ^/api/eda/v[0-9]+/ {
                 proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
                 proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             }
 
             location ~ ^/api/eda/ws/[0-9a-z-]+ {
                 proxy_pass http://{{ ansible_operator_meta.name }}-daphne:8001;
                 proxy_set_header Origin http://{{ ansible_operator_meta.name }}-daphne:8001;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
                 proxy_http_version 1.1;
                 proxy_set_header Upgrade $http_upgrade;
                 proxy_set_header Connection "Upgrade";
