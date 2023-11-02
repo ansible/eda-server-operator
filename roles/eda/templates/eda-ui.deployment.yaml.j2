@@ -79,8 +79,8 @@ spec:
 {% endif %}
         volumeMounts:
           - name: {{ ansible_operator_meta.name }}-nginx-default-conf-template
-            mountPath: /etc/nginx/templates/default.conf.template
-            subPath: default.conf.template
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
             readOnly: true
       volumes:
         - name: {{ ansible_operator_meta.name }}-nginx-default-conf-template
@@ -88,4 +88,4 @@ spec:
             name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-configmap'
             items:
               - key: nginx_default_conf_template
-                path: default.conf.template
+                path: nginx.conf
