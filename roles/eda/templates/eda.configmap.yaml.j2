@@ -22,7 +22,6 @@ data:
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
   EDA_PROTOCOL: "http"
   EDA_HOST: "{{ ansible_operator_meta.name }}-api:8000"
-  EDA_SERVER: "http://{{ ansible_operator_meta.name }}-api:8000"
 
   # Custom user variables
 {% for item in extra_settings | default([]) %}
@@ -63,13 +62,13 @@ data:
         root /usr/share/nginx/html;
 
         location ~ ^/api/eda/v[0-9]+/ {
-            proxy_pass $EDA_SERVER;
-            proxy_set_header Origin $EDA_SERVER;
+            proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+            proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
         }
 
         location ~ ^/api/eda/ws/[0-9a-z-]+ {
-            proxy_pass $EDA_SERVER;
-            proxy_set_header Origin $EDA_SERVER;
+            proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
+            proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "Upgrade";
