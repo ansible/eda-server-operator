@@ -67,8 +67,8 @@ data:
         }
 
         location ~ ^/api/eda/ws/[0-9a-z-]+ {
-            proxy_pass http://{{ ansible_operator_meta.name }}-api:8000;
-            proxy_set_header Origin http://{{ ansible_operator_meta.name }}-api:8000;
+            proxy_pass http://{{ ansible_operator_meta.name }}-daphne:8001;
+            proxy_set_header Origin http://{{ ansible_operator_meta.name }}-daphne:8001;
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection "Upgrade";
