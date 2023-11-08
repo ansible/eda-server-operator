@@ -138,6 +138,9 @@ route_host: ''
 
 hostname: ''
 
+# Secret to lookup that provides the custom CA trusted bundle
+bundle_cacert_secret: ''
+
 # Secret to lookup that provide the secret key
 # #
 db_fields_encryption_secret: ''

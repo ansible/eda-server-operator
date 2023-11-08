@@ -3,3 +3,4 @@
 
 websocket_server_name: "{{ ansible_operator_meta.name }}-daphne"
 media_dir: /var/lib/eda/files
+bundle_ca_crt: ''

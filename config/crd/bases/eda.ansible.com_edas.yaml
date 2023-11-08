@@ -2140,6 +2140,9 @@ spec:
                 description: Disable UI container's nginx ipv6 listener
                 type: boolean
                 default: false
+              bundle_cacert_secret:
+                description: Secret where can be found the trusted Certificate Authority Bundle
+                type: string
           status:
             description: Status defines the observed state of EDA
             properties:

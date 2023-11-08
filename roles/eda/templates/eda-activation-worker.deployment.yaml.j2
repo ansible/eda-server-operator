@@ -54,6 +54,28 @@ spec:
       topologySpreadConstraints:
         {{ combined_activation_worker.topology_spread_constraints | indent(width=8) }}
 {% endif %}
+{% if bundle_ca_crt  %}
+      initContainers:
+      - name: configure-bundle-ca-cert
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command:
+          - /bin/sh
+          - -c
+          - |
+            mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
+            update-ca-trust
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_activation_worker.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: "ca-trust-extracted"
+            mountPath: "/etc/pki/ca-trust/extracted"
+          - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+            mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
+            subPath: bundle-ca.crt
+            readOnly: true
+{% endif %}
       containers:
       - name: eda-activation-worker
         image: {{ _image }}
@@ -104,7 +126,25 @@ spec:
         volumeMounts:
           - name: "{{ ansible_operator_meta.name }}-media-data"
             mountPath: "{{ media_dir }}"
+{% if bundle_ca_crt %}
+          - name: "ca-trust-extracted"
+            mountPath: "/etc/pki/ca-trust/extracted"
+          - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+            mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
+            subPath: bundle-ca.crt
+            readOnly: true
+{% endif %}
       restartPolicy: Always
       volumes:
         - name: {{ ansible_operator_meta.name }}-media-data
           emptyDir: {}
+{% if bundle_ca_crt %}
+        - name: "ca-trust-extracted"
+          emptyDir: {}
+        - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+          secret:
+            secretName: "{{ bundle_cacert_secret }}"
+            items:
+              - key: bundle-ca.crt
+                path: 'bundle-ca.crt'
+{% endif %}
