@@ -97,66 +97,6 @@ yDL2Cx5Za94g9MvBP6B73nzVLlmfgPjR
 
 ## Advanced Configuration
 
-### Deploying a specific version of EDA
-
-There are a few variables that are customizable for eda the image management.
-
-| Name                   | Description               | Default                                 |
-| ---------------------- | ------------------------- | --------------------------------------  |
-| image                  | Path of the image to pull | quay.io/ansible/eda-server              |
-| image_version          | Image version to pull     | main                                    |
-| image                  | Path of the image to pull | quay.io/ansible/eda-ui                  |
-| image_version          | Image version to pull     | latest                                  |
-| image_pull_policy      | The pull policy to adopt  | IfNotPresent                            |
-| image_pull_secrets     | The pull secrets to use   | None                                    |
-| redis_image            | Path of the image to pull | redis                                   |
-| redis_image_version    | Image version to pull     | latest                                  |
-| postgres_image         | Path of the image to pull | postgres                                |
-| postgres_image_version | Image version to pull     | latest                                  |
-
-Example of customization could be:
-
-```yaml
----
-spec:
-  ...
-  image: myorg/my-custom-eda
-  image_version: latest
-  image_web: myorg/my-custom-eda
-  image_web_version: latest
-  image_pull_policy: Always
-  image_pull_secrets:
-    - pull_secret_name
-```
-
-  > **Note**: The `image` and `image_version` style variables are intended for local mirroring scenarios. Please note that using a version of EDA other than the one bundled with the `eda-server-operator` is **not** supported even though it will likely work and can be useful for pinning a version. For the default values, check the [main.yml](https://github.com/ansible/eda-server-operator/blob/main/roles/eda/defaults/main.yml) file.
-
-
-### Configuring an image pull secret
-
-1. Log in with that token, or username/password, then create a pull secret from the docker/config.json
-
-```bash
-docker login quay.io -u <user> -p <token>
-```
-
-2. Then, create a k8s secret from your .docker/config.json file. This pull secret should be created in the same namespace you are installing the EDA Operator.
-
-```bash
-kubectl create secret generic redhat-operators-pull-secret \
-  --from-file=.dockerconfigjson=.docker/config.json \
-  --type=kubernetes.io/dockerconfigjson
-```
-
-3. Add that image pull secret to your EDA spec
-
-```yaml
----
-spec:
-  image_pull_secrets:
-    - redhat-operators-pull-secret
-```
-
 ### Admin user account configuration
 
 There are three variables that are customizable for the admin user account creation.
@@ -207,17 +147,22 @@ The secret should be formatted as follow:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: custom-awx-db-encryption-secret
+  name: custom-eda-db-encryption-secret
   namespace: <target namespace>
 stringData:
   secret_key: supersecuresecretkey
 ```
 
-Then specify the name of the k8s secret on the AWX spec:
+Then specify the name of the k8s secret on the EDA spec:
 
 ```yaml
 ---
 spec:
   ...
-  db_fields_encryption_secret: custom-awx-db-encryption-secret
+  db_fields_encryption_secret: custom-eda-db-encryption-secret
 ```
+
+### Additional Advanced Configuration
+- [No Log](./docs/user-guide/advanced-configuration/no-log.md)
+- [Deploy a Specific Version of EDA](./docs/user-guide/advanced-configuration/deploying-a-specific-version.md)
+- [Trusting a Custom Certificate Authority](./docs/user-guide/advanced-configuration/trusting-a-custom-certificate-authority.md)

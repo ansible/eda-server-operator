@@ -11,7 +11,7 @@ image_pull_policy: IfNotPresent
 image_pull_secrets: []
 
 _image: quay.io/ansible/eda-server
-_image_version: main
+_image_version: latest
 
 _image_web: quay.io/ansible/eda-ui
 _image_web_version: latest
