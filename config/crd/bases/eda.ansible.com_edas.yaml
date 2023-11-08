@@ -1481,6 +1481,9 @@ spec:
               admin_password_secret:
                 description: Secret where the admin password can be found. If not specified, one will be generated.
                 type: string
+              bundle_cacert_secret:
+                description: Secret where can be found the trusted Certificate Authority Bundle
+                type: string
           status:
             description: Status defines the observed state of EDA
             properties:

@@ -19,6 +19,11 @@
 - name: Set EDA app images
   include_tasks: set_images.yml
 
+- name: Set Bundle Certificate Authority
+  include_tasks: set_bundle_cacert.yml
+  when:
+  - bundle_cacert_secret | length
+
 - name: Create DB fields encryption
   include_tasks: db_fields_encryption_configuration.yml
 

@@ -558,6 +558,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:NodePort
+      - description: Secret where can be found the trusted Certificate Authority Bundle
+        path: bundle_cacert_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
       - displayName: Service Account Annotations
         path: service_account_annotations
         x-descriptors:
