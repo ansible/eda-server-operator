@@ -523,8 +523,8 @@ spec:
         path: redis.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Deployment strategy to use to replace existing pods with
-          new ones.
+      - description: Deployment strategy to use to replace existing pods with new
+          ones.
         displayName: Strategy
         path: redis.strategy
         x-descriptors:
@@ -633,7 +633,7 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:NodePort
-      - description: Secret where can be found the trusted Certificate Authority Bundle
+      - description: Secret where the trusted Certificate Authority Bundle is stored
         path: bundle_cacert_secret
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
