@@ -65,7 +65,7 @@ spec:
           - |
             mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
             update-ca-trust
-{% if combined_api.resource_requirements is defined %}
+{% if combined_activation_worker.resource_requirements is defined %}
         resources: {{ combined_activation_worker.resource_requirements }}
 {% endif %}
         volumeMounts:
