@@ -20,6 +20,14 @@
     - 'eda-activation-worker.deployment'
     - 'eda-scheduler.deployment'
 
+- name: Remove legacy EDA worker deployment
+  k8s:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-worker"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    state: absent
+
 - name: Check for API Pod
   k8s_info:
     kind: Pod
