@@ -64,13 +64,13 @@ spec:
         - containerPort: 8080
         readinessProbe:
           httpGet:
-            path: /
+            path: /eda/
             port: 8080
           failureThreshold: 1
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /
+            path: /eda/
             port: 8080
           failureThreshold: 1
           periodSeconds: 10
