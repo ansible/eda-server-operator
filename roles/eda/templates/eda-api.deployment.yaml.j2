@@ -208,14 +208,14 @@ spec:
             port: 8000
           failureThreshold: 10
           periodSeconds: 10
-          initialDelaySeconds: 90
+          initialDelaySeconds: 20
         livenessProbe:
           httpGet:
             path: /_healthz
             port: 8000
           failureThreshold: 10
           periodSeconds: 10
-          initialDelaySeconds: 90
+          initialDelaySeconds: 20
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
