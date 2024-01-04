@@ -1,0 +1,66 @@
+name: Release Operator
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release Version'
+        required: true
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          ref: 'main'
+
+      - name: Set up Kubectl
+        uses: azure/setup-kubectl@v1
+
+      - name: Create and Push Tag
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git tag ${{ github.event.inputs.version }}
+          git push origin ${{ github.event.inputs.version }}
+
+      - name: Build Operator Image
+        run: IMG=quay.io/ansible/eda-server-operator:${{ github.event.inputs.version }} make docker-build
+
+      - name: Push Operator Image
+        uses: redhat-actions/push-to-registry@v2.1.1
+        with:
+          image: quay.io/ansible/eda-server-operator
+          tags: ${{ github.event.inputs.version }},latest
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      # Similar steps for Bundle and Catalog images...
+      # Repeat the build and push steps for each image
+
+      - name: Generate operator.yaml
+        run: make generate-operator-yaml VERSION=${{ github.event.inputs.version }}
+
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: Release ${{ github.event.inputs.version }}
+          draft: true
+
+      - name: Upload Release Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./operator.yaml
+          asset_name: operator.yaml
+          asset_content_type: application/yaml
+

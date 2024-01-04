@@ -207,3 +207,11 @@ catalog-build: opm ## Build a catalog image.
 .PHONY: catalog-push
 catalog-push: ## Push a catalog image.
 	$(MAKE) docker-push IMG=$(CATALOG_IMG)
+
+# Generate operator.yaml with image tag as a release artifact
+.PHONY: generate-operator-yaml
+generate-operator-yaml: kustomize ## Generate operator.yaml with image tag $(VERSION)
+	@cd config/manager && $(KUSTOMIZE) edit set image controller=quay.io/ansible/eda-server-operator:${VERSION}
+	@$(KUSTOMIZE) build config/default > ./operator.yaml
+
+	@echo "Generated operator.yaml with image tag $(VERSION)"
