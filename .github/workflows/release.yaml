@@ -38,8 +38,32 @@ jobs:
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      # Similar steps for Bundle and Catalog images...
-      # Repeat the build and push steps for each image
+      - name: Build Bundle Image
+        run: |
+          make bundle IMG=quay.io/ansible/eda-server-operator:${{ github.event.inputs.version }} VERSION=${{ github.event.inputs.version }}
+          make bundle-build BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.version }}
+
+      - name: Push Bundle Image
+        uses: redhat-actions/push-to-registry@v2.1.1
+        with:
+          image: quay.io/ansible/eda-server-operator-bundle
+          tags: ${{ github.event.inputs.version }},latest
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
+
+      - name: Build Catalog Image
+        run: |
+          make catalog-build CATALOG_IMG=quay.io/ansible/eda-server-operator-catalog:${{ github.event.inputs.version }} BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.version }}
+
+      - name: Push Catalog Image
+        uses: redhat-actions/push-to-registry@v2.1.1
+        with:
+          image: quay.io/ansible/eda-server-operator-catalog
+          tags: ${{ github.event.inputs.version }},latest
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Generate operator.yaml
         run: make generate-operator-yaml VERSION=${{ github.event.inputs.version }}
@@ -63,4 +87,3 @@ jobs:
           asset_path: ./operator.yaml
           asset_name: operator.yaml
           asset_content_type: application/yaml
-

@@ -195,3 +195,10 @@ spec:
 - [No Log](./docs/user-guide/advanced-configuration/no-log.md)
 - [Deploy a Specific Version of EDA](./docs/user-guide/advanced-configuration/deploying-a-specific-version.md)
 - [Trusting a Custom Certificate Authority](./docs/user-guide/advanced-configuration/trusting-a-custom-certificate-authority.md)
+
+## Maintainers Docs
+
+Maintainers of this repo need to carry out releases, triage issues, etc. There are docs for those types of administrative tasks in the `docs/maintainer/` directory.
+
+To release the EDA Server Operator, see these docs:
+* [Release Operator](./docs/maintainers/release.md)
