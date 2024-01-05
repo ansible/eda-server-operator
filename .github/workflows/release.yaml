@@ -20,6 +20,8 @@ jobs:
         uses: azure/setup-kubectl@v1
 
       - name: Create and Push Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
@@ -27,41 +29,52 @@ jobs:
           git push origin ${{ github.event.inputs.version }}
 
       - name: Build Operator Image
-        run: IMG=quay.io/ansible/eda-server-operator:${{ github.event.inputs.version }} make docker-build
+        run: |
+          IMG=eda-server-operator:${{ github.event.inputs.version }} make docker-build
+          docker tag eda-server-operator:${{ github.event.inputs.version }} eda-server-operator:latest
 
       - name: Push Operator Image
         uses: redhat-actions/push-to-registry@v2.1.1
         with:
-          image: quay.io/ansible/eda-server-operator
-          tags: ${{ github.event.inputs.version }},latest
-          registry: quay.io
+          image: eda-server-operator
+          tags: ${{ github.event.inputs.version }}
+          registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
+      - name: Install operator-sdk
+        run: |
+          OPERATOR_SDK_VERSION=v1.23.0
+          curl -Lo operator-sdk "https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk_linux_amd64"
+          chmod +x operator-sdk
+          sudo mv operator-sdk /usr/local/bin/
+
       - name: Build Bundle Image
         run: |
-          make bundle IMG=quay.io/ansible/eda-server-operator:${{ github.event.inputs.version }} VERSION=${{ github.event.inputs.version }}
-          make bundle-build BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.version }}
+          make bundle IMG=eda-server-operator:${{ github.event.inputs.version }} VERSION=${{ github.event.inputs.version }}
+          make bundle-build BUNDLE_IMG=eda-server-operator-bundle:${{ github.event.inputs.version }}
+          docker tag eda-server-operator-bundle:${{ github.event.inputs.version }} eda-server-operator-bundle:latest
 
       - name: Push Bundle Image
         uses: redhat-actions/push-to-registry@v2.1.1
         with:
-          image: quay.io/ansible/eda-server-operator-bundle
-          tags: ${{ github.event.inputs.version }},latest
-          registry: quay.io
+          image: eda-server-operator-bundle
+          tags: ${{ github.event.inputs.version }}
+          registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build Catalog Image
         run: |
-          make catalog-build CATALOG_IMG=quay.io/ansible/eda-server-operator-catalog:${{ github.event.inputs.version }} BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.version }}
+          make catalog-build CATALOG_IMG=eda-server-operator-catalog:${{ github.event.inputs.version }} BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.version }}
+          docker tag eda-server-operator-catalog:${{ github.event.inputs.version }} eda-server-operator-catalog:latest
 
       - name: Push Catalog Image
         uses: redhat-actions/push-to-registry@v2.1.1
         with:
-          image: quay.io/ansible/eda-server-operator-catalog
+          image: eda-server-operator-catalog
           tags: ${{ github.event.inputs.version }},latest
-          registry: quay.io
+          registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
