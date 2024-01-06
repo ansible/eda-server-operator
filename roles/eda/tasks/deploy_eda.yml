@@ -44,6 +44,9 @@
     - "eda_api_pod['resources'] | length"
     - "eda_api_pod['resources'][0]['status']['phase'] == 'Running'"
     - "eda_api_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
+    - "eda_api_pod['resources'][0]['status']['containerStatuses'][1]['ready'] == true"
+  retries: 60
+  delay: 5
 
 - name: Set the resource pod name as a variable.
   set_fact:
