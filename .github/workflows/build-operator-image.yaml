@@ -2,26 +2,50 @@
 
 name: Build Operator Image
 
+
 on:
   push:
     branches: [main]
 
+
+env:
+  IMAGE: "ghcr.io/${{ github.repository_owner }}/eda-server-operator:${{ github.sha }}"
+  # PUBLISH_IMAGE: "quay.io/ansible/eda-server-operator:main"
+  PUBLISH_IMAGE: "ghcr.io/${{ github.repository_owner }}/eda-server-operator:quay-test"
+
+
 jobs:
-  release:
+
+  docker-build:
     runs-on: ubuntu-latest
-    name: Push main image
+    name: Build Current Commit
     steps:
+
+
       - uses: actions/checkout@v2
 
-      - name: Build Image
-        run: |
-          IMG=eda-server-operator:main make docker-build
 
-      - name: Push To Quay
-        uses: redhat-actions/push-to-registry@v2.1.1
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
         with:
-          image: eda-server-operator
-          tags: main
-          registry: quay.io/ansible/
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # - name: Log into registry quay.io
+      #   uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      #   with:
+      #     registry: quay.io/ansible/
+      #     username: ${{ secrets.QUAY_USER }}
+      #     password: ${{ secrets.QUAY_TOKEN }}
+
+
+      - name: Build and Store Image @ghcr
+        run: |
+          IMG=${{ env.IMAGE }} make docker-buildx
+
+
+      - name: Publish Image to quay.io/eda-server-operator:main
+        run: |
+          docker buildx imagetools create ${{ env.IMAGE }} --tag ${{ env.PUBLISH_IMAGE }}
