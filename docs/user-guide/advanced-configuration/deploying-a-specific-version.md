@@ -22,9 +22,9 @@ Example of customization could be:
 spec:
   ...
   image: myorg/my-custom-eda
-  image_version: latest
+  image_version: main
   image_web: myorg/my-custom-eda
-  image_web_version: latest
+  image_web_version: main
   image_pull_policy: Always
   image_pull_secrets:
     - pull_secret_name
