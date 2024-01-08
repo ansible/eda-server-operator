@@ -30,6 +30,12 @@
 - name: Create admin password
   include_tasks: admin_password_configuration.yml
 
+- name: Load Route TLS certificate
+  include_tasks: load_route_tls_secret.yml
+  when:
+    - ingress_type | lower == 'route'
+    - route_tls_secret | length
+
 - name: Deploy EDA
   include_tasks: deploy_eda.yml
 
