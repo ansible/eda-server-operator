@@ -1,0 +1,43 @@
+---
+
+name: Release Operator Image
+
+
+on:
+  release:
+    types: [published]
+
+
+env:
+  IMAGE: "ghcr.io/${{ github.repository_owner }}/eda-server-operator:${{ github.sha }}"
+  #PUBLISH_IMAGE: "quay.io/ansible/eda-server-operator:${{ github.event.release.tag_name }}"
+  PUBLISH_IMAGE: "ghcr.io/${{ github.repository_owner }}/eda-server-operator:${{ github.event.release.tag_name }}"
+
+
+jobs:
+
+  docker-build:
+    runs-on: ubuntu-latest
+    name: Publish Current Commit
+    steps:
+
+
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # - name: Log into registry quay.io
+      #   uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+      #   with:
+      #     registry: quay.io/ansible/
+      #     username: ${{ secrets.QUAY_USER }}
+      #     password: ${{ secrets.QUAY_TOKEN }}
+
+
+      - name: Pull Stored Image and Publish to quay.io/eda-server-operator:git_tag
+        run: |
+          docker buildx imagetools create ${{ env.IMAGE }} --tag ${{ env.PUBLISH_IMAGE }}
