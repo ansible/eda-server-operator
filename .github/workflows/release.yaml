@@ -58,13 +58,6 @@ jobs:
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Install operator-sdk
-        run: |
-          OPERATOR_SDK_VERSION=v1.23.0
-          curl -Lo operator-sdk "https://github.com/operator-framework/operator-sdk/releases/download/${OPERATOR_SDK_VERSION}/operator-sdk_linux_amd64"
-          chmod +x operator-sdk
-          sudo mv operator-sdk /usr/local/bin/
-
       - name: Build Bundle Image
         run: |
           make bundle IMG=eda-server-operator:${{ github.event.inputs.version }} VERSION=${{ github.event.inputs.version }}
