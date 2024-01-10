@@ -1,62 +1,59 @@
-name: Release Operator
+name: Promote Operator Release
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
-      version:
-        description: 'Release Version'
+      tag_name:
+        description: 'Name for the tag of the release.'
         required: true
 
 jobs:
-  create-release:
+  promote-staged-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+      - name: Set TAG_NAME for workflow_dispatch event
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "TAG_NAME=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+
+      - name: Set TAG_NAME for release event
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          echo "TAG_NAME=${{ github.event.release.tag_name }}" >> $GITHUB_ENV
+
+      - uses: actions/checkout@v3
         with:
           ref: 'main'
+          depth: 0
 
-      - name: Set up Kubectl
-        uses: azure/setup-kubectl@v1
+      - name: Log into registry ghcr.io
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d    # v3.0.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and Push Tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@github.com'
-          git tag ${{ github.event.inputs.version }}
-          git push origin ${{ github.event.inputs.version }}
 
       - name: Log into registry quay.io
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d    # v3.0.0
         with:
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Build Operator Image
+      - name: Pull Stored Image and Publish to quay.io/${{ github.repository }}:${TAG_NAME}
         run: |
-          IMG=eda-server-operator:${{ github.event.inputs.version }} make docker-buildx
-          docker tag eda-server-operator:${{ github.event.inputs.version }} eda-server-operator:latest
+          docker buildx imagetools create \
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${TAG_NAME} \
+            --tag quay.io/ansible/${{ github.repository }}:${TAG_NAME}
 
-      - name: Push Operator Image
-        uses: redhat-actions/push-to-registry@v2.1.1
-        with:
-          image: eda-server-operator
-          tags: ${{ github.event.inputs.version }}
-          registry: quay.io/ansible/
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Push Operator Image
-        uses: redhat-actions/push-to-registry@v2.1.1
-        with:
-          image: eda-server-operator
-          tags: latest
-          registry: quay.io/ansible/
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
+      - name: Pull Stored Image and Publish to quay.io/${{ github.repository }}:latest
+        run: |
+          docker buildx imagetools create \
+            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${TAG_NAME} \
+            --tag quay.io/ansible/${{ github.repository }}:latest
 
       - name: Build Bundle Image
         run: |
@@ -86,26 +83,3 @@ jobs:
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Generate operator.yaml
-        run: make generate-operator-yaml VERSION=${{ github.event.inputs.version }}
-
-      - name: Create Draft Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.event.inputs.version }}
-          release_name: Release ${{ github.event.inputs.version }}
-          draft: true
-
-      - name: Upload Release Artifact
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./operator.yaml
-          asset_name: operator.yaml
-          asset_content_type: application/yaml
