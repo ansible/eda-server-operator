@@ -45,23 +45,23 @@ jobs:
       - name: Log into registry quay.io
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d    # v3.0.0
         with:
-          registry: ${{ github.event.inputs.quay_registry }}
+          registry: ${QUAY_REGISTRY}
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Pull Stored Image and Publish to ${{ github.event.inputs.quay_registry }}/eda-server-operator:${TAG_NAME}
+      - name: Pull Stored Image and Publish to ${QUAY_REGISTRY}/eda-server-operator:${TAG_NAME}
         run: |
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
-            --tag ${{ github.event.inputs.quay_registry }}/eda-server-operator:${TAG_NAME}
-            --tag ${{ github.event.inputs.quay_registry }}/eda-server-operator:latest
+            --tag ${QUAY_REGISTRY}/eda-server-operator:${TAG_NAME}
+            --tag ${QUAY_REGISTRY}/eda-server-operator:latest
         working-directory: eda-server-operator
 
-      - name: Pull Stored Image and Publish to ${{ github.event.inputs.quay_registry }}/eda-server-operator:latest
+      - name: Pull Stored Image and Publish to ${QUAY_REGISTRY}/eda-server-operator:latest
         run: |
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
-            --tag ${{ github.event.inputs.quay_registry }}/eda-server-operator:latest
+            --tag ${QUAY_REGISTRY}/eda-server-operator:latest
         working-directory: eda-server-operator
 
       - name: Build Bundle Image
