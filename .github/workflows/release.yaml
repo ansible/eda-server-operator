@@ -53,6 +53,7 @@ jobs:
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
             --tag ${{ github.event.inputs.quay_registry }}/eda-server-operator:${TAG_NAME}
+            --tag ${{ github.event.inputs.quay_registry }}/eda-server-operator:latest
         working-directory: eda-server-operator
 
       - name: Pull Stored Image and Publish to ${{ github.event.inputs.quay_registry }}/eda-server-operator:latest
@@ -64,25 +65,15 @@ jobs:
 
       - name: Build Bundle Image
         run: |
-          make bundle IMG=eda-server-operator:${{ github.event.inputs.tag_name }} VERSION=${{ github.event.inputs.tag_name }}
-          make bundle-build BUNDLE_IMG=eda-server-operator-bundle:${{ github.event.inputs.tag_name }}
+          make bundle bundle-build IMG=eda-server-operator:${{ github.event.inputs.tag_name }} VERSION=${{ github.event.inputs.tag_name }} BUNDLE_IMG=eda-server-operator-bundle:${{ github.event.inputs.tag_name }}
           docker tag eda-server-operator-bundle:${{ github.event.inputs.tag_name }} eda-server-operator-bundle:latest
         working-directory: eda-server-operator
 
       - name: Push Bundle Image
-        uses: redhat-actions/push-to-registry@v2.1.1
+        uses: redhat-actions/push-to-registry@v2.7.1
         with:
           image: eda-server-operator-bundle
-          tags: ${{ github.event.inputs.tag_name }}
-          registry: quay.io/ansible/
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Push Bundle Image
-        uses: redhat-actions/push-to-registry@v2.1.1
-        with:
-          image: eda-server-operator-bundle
-          tags: latest
+          tags: ${{ github.event.inputs.tag_name }} latest
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
@@ -94,19 +85,10 @@ jobs:
         working-directory: eda-server-operator
 
       - name: Push Catalog Image
-        uses: redhat-actions/push-to-registry@v2.1.1
+        uses: redhat-actions/push-to-registry@v2.7.1
         with:
           image: eda-server-operator-catalog
-          tags: ${{ github.event.inputs.tag_name }}
-          registry: quay.io/ansible/
-          username: ${{ secrets.QUAY_USER }}
-          password: ${{ secrets.QUAY_TOKEN }}
-
-      - name: Push Catalog Image
-        uses: redhat-actions/push-to-registry@v2.1.1
-        with:
-          image: eda-server-operator-catalog
-          tags: latest
+          tags: ${{ github.event.inputs.tag_name }} latest
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
