@@ -92,11 +92,6 @@ data:
             }
 
             location / {
-                # Redirect all traffic from root to /eda/
-                return 301 $remote_scheme://$host/eda/;
-            }
-
-            location /eda/ {
                 autoindex off;
                 expires off;
                 add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
