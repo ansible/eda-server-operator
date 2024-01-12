@@ -9,6 +9,24 @@ A Kubernetes operator for Kubernetes built with [Operator SDK](https://github.co
 
 This operator is meant to provide a more Kubernetes-native installation method for EDA Server via an EDA Custom Resource Definition (CRD). In the future, this operator will grow to be able to maintain the full life-cycle of an EDA Server deployment. Currently, it can handle fresh installs and upgrades.
 
+Table of Contents
+=================
+
+- [EDA Server Operator](#eda-server-operator)
+  - [Overview](#overview)
+- [Table of Contents](#table-of-contents)
+  - [Contributing](#contributing)
+    - [Prerequisites](#prerequisites)
+  - [Install the EDA Server Operator](#install-the-eda-server-operator)
+  - [Deploy EDA](#deploy-eda)
+  - [Advanced Configuration](#advanced-configuration)
+    - [Admin user account configuration](#admin-user-account-configuration)
+    - [Database Fields Encryption Configuration](#database-fields-encryption-configuration)
+    - [Additional Advanced Configuration](#additional-advanced-configuration)
+  - [Maintainers Docs](#maintainers-docs)
+
+<!-- Created by https://github.com/ekalinin/github-markdown-toc -->
+
 ## Contributing
 
 Please visit [our contributing guide](./CONTRIBUTING.md) which has details about how to set up your development environment.
@@ -195,3 +213,10 @@ spec:
 - [No Log](./docs/user-guide/advanced-configuration/no-log.md)
 - [Deploy a Specific Version of EDA](./docs/user-guide/advanced-configuration/deploying-a-specific-version.md)
 - [Trusting a Custom Certificate Authority](./docs/user-guide/advanced-configuration/trusting-a-custom-certificate-authority.md)
+
+## Maintainers Docs
+
+Maintainers of this repo need to carry out releases, triage issues, etc. There are docs for those types of administrative tasks in the `docs/maintainer/` directory.
+
+To release the EDA Server Operator, see these docs:
+* [Release Operator](./docs/maintainers/release.md)
