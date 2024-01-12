@@ -66,30 +66,30 @@ jobs:
 
       - name: Build Bundle Image
         run: |
-          make bundle bundle-build IMG=eda-server-operator:${{ github.event.inputs.tag_name }} VERSION=${{ github.event.inputs.tag_name }} BUNDLE_IMG=eda-server-operator-bundle:${{ github.event.inputs.tag_name }}
-          docker tag eda-server-operator-bundle:${{ github.event.inputs.tag_name }} eda-server-operator-bundle:latest
+          make bundle bundle-build IMG=eda-server-operator:${TAG_NAME} VERSION=${TAG_NAME} BUNDLE_IMG=eda-server-operator-bundle:${TAG_NAME}
+          docker tag eda-server-operator-bundle:${TAG_NAME} eda-server-operator-bundle:latest
         working-directory: eda-server-operator
 
       - name: Push Bundle Image
         uses: redhat-actions/push-to-registry@v2.7.1
         with:
           image: eda-server-operator-bundle
-          tags: ${{ github.event.inputs.tag_name }} latest
+          tags: ${{ env.TAG_NAME }} latest
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
       - name: Build Catalog Image
         run: |
-          make catalog-build CATALOG_IMG=eda-server-operator-catalog:${{ github.event.inputs.tag_name }} BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${{ github.event.inputs.tag_name }}
-          docker tag eda-server-operator-catalog:${{ github.event.inputs.tag_name }} eda-server-operator-catalog:latest
+          make catalog-build CATALOG_IMG=eda-server-operator-catalog:${TAG_NAME} BUNDLE_IMG=quay.io/ansible/eda-server-operator-bundle:${TAG_NAME}
+          docker tag eda-server-operator-catalog:${TAG_NAME} eda-server-operator-catalog:latest
         working-directory: eda-server-operator
 
       - name: Push Catalog Image
         uses: redhat-actions/push-to-registry@v2.7.1
         with:
           image: eda-server-operator-catalog
-          tags: ${{ github.event.inputs.tag_name }} latest
+          tags: ${{ env.TAG_NAME }} latest
           registry: quay.io/ansible/
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
