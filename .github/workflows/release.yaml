@@ -53,7 +53,7 @@ jobs:
         run: |
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
-            --tag ${QUAY_REGISTRY}/eda-server-operator:${TAG_NAME}
+            --tag ${QUAY_REGISTRY}/eda-server-operator:${TAG_NAME} \
             --tag ${QUAY_REGISTRY}/eda-server-operator:latest
         working-directory: eda-server-operator
 
