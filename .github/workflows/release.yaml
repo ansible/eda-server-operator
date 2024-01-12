@@ -45,11 +45,11 @@ jobs:
       - name: Log into registry quay.io
         uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d    # v3.0.0
         with:
-          registry: ${QUAY_REGISTRY}
+          registry: quay.io
           username: ${{ secrets.QUAY_USER }}
           password: ${{ secrets.QUAY_TOKEN }}
 
-      - name: Pull Stored Image and Publish to ${QUAY_REGISTRY}/eda-server-operator:${TAG_NAME}
+      - name: Pull Stored Image and Publish eda-server-operator:${TAG_NAME}
         run: |
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
@@ -57,7 +57,7 @@ jobs:
             --tag ${QUAY_REGISTRY}/eda-server-operator:latest
         working-directory: eda-server-operator
 
-      - name: Pull Stored Image and Publish to ${QUAY_REGISTRY}/eda-server-operator:latest
+      - name: Pull Stored Image and Publish eda-server-operator:latest
         run: |
           docker buildx imagetools create \
             ghcr.io/${{ github.repository }}:${TAG_NAME} \
