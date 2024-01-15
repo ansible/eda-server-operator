@@ -7,7 +7,7 @@ Before proceeding with the installation, ensure that the following prerequisites
 
 1. **Kubernetes Cluster**: You need an active Kubernetes cluster. If you do not have one, you can set it up using platforms like Minikube, Kind, or a cloud provider like AWS, Azure, or GCP.
 
-2. **kubectl**: The Kubernetes command-line tool, kubectl, should be installed and configured to communicate with your cluster. You can check its availability by running kubectl version.
+2. **kubectl**: The Kubernetes command-line tool, kubectl, should be installed and configured to communicate with your cluster. You can check its availability by running `kubectl version`.
 
 ## Installation
 The EDA Server Operator can be installed using a single command. This command applies a YAML file from the EDA Server Operator's GitHub repository directly to your Kubernetes cluster.
@@ -23,8 +23,18 @@ kubectl apply -f https://github.com/ansible/eda-server-operator/releases/downloa
 
 Now create your EDA custom restore by applying the `eda-demo.yml` file and you will soon have a working EDA instance!
 
+```yaml
+# eda-demo.yaml
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: my-eda
+spec:
+  automation_server_url: https://awx-host
+```
+
 ```bash
-$ kubectl apply -f eda-demo.yaml
+kubectl apply -f eda-demo.yaml
 ```
 
 See the [README.md](../README.md) for more information on configuring EDA by modifying the `spec`.
@@ -34,7 +44,7 @@ See the [README.md](../README.md) for more information on configuring EDA by mod
 ## Pre-Upgrade Checklist
 
 * **Backup**: Backup your EDA instance by creating an EDABackup. 
-* **Review Release Notes**: Check the release notes for the new version of the EDA Server Operator. This can be found on the GitHub [releases page(https://github.com/ansible/eda-server-operator/releases)]. Pay attention to any breaking changes, new features, or specific instructions for upgrading from your current version.
+* **Review Release Notes**: Check the release notes for the new version of the EDA Server Operator. This can be found on the GitHub [releases page](https://github.com/ansible/eda-server-operator/releases). Pay attention to any breaking changes, new features, or specific instructions for upgrading from your current version.
 
 ### Upgrade the Operator
 
