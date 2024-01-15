@@ -47,6 +47,9 @@ Before you begin, you need to have a k8s cluster up. If you don't already have a
 
 Once you have a running Kubernetes cluster, you can deploy EDA Server Operator into your cluster using [Kustomize](https://kubectl.docs.kubernetes.io/guides/introduction/kustomize/). Since kubectl version 1.14 kustomize functionality is built-in (otherwise, follow the instructions here to install the latest version of Kustomize: https://kubectl.docs.kubernetes.io/installation/kustomize/)
 
+> [!Note]
+> If you want to do a single-command install with no modifications, please see these docs [here](./docs/single-command-install.md).
+
 First, create a file called `kustomization.yaml` with the following content:
 
 ```yaml
