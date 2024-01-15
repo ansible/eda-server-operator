@@ -12,7 +12,13 @@ Before proceeding with the installation, ensure that the following prerequisites
 ## Installation
 The EDA Server Operator can be installed using a single command. This command applies a YAML file from the EDA Server Operator's GitHub repository directly to your Kubernetes cluster.
 
-Run the following command in your terminal, modifying the version to whichever version you want to install.
+Run the following command in your terminal to install the latest operator
+
+```bash
+kubectl apply -f https://github.com/ansible/eda-server-operator/releases/latest/download/operator.yaml
+```
+
+If you want to install a specific version instead, modify the version to whichever version you want to install. For example:
 
 ```bash
 kubectl apply -f https://github.com/ansible/eda-server-operator/releases/download/1.0.0/operator.yaml
@@ -21,7 +27,7 @@ kubectl apply -f https://github.com/ansible/eda-server-operator/releases/downloa
 > [!Note]
 > This will create the EDA Server Operator resources in the eda-server-operator-system namespace.
 
-Now create your EDA custom restore by applying the `eda-demo.yml` file and you will soon have a working EDA instance!
+Now create your EDA custom resource by applying the `eda-demo.yml` file and you will soon have a working EDA instance!
 
 ```yaml
 # eda-demo.yaml
