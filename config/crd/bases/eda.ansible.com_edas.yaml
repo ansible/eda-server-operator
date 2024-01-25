@@ -2473,6 +2473,10 @@ spec:
               bundle_cacert_secret:
                 description: Secret where the trusted Certificate Authority Bundle is stored
                 type: string
+              force_drop_db:
+                description: Force drop the database before restoring. USE WITH CAUTION!
+                type: boolean
+                default: false
           status:
             description: Status defines the observed state of EDA
             properties:
