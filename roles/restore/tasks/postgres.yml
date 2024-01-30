@@ -80,16 +80,55 @@
       -p {{ eda_postgres_port }}
   no_log: "{{ no_log }}"
 
+- name: Set drop db command
+  set_fact:
+    pg_drop_db: >-
+      echo 'DROP DATABASE {{ eda_postgres_database }} WITH (FORCE);' | PGPASSWORD='{{ eda_postgres_pass }}' psql
+      -U {{ eda_postgres_user }}
+      -h {{ resolvable_db_host }}
+      -d postgres
+      -p {{ eda_postgres_port }}
+  no_log: "{{ no_log }}"
+
+- name: Set create db command
+  set_fact:
+    pg_create_db: >-
+      echo 'CREATE DATABASE {{ eda_postgres_database }} WITH OWNER = {{ eda_postgres_user }};' | PGPASSWORD='{{ eda_postgres_pass }}' psql
+      -U {{ eda_postgres_user }}
+      -h {{ resolvable_db_host }}
+      -d postgres
+      -p {{ eda_postgres_port }}
+  no_log: "{{ no_log }}"
+
 - name: Restore database dump to the new postgresql container
   k8s_exec:
     namespace: "{{ backup_pvc_namespace }}"
     pod: "{{ ansible_operator_meta.name }}-db-management"
     command: |
-      bash -c """
+      bash -c "
+      function end_keepalive {
+        rc=$?
+        rm -f \"$1\"
+        kill $(cat /proc/$2/task/$2/children 2>/dev/null) 2>/dev/null || true
+        wait $2 || true
+        exit $rc
+      }
+      keepalive_file=\"$(mktemp)\"
+      while [[ -f \"$keepalive_file\" ]]; do
+        echo 'Migrating data from old database...'
+        sleep 60
+      done &
+      keepalive_pid=$!
+      trap 'end_keepalive \"$keepalive_file\" \"$keepalive_pid\"' EXIT SIGINT SIGTERM
+      echo keepalive_pid: $keepalive_pid
       set -e -o pipefail
+      if {{ force_drop_db }}; then
+        {{ pg_drop_db }}
+        {{ pg_create_db }}
+      fi
       cat {{ backup_dir }}/eda.db | PGPASSWORD='{{ eda_postgres_pass }}' {{ pg_restore }}
       echo 'Successful'
-      """
+      "
   register: data_migration
   no_log: "{{ no_log }}"
   failed_when: "'Successful' not in data_migration.stdout"
