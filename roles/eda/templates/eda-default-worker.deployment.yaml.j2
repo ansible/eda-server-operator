@@ -34,6 +34,16 @@ spec:
         app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
       annotations:
         kubectl.kubernetes.io/default-container: 'eda-default-worker'
+{% for template in [
+    "eda.configmap",
+  ] %}
+        checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.yaml.j2') | sha1 }}"
+{% endfor %}
+{% for secret in [
+    "secrets/db_fields_encryption",
+  ] %}
+        checksum-secret-{{ secret }}: "{{ lookup('ansible.builtin.vars', secret, default='')["resources"][0]["data"] | default('') | sha1 }}"
+{% endfor %}
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if image_pull_secrets | length > 0 %}

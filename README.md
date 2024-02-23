@@ -214,6 +214,7 @@ spec:
 
 ### Additional Advanced Configuration
 - [No Log](./docs/user-guide/advanced-configuration/no-log.md)
+- [EDA application settings](./docs/user-guide/advanced-configuration/settings.md)
 - [Deploy a Specific Version of EDA](./docs/user-guide/advanced-configuration/deploying-a-specific-version.md)
 - [Trusting a Custom Certificate Authority](./docs/user-guide/advanced-configuration/trusting-a-custom-certificate-authority.md)
 
