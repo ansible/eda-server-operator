@@ -234,11 +234,10 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
-      - displayName: API Extra Settings
+      - displayName: Extra Settings
         path: extra_settings
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: PostgreSQL Database configuration
         path: database
         x-descriptors:
