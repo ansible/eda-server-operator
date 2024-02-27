@@ -12,7 +12,7 @@ metadata:
 spec:
   ...
   extra_settings:
-    - setting: MAX_RUNNING_ACTIVATIONS
+    - setting: EDA_MAX_RUNNING_ACTIVATIONS
       value: "12"
 
 ```
@@ -25,4 +25,4 @@ Below is a table of the setting name, default value, and a description of it's p
 
 | Setting Name             | Default Value  | Description                                     |
 |--------------------------|----------------|-------------------------------------------------|
-| MAX_RUNNING_ACTIVATIONS  | "12"           | Maximum number of running activations           |
+| EDA_MAX_RUNNING_ACTIVATIONS  | "12"           | Maximum number of running activations           |
