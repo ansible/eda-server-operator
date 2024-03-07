@@ -83,7 +83,7 @@
     label_selectors:
       - "app.kubernetes.io/component=database"
       - "app.kubernetes.io/instance={{ old_postgres_pod.metadata.labels['app.kubernetes.io/instance'] }}"
-      - "app.kubernetes.io/managed-by=eda-operator"
+      - "app.kubernetes.io/managed-by={{ deployment_type }}-operator"
   register: old_postgres_svc
 
 - name: Set full resolvable host name for postgres pod
@@ -175,4 +175,5 @@
     state: absent
   loop:
     - "postgres-{{ ansible_operator_meta.name }}-postgres-13-0"
+    - "postgres-13-{{ ansible_operator_meta.name }}-postgres-13-0"
   when: postgres_keep_pvc_after_upgrade

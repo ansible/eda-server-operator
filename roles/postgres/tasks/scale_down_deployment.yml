@@ -19,5 +19,8 @@
     wait: yes
   loop:
     - "{{ ansible_operator_meta.name }}-api"
+    - "{{ ansible_operator_meta.name }}-scheduler"
+    - "{{ ansible_operator_meta.name }}-default-worker"
+    - "{{ ansible_operator_meta.name }}-activation-worker"
   when: this_deployment['resources'] | length
 
