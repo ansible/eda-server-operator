@@ -72,5 +72,5 @@
         - (_old_pg_version.stdout | default(0) | int ) < supported_pg_version
   when:
     - managed_database
-    - (_previous_upgraded_pg_version | default(false)) | ternary(_previous_upgraded_pg_version < supported_pg_version, true)
+    - (_previous_upgraded_pg_version | default(false)) | ternary(_previous_upgraded_pg_version | int < supported_pg_version, true)
     - old_postgres_pod | length  # If empty, then old pg pod has been removed and we can assume the upgrade is complete
