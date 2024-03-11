@@ -65,7 +65,7 @@ spec:
         {{ combined_api.topology_spread_constraints | indent(width=8) }}
 {% endif %}
       initContainers:
-      - name: eda-migrations
+      - name: run-migrations
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         command: ['aap-eda-manage', 'migrate']
