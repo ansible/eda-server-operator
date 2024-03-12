@@ -238,6 +238,7 @@ spec:
         path: extra_settings
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: PostgreSQL Database configuration
         path: database
         x-descriptors:
