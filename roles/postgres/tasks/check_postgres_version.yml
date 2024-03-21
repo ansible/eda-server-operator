@@ -23,7 +23,7 @@
     set_fact:
       sorted_old_postgres_pods: "{{ filtered_old_postgres_pods |
         sort(attribute='metadata.name') |
-        reverse }}"
+        reverse | list }}"
     when: filtered_old_postgres_pods | length
 
   - name: Set info for previous postgres pod
