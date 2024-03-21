@@ -97,6 +97,12 @@ rules:
       - update
       - watch
   - apiGroups:
+      - apps
+    resources:
+      - deployments/scale
+    verbs:
+      - patch
+  - apiGroups:
       - ""
     resources:
       - pods/exec
