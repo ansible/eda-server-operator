@@ -2305,6 +2305,10 @@ spec:
                     description: 'Configure PostgreSQL connection sslmode option.
                       Default: "prefer"'
                     type: string
+                  postgres_keep_pvc_after_upgrade:
+                    description: Specify whether or not to keep the old PVC after PostgreSQL upgrades
+                    type: boolean
+                    default: true
                   storage_requirements:
                     description: Storage requirements for the PostgreSQL container
                     properties:
@@ -2491,6 +2495,9 @@ spec:
                 type: string
               dbFieldsEncryptionSecret:
                 description: Database Fields Encryption secret name of the deployed instance
+                type: string
+              upgradedPostgresVersion:
+                description: Status to indicate that the database has been upgraded to the version in the status
                 type: string
               image:
                 description: URL of the image used for the deployed instance
