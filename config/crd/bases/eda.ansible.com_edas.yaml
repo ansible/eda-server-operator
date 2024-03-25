@@ -2305,6 +2305,10 @@ spec:
                     description: 'Configure PostgreSQL connection sslmode option.
                       Default: "prefer"'
                     type: string
+                  postgres_keep_pvc_after_upgrade:
+                    description: Specify whether or not to keep the old PVC after PostgreSQL upgrades
+                    type: boolean
+                    default: true
                   storage_requirements:
                     description: Storage requirements for the PostgreSQL container
                     properties:
