@@ -298,6 +298,11 @@ spec:
         path: database.priority_class
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: Should PostgreSQL data for managed databases be kept after upgrades?
+        path: database.postgres_keep_pvc_after_upgrade
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - displayName: API Image
         path: image
         x-descriptors:
