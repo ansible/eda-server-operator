@@ -19,6 +19,7 @@ Table of Contents
     - [Prerequisites](#prerequisites)
   - [Install the EDA Server Operator](#install-the-eda-server-operator)
   - [Deploy EDA](#deploy-eda)
+  - [Upgrades](#upgrades)
   - [Advanced Configuration](#advanced-configuration)
     - [Admin user account configuration](#admin-user-account-configuration)
     - [Database Fields Encryption Configuration](#database-fields-encryption-configuration)
@@ -144,6 +145,11 @@ $ kubectl get secret eda-demo-admin-password -o jsonpath="{.data.password}" | ba
 yDL2Cx5Za94g9MvBP6B73nzVLlmfgPjR
 ```
 
+## Upgrades
+
+We recommend you take an backup by creating an EDABackup resource before upgrading, particularly if the new version includes a PostgreSQL database version change.
+
+For information on how to upgrade, please see the [upgrading.md](./docs/upgrade/upgrading.md).
 
 ## Advanced Configuration
 
