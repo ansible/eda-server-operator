@@ -14,7 +14,7 @@ docker run --entrypoint="" quay.io/ansible/eda-server-operator:$EDA_OPERATOR_VER
 
 Follow the installation instructions ('make deploy', 'kustomization', etc.) using the new release version to apply the new operator yaml and upgrade the operator. This will in turn also upgrade your EDA deployment.
 
-For example, if you installed with kustomize, you could modify the version in your kustomization.yaml file from 1.0.0 to 1.0.1, then apply it. 
+For example, if you installed with kustomize, you could modify the version in your kustomization.yaml file from 1.0.0 to 1.0.1, then apply it.
 
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -52,7 +52,7 @@ In the event you need to recover the backup see the [restore role documentation]
 
 If there is a PostgreSQL major version upgrade, after the data directory on the PVC is migrated to the new version, the old PVC is kept by default.
 This provides the ability to roll back if needed, but can take up extra storage space in your cluster unnecessarily. By default, the postgres pvc from the previous version will remain unless you manually remove it, or have the `database.postgres_keep_pvc_after_upgrade` parameter set to false. You can configure it to be deleted automatically
-after a successful upgrade by setting the following variable on the AWX spec. 
+after a successful upgrade by setting the following variable on the EDA spec.
 
 ```yaml
   spec:

@@ -40,8 +40,8 @@ _database:
   priority_class: ''
   tolerations: ''
   postgres_extra_args: ''
-  postgres_keep_pvc_after_upgrade: true
-  database_secret: '' # Name of k8s secret containing postgres host, username, password, database, port, and type
+  postgres_keep_pvc_after_upgrade: true  # Specify whether or not to keep the old PVC after PostgreSQL upgrades
+  database_secret: ''  # Name of k8s secret containing postgres host, username, password, database, port, and type
 
 
 image_pull_policy: IfNotPresent
