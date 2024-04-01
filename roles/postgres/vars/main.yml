@@ -3,4 +3,5 @@
 
 supported_pg_version: 15
 _previous_upgraded_pg_version: 0
+_postgres_data_path: '/var/lib/pgsql/data/userdata'
 old_postgres_pod: []
