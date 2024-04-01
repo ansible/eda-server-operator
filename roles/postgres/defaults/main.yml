@@ -39,7 +39,6 @@ _database:
   node_selector: ''
   priority_class: ''
   tolerations: ''
-  postgres_data_path: '/var/lib/pgsql/data/userdata'
   postgres_extra_args: ''
   postgres_keep_pvc_after_upgrade: true
   database_secret: '' # Name of k8s secret containing postgres host, username, password, database, port, and type

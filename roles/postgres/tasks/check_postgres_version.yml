@@ -51,7 +51,7 @@
   block:
     - name: Set path to PG_VERSION file for given container image
       set_fact:
-        path_to_pg_version: '{{ combined_database.postgres_data_path }}/PG_VERSION'
+        path_to_pg_version: '{{ _postgres_data_path }}/PG_VERSION'
 
     - name: Get old PostgreSQL version
       k8s_exec:

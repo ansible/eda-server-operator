@@ -265,11 +265,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:StorageClass
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Database data path
-        path: database.postgres_data_path
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: Database Extra Arguments
         path: database.postgres_extra_args
         x-descriptors:

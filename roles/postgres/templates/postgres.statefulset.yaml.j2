@@ -106,8 +106,8 @@ spec:
               name: postgres-{{ supported_pg_version }}
           volumeMounts:
             - name: postgres-{{ supported_pg_version }}
-              mountPath: '{{ combined_database.postgres_data_path | dirname }}'
-              subPath: '{{ combined_database.postgres_data_path | dirname | basename }}'
+              mountPath: '{{ _postgres_data_path | dirname }}'
+              subPath: '{{ _postgres_data_path | dirname | basename }}'
 {% if combined_database.resource_requirements is defined %}
           resources: {{ combined_database.resource_requirements }}
 {% endif %}
