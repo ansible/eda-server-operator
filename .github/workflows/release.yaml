@@ -1,5 +1,8 @@
 name: Promote Operator Release
 
+env:
+  ENGINE: docker # use docker for everything so buildx commands can be used
+
 on:
   release:
     types: [published]
@@ -66,7 +69,7 @@ jobs:
 
       - name: Build Bundle Image
         run: |
-          make bundle bundle-build IMG=eda-server-operator:${TAG_NAME} VERSION=${TAG_NAME} BUNDLE_IMG=eda-server-operator-bundle:${TAG_NAME}
+          make bundle bundle-build IMG=quay.io/ansible/eda-server-operator:${TAG_NAME} VERSION=${TAG_NAME} BUNDLE_IMG=eda-server-operator-bundle:${TAG_NAME}
           docker tag eda-server-operator-bundle:${TAG_NAME} eda-server-operator-bundle:latest
         working-directory: eda-server-operator
 
