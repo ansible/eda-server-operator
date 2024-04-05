@@ -31,6 +31,9 @@ spec:
         app.kubernetes.io/managed-by: 'eda-operator' 
     spec:
       securityContext:
+{% if postgres_security_context_settings|length %}
+        {{ postgres_security_context_settings | to_nice_yaml | indent(8) }}
+{% endif %}
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
