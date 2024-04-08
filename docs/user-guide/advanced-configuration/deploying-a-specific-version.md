@@ -11,7 +11,7 @@ There are a few variables that are customizable for eda the image management.
 | image_pull_policy      | The pull policy to adopt  | IfNotPresent                            |
 | image_pull_secrets     | The pull secrets to use   | None                                    |
 | redis_image            | Path of the image to pull | redis                                   |
-| redis_image_version    | Image version to pull     | latest                                  |
+| redis_image_version    | Image version to pull     | c9s                                     |
 | postgres_image         | Path of the image to pull | postgres                                |
 | postgres_image_version | Image version to pull     | latest                                  |
 

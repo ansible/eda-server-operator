@@ -7,7 +7,7 @@ image_pull_policy: IfNotPresent
 image_pull_secrets: []
 
 _redis_image: quay.io/sclorg/redis-6-c9s
-_redis_image_version: latest
+_redis_image_version: c9s
 
 redis: {}
 _redis:
