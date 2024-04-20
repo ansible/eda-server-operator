@@ -43,6 +43,14 @@ _database:
   postgres_keep_pvc_after_upgrade: true  # Specify whether or not to keep the old PVC after PostgreSQL upgrades
   database_secret: ''  # Name of k8s secret containing postgres host, username, password, database, port, and type
 
+postgres_tolerations: ''
+postgres_storage_requirements:
+  requests:
+    storage: 8Gi
+postgres_resource_requirements:
+  requests:
+    cpu: 10m
+    memory: 64Mi
 
 image_pull_policy: IfNotPresent
 image_pull_secrets: []

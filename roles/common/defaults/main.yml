@@ -16,3 +16,8 @@ service_account_annotations: ''
 # This should be true if using the operator loop.
 # Set to false to run a role locally for testing.
 set_self_labels: true
+
+# Used to determine some cluster specific logic
+is_k8s: false
+is_openshift: false
+
