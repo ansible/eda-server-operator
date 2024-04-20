@@ -41,16 +41,12 @@ _database:
   tolerations: ''
   postgres_extra_args: ''
   postgres_keep_pvc_after_upgrade: true  # Specify whether or not to keep the old PVC after PostgreSQL upgrades
+  postgres_data_volume_init: false
+  postgres_init_container_commands: |
+    chown 26:0 /var/lib/pgsql/data
+    chmod 700 /var/lib/pgsql/data
   database_secret: ''  # Name of k8s secret containing postgres host, username, password, database, port, and type
 
-postgres_tolerations: ''
-postgres_storage_requirements:
-  requests:
-    storage: 8Gi
-postgres_resource_requirements:
-  requests:
-    cpu: 10m
-    memory: 64Mi
 
 image_pull_policy: IfNotPresent
 image_pull_secrets: []

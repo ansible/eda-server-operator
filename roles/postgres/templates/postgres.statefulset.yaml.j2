@@ -28,7 +28,7 @@ spec:
         app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
         app.kubernetes.io/component: 'database'
         app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
-        app.kubernetes.io/managed-by: 'eda-operator' 
+        app.kubernetes.io/managed-by: 'eda-operator'
     spec:
       securityContext:
         allowPrivilegeEscalation: false
@@ -62,8 +62,8 @@ spec:
             - /bin/sh
             - -c
             - |
-              {{ postgres_init_container_commands | indent(width=14) }}
-          resources: {{ postgres_init_container_resource_requirements | default(postgres_resource_requirements) }}
+              {{ combined_database.postgres_init_container_commands | indent(width=14) }}
+          resources: {{ combined_database.resource_requirements }}
           volumeMounts:
             - name: postgres-{{ supported_pg_version }}
               mountPath: '{{ _postgres_data_path | dirname }}'
