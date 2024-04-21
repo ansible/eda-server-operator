@@ -2286,6 +2286,13 @@ spec:
                       type: string
                     description: NodeSelector for the database pod.
                     type: object
+                  postgres_data_volume_init:
+                    description: Sets permissions on the /var/lib/pgdata/data for postgres container using an init container (not Openshift)
+                    type: boolean
+                    default: false
+                  postgres_init_container_commands:
+                    description: Customize the postgres init container commands (Non Openshift)
+                    type: string
                   postgres_extra_args:
                     description: Arguments to pass to postgres process
                     items:
