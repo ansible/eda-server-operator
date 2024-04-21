@@ -60,7 +60,7 @@ The following variables are customizable for the managed PostgreSQL service
 | database.storage_requirements                 | PostgreSQL container storage requirements     | requests: {storage: 8Gi}               |
 | database.postgres_storage_class               | PostgreSQL PV storage class                   | Empty string                           |
 | database.priority_class                       | Priority class used for PostgreSQL pod        | Empty string                           |
-| data.postgres_data_volume_init |  Initialize PostgreSQL data directory with the correct permissions | false |
+| data.postgres_data_volume_init                |  Initialize PostgreSQL data directory with the correct permissions | false |
 
 Example of customization could be:
 
@@ -98,4 +98,17 @@ You can no longer configure a custom `postgres_data_path` because it is hardcode
 
 When using a hostPath backed PVC and some other storage classes like longhorn storage, the postgres data directory needs to be accessible by the user in the postgres pod (UID 26).
 
-To initialize this directory with the correct permissions, add `data.postgres_data_volume_init: true`.
+To initialize this directory with the correct permissions, add `data.postgres_data_volume_init: true` to EDA instance.
+```
+---
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+  namespace: eda
+spec:
+  automation_server_url: https://awx.example.com
+  service_type: ClusterIP
+  database:
+    postgres_data_volume_init: true
+```
