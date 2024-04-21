@@ -60,6 +60,7 @@ The following variables are customizable for the managed PostgreSQL service
 | database.storage_requirements                 | PostgreSQL container storage requirements     | requests: {storage: 8Gi}               |
 | database.postgres_storage_class               | PostgreSQL PV storage class                   | Empty string                           |
 | database.priority_class                       | Priority class used for PostgreSQL pod        | Empty string                           |
+| data.postgres_data_volume_init |  Initialize PostgreSQL data directory with the correct permissions | false |
 
 Example of customization could be:
 
@@ -79,6 +80,7 @@ spec:
       requests:
         storage: 8Gi
     postgres_storage_class: fast-ssd
+    postgres_data_volume_init: true
     postgres_extra_args:
       - '-c'
       - 'max_connections=1000'
@@ -91,3 +93,9 @@ spec:
 We recommend you use the default image sclorg image. If you override the postgres image to use a custom postgres image like `postgres:15` for example, the default data directory path may be different. These images cannot be used interchangeably.
 
 You can no longer configure a custom `postgres_data_path` because it is hardcoded in the quay.io/sclorg/postgresql-15-c9s image.
+
+#### Note about Postgres data volume initialization
+
+When using a hostPath backed PVC and some other storage classes like longhorn storage, the postgres data directory needs to be accessible by the user in the postgres pod (UID 26).
+
+To initialize this directory with the correct permissions, add `data.postgres_data_volume_init: true`.
