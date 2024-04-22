@@ -98,7 +98,7 @@ You can no longer configure a custom `postgres_data_path` because it is hardcode
 
 When using a hostPath backed PVC and some other storage classes like longhorn storage, the postgres data directory needs to be accessible by the user in the postgres pod (UID 26).
 
-To initialize this directory with the correct permissions, add `data.postgres_data_volume_init: true` to EDA instance.
+To initialize this directory with the correct permissions, add `database.postgres_data_volume_init: true` to EDA instance.
 
 ```yaml
 spec:
