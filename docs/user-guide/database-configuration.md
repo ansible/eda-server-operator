@@ -99,16 +99,20 @@ You can no longer configure a custom `postgres_data_path` because it is hardcode
 When using a hostPath backed PVC and some other storage classes like longhorn storage, the postgres data directory needs to be accessible by the user in the postgres pod (UID 26).
 
 To initialize this directory with the correct permissions, add `data.postgres_data_volume_init: true` to EDA instance.
-```
----
-apiVersion: eda.ansible.com/v1alpha1
-kind: EDA
-metadata:
-  name: eda
-  namespace: eda
+
+```yaml
 spec:
-  automation_server_url: https://awx.example.com
-  service_type: ClusterIP
   database:
     postgres_data_volume_init: true
+```
+
+Should you need to modify the init container commands, there is an example below.
+
+```yaml
+spec:
+  database:
+    postgres_data_volume_init: true
+    postgres_init_container_commands: |
+      chown 26:0 /var/lib/pgsql/data
+      chmod 700 /var/lib/pgsql/data
 ```
