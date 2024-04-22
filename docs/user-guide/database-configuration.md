@@ -60,7 +60,7 @@ The following variables are customizable for the managed PostgreSQL service
 | database.storage_requirements                 | PostgreSQL container storage requirements     | requests: {storage: 8Gi}               |
 | database.postgres_storage_class               | PostgreSQL PV storage class                   | Empty string                           |
 | database.priority_class                       | Priority class used for PostgreSQL pod        | Empty string                           |
-| data.postgres_data_volume_init                |  Initialize PostgreSQL data directory with the correct permissions | false |
+| database.postgres_data_volume_init                |  Initialize PostgreSQL data directory with the correct permissions | false |
 
 Example of customization could be:
 
