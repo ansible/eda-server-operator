@@ -764,7 +764,7 @@ spec:
                   replicas:
                     default: 2
                     description: 'Size is the size of number of eda-default-worker replicas.
-                      Default: 1'
+                      Default: 2'
                     format: int32
                     minimum: 0
                     nullable: true
@@ -1092,9 +1092,9 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 5
+                    default: 2
                     description: 'Size is the size of number of eda-activation-worker replicas.
-                      Default: 5'
+                      Default: 2'
                     format: int32
                     minimum: 0
                     nullable: true
@@ -1424,7 +1424,7 @@ spec:
                   replicas:
                     default: 2
                     description: 'Size is the size of number of eda-worker replicas.
-                      Default: 1'
+                      Default: 2'
                     format: int32
                     minimum: 0
                     nullable: true

@@ -50,7 +50,7 @@ _default_worker:
 
 # Note: "activation-worker: {}" is intentionally excluded here so we know if the user set it
 _activation_worker:
-  replicas: 5
+  replicas: 2
   resource_requirements:
     requests:
       cpu: 25m
