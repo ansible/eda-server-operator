@@ -1745,7 +1745,7 @@ spec:
                 type: object
               scheduler:
                 default:
-                  replicas: 1
+                  replicas: 2
                 description: Defines desired state of eda-scheduler resources
                 properties:
                   node_selector:
@@ -1754,9 +1754,9 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 1
+                    default: 2
                     description: 'Size is the size of number of eda-scheduler replicas.
-                      Default: 1'
+                      Default: 2'
                     format: int32
                     minimum: 0
                     nullable: true
