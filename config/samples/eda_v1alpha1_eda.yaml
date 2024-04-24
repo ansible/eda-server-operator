@@ -31,6 +31,12 @@ spec:
       requests:
         cpu: 150m
         memory: 256Mi
+  scheduler:
+    replicas: 2
+    resource_requirements:
+      requests:
+        cpu: 150m
+        memory: 256Mi
   ui:
     replicas: 1
     resource_requirements:

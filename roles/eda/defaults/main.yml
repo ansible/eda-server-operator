@@ -70,7 +70,7 @@ _worker:
 
 scheduler: {}
 _scheduler:
-  replicas: 1
+  replicas: 2
   resource_requirements:
     requests:
       cpu: 50m
