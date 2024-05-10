@@ -20,6 +20,7 @@ data:
   EDA_CSRF_TRUSTED_ORIGINS: "http://{{ ansible_operator_meta.name }}-api:8000"
   EDA_MQ_HOST: "{{ ansible_operator_meta.name }}-redis-svc"
   EDA_WEBSOCKET_BASE_URL: "ws://{{ websocket_server_name }}:8001"
+  EDA_WEBSOCKET_TOKEN_BASE_URL: "http://{{ ansible_operator_meta.name }}-api:8000"
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
   EDA_PROTOCOL: "http"
   EDA_HOST: "{{ ansible_operator_meta.name }}-api:8000"
