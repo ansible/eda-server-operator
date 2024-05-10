@@ -128,8 +128,6 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
-        ports:
-        - containerPort: 8000
 {% if combined_activation_worker.resource_requirements is defined %}
         resources: {{ combined_activation_worker.resource_requirements }}
 {% endif %}
