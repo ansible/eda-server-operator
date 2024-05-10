@@ -175,7 +175,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:8000 --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
+        - gunicorn --bind 0.0.0.0:{{ api_port }} --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -211,18 +211,18 @@ spec:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
         ports:
-        - containerPort: 8000
+        - containerPort: {{ api_port }}
         readinessProbe:
           httpGet:
             path: /_healthz
-            port: 8000
+            port: {{ api_port }}
           failureThreshold: 10
           periodSeconds: 10
           initialDelaySeconds: 20
         livenessProbe:
           httpGet:
             path: /_healthz
-            port: 8000
+            port: {{ api_port }}
           failureThreshold: 10
           periodSeconds: 10
           initialDelaySeconds: 20
@@ -235,7 +235,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - daphne -b 0.0.0.0 -p 8001 aap_eda.asgi:application
+        - daphne -b 0.0.0.0 -p {{ websocket_port }} aap_eda.asgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'

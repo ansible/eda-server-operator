@@ -2,6 +2,8 @@
 # vars file for EDA
 
 api_server_name: "{{ ansible_operator_meta.name }}-api"
+api_port: 8000
 websocket_server_name: "{{ ansible_operator_meta.name }}-daphne"
+websocket_port: 8001
 media_dir: /var/lib/eda/files
 bundle_ca_crt: ''
