@@ -1,0 +1,18 @@
+name: EDA-Operator CI
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '00 3 * * *'
+env:
+  COLORTERM: 'yes'
+  TERM: 'xterm-256color'
+jobs:
+  validate-bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Validate OLM Bundle
+        run: make bundle
