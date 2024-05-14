@@ -7,6 +7,108 @@ env:
   COLORTERM: 'yes'
   TERM: 'xterm-256color'
 jobs:
+  eda:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - SCENARIO: default
+          - SCENARIO: externaldb
+          - SCENARIO: ingress
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Start minikube
+        run: minikube start --memory=max --cpus=max --vm-driver=docker --extra-config=apiserver.service-node-port-range=80-32000 --kubernetes-version=v1.28.9
+
+      - name: Enable ingress on minikube
+        run: minikube addons enable ingress
+        if: ${{ matrix.SCENARIO == 'ingress' }}
+
+      - name: Deploy external postgresql
+        run: |
+          eval $(minikube -p minikube docker-env)
+          docker volume create postgresql
+          docker run -d -p 5555:5432 --name postgresql -e POSTGRESQL_USER=eda -e POSTGRESQL_PASSWORD=eda -e POSTGRESQL_DATABASE=eda -v postgresql:/var/lib/pgsql/data quay.io/sclorg/postgresql-15-c9s:latest
+          echo $(minikube ip)   eda-postgresql | sudo tee -a /etc/hosts
+        if: ${{ matrix.SCENARIO == 'externaldb' }}
+
+      - name: Build the EDA operator container image
+        run: |
+          eval $(minikube -p minikube docker-env)
+          make docker-build
+        env:
+          VERSION: main
+
+      - name: Set imagePullPolicy to ifNotPresent
+        run: |
+          sed -i 's/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g' config/manager/manager.yaml
+
+      - name: Deploy the EDA operator
+        run: make deploy
+        env:
+          NAMESPACE: eda
+          VERSION: main
+
+      - name: Set context to eda namespace
+        run: kubectl config set-context --current --namespace=eda
+
+      - name: Create postgresl secret for external database
+        run: kubectl apply -f .ci/eda-external-database.secret.yaml
+        if: ${{ matrix.SCENARIO == 'externaldb' }}
+
+      - name: Create the EDA demo CR
+        run: kubectl apply -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+
+      - name: Print EDA demo CR
+        run: kubectl -n eda get eda eda-demo -o yaml
+
+      - name: Check and wait the EDA demo to be ready
+        run: kubectl wait --for condition=Successful eda/eda-demo --timeout=-1s
+
+      - name: Test EDA API via k8s service
+        run: |
+          kubectl port-forward service/eda-demo-ui 8080:80 &
+          sleep 1
+          curl -s http://localhost:8080/api/eda/v1/status/
+        if: ${{ matrix.SCENARIO != 'ingress' }}
+
+      - name: Test EDA API via k8s ingress
+        run: |
+          IP=$(kubectl get ingress -n eda eda-demo-ingress -o json | jq .status.loadBalancer.ingress[0].ip -r)
+          curl -s http://${IP}:80/api/eda/v1/status/
+        if: ${{ matrix.SCENARIO == 'ingress' }}
+
+      - name: Get logs
+        if: always()
+        run: |
+          echo ::group::OPERATOR_LOGS
+          kubectl logs -l control-plane=controller-manager --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::POSTGRES_LOGS
+          kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::REDIS_LOGS
+          kubectl logs -l app.kubernetes.io/component=cache --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::EDA_API_LOGS
+          kubectl logs -l app.kubernetes.io/component=eda-api --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::EDA_UI_LOGS
+          kubectl logs -l app.kubernetes.io/component=eda-ui --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::EDA_DEFAULT_WORKER_LOGS
+          kubectl logs -l app.kubernetes.io/component=eda-default-worker --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::EDA_ACTIVATION_WORKERLOGS
+          kubectl logs -l app.kubernetes.io/component=eda-activation-worker --tail=1000 || true
+          echo ::endgroup::
+          echo ::group::EDA_SCHEDULER_LOGS
+          kubectl logs -l app.kubernetes.io/component=eda-scheduler --tail=1000 || true
+          echo ::endgroup::
   validate-bundle:
     runs-on: ubuntu-latest
     timeout-minutes: 10

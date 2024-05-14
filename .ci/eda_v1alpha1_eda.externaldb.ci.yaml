@@ -1,0 +1,11 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda-demo
+  annotations:
+    "ansible.sdk.operatorframework.io/verbosity": "5"
+spec:
+  no_log: false
+  automation_server_url: http://foo.bar
+  database:
+    database_secret: eda-demo-external-database
