@@ -1,10 +1,9 @@
 apiVersion: eda.ansible.com/v1alpha1
-kind: EDA
+kind: EDABackup
 metadata:
-  name: eda-demo
+  name: eda-demo-backup
   annotations:
     "ansible.sdk.operatorframework.io/verbosity": "5"
 spec:
   no_log: false
-  automation_server_url: http://foo.bar
-  ingress_type: ingress
+  deployment_name: eda-demo
