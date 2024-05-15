@@ -9,7 +9,7 @@ env:
 jobs:
   eda:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -43,12 +43,10 @@ jobs:
         env:
           VERSION: main
 
-      - name: Set imagePullPolicy to ifNotPresent
+      - name: Deploy the EDA operator
         run: |
           sed -i 's/imagePullPolicy: Always/imagePullPolicy: IfNotPresent/g' config/manager/manager.yaml
-
-      - name: Deploy the EDA operator
-        run: make deploy
+          make deploy
         env:
           NAMESPACE: eda
           VERSION: main
@@ -61,13 +59,10 @@ jobs:
         if: ${{ matrix.SCENARIO == 'externaldb' }}
 
       - name: Create the EDA demo CR
-        run: kubectl apply -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
-
-      - name: Print EDA demo CR
-        run: kubectl -n eda get eda eda-demo -o yaml
-
-      - name: Check and wait the EDA demo to be ready
-        run: kubectl wait --for condition=Successful eda/eda-demo --timeout=-1s
+        run: |
+          kubectl apply -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+          kubectl -n eda get eda eda-demo -o yaml
+          kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
 
       - name: Test EDA API via k8s service
         run: |
@@ -82,11 +77,27 @@ jobs:
           curl -s http://${IP}:80/api/eda/v1/status/
         if: ${{ matrix.SCENARIO == 'ingress' }}
 
+      - name: Backup EDA demo
+        run: |
+          kubectl apply -f .ci/eda_v1alpha1_edabackup.ci.yaml
+          kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_edabackup.ci.yaml
+
+      - name: Delete the EDA demo CR
+        run: |
+          kubectl delete --cascade=foreground -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+          kubectl wait --for=delete --timeout=-1s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+
+      - name: Restore EDA demo
+        run: |
+          kubectl apply -f .ci/eda_v1alpha1_edarestore.ci.yaml
+          kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_edarestore.ci.yaml
+          kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+
       - name: Get logs
         if: always()
         run: |
           echo ::group::OPERATOR_LOGS
-          kubectl logs -l control-plane=controller-manager --tail=1000 || true
+          kubectl logs -l control-plane=controller-manager --tail=10000 || true
           echo ::endgroup::
           echo ::group::POSTGRES_LOGS
           kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true
@@ -103,7 +114,7 @@ jobs:
           echo ::group::EDA_DEFAULT_WORKER_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-default-worker --tail=1000 || true
           echo ::endgroup::
-          echo ::group::EDA_ACTIVATION_WORKERLOGS
+          echo ::group::EDA_ACTIVATION_WORKER_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-activation-worker --tail=1000 || true
           echo ::endgroup::
           echo ::group::EDA_SCHEDULER_LOGS

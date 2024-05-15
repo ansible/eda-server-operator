@@ -6,4 +6,4 @@ metadata:
     "ansible.sdk.operatorframework.io/verbosity": "5"
 spec:
   no_log: false
-  automation_server_url: https://foo.bar
+  automation_server_url: http://foo.bar
