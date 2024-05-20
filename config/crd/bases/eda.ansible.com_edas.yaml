@@ -89,7 +89,6 @@ spec:
                 description: Defines desired state of eda-api resources
                 properties:
                   gunicorn_workers:
-                    default: 2
                     description: 'The number of gunicorn workers for the api.
                       Default: 2'
                     format: int32
@@ -102,7 +101,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 1
                     description: 'Size is the size of number of eda-api replicas.
                       Default: 1'
                     format: int32
@@ -432,7 +430,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 1
                     description: 'Size is the size of number of eda-ui replicas.
                       Default: 1'
                     format: int32
@@ -762,7 +759,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 2
                     description: 'Size is the size of number of eda-default-worker replicas.
                       Default: 2'
                     format: int32
@@ -1092,7 +1088,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 2
                     description: 'Size is the size of number of eda-activation-worker replicas.
                       Default: 2'
                     format: int32
@@ -1422,7 +1417,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 2
                     description: 'Size is the size of number of eda-worker replicas.
                       Default: 2'
                     format: int32
@@ -1744,8 +1738,6 @@ spec:
                     type: array
                 type: object
               scheduler:
-                default:
-                  replicas: 2
                 description: Defines desired state of eda-scheduler resources
                 properties:
                   node_selector:
@@ -1754,7 +1746,6 @@ spec:
                     description: NodeSelector for the EDA pods.
                     type: object
                   replicas:
-                    default: 2
                     description: 'Size is the size of number of eda-scheduler replicas.
                       Default: 2'
                     format: int32
@@ -2079,7 +2070,6 @@ spec:
                 description: 'Defines desired state of cache resources'
                 properties:
                   replicas:
-                    default: 1
                     description: 'Defines Redis Deployment replicas'
                     format: int32
                     type: integer
@@ -2311,7 +2301,6 @@ spec:
                   postgres_keep_pvc_after_upgrade:
                     description: Specify whether or not to keep the old PVC after PostgreSQL upgrades
                     type: boolean
-                    default: true
                   storage_requirements:
                     description: Storage requirements for the PostgreSQL container
                     properties:
@@ -2380,7 +2369,6 @@ spec:
               set_self_labels:
                 description: Maintain some of the recommended `app.kubernetes.io/*` labels on the resource (self)
                 type: boolean
-                default: true
               service_type:
                 description: The service type to be used on the deployed instance
                 type: string
@@ -2421,21 +2409,18 @@ spec:
               loadbalancer_protocol:
                 description: Protocol to use for the loadbalancer
                 type: string
-                default: http
                 enum:
                 - http
                 - https
               loadbalancer_port:
                 description: Port to use for the loadbalancer
                 type: integer
-                default: 80
               route_host:
                 description: The DNS to use to points to the instance
                 type: string
               route_tls_termination_mechanism:
                 description: The secure TLS termination mechanism to use
                 type: string
-                default: Edge
                 enum:
                 - Edge
                 - edge
@@ -2476,14 +2461,12 @@ spec:
               ipv6_disabled:
                 description: Disable UI container's nginx ipv6 listener
                 type: boolean
-                default: false
               bundle_cacert_secret:
                 description: Secret where the trusted Certificate Authority Bundle is stored
                 type: string
               force_drop_db:
                 description: Force drop the database before restoring. USE WITH CAUTION!
                 type: boolean
-                default: false
           status:
             description: Status defines the observed state of EDA
             properties:

@@ -201,11 +201,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:io.kubernetes:Secret
-      - displayName: Disable IPv6 listener?
-        path: ipv6_disabled
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: Name of the k8s secret the DB fields encryption key is stored
           in.
         displayName: DB Fields Encryption Key
@@ -405,6 +400,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-default-worker deployment resources
+        displayName: (Deprecated) Default worker deployment configuration
+        path: worker
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Defines desired state of eda-default-worker deployment resources
         displayName: Default worker deployment configuration
         path: default_worker
         x-descriptors:
@@ -475,7 +475,7 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-scheduler deployment resources
-        displayName: scheduler deployment configuration
+        displayName: Scheduler deployment configuration
         path: scheduler
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
@@ -634,6 +634,7 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:fieldDependency:service_type:NodePort
       - description: Secret where the trusted Certificate Authority Bundle is stored
+        displayName: Bundle CA Cert Secret
         path: bundle_cacert_secret
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
@@ -643,6 +644,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:text
+      - displayName: Disable IPv6 listener?
+        path: ipv6_disabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - displayName: Set default labels on EDA resource
         path: set_self_labels
         x-descriptors:
@@ -652,7 +658,7 @@ spec:
       - displayName: Force drop database before restore
         path: force_drop_db
         x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       statusDescriptors:
       - description: Admin password for the instance deployed

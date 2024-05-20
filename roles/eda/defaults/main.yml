@@ -59,14 +59,7 @@ _activation_worker:
   tolerations: ''
 
 # Note: Deprecated "worker: {}" is intentionally excluded here so we know if the user set it
-_worker:
-  replicas: 2
-  resource_requirements:
-    requests:
-      cpu: 25m
-      memory: 130Mi
-  node_selector: ''
-  tolerations: ''
+_worker: {}
 
 scheduler: {}
 _scheduler:

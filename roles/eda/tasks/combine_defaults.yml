@@ -22,12 +22,10 @@
   set_fact:
     combined_default_worker: "{{ _default_worker | combine(default_worker, recursive=True) }}"
   when:
-    - worker is not defined
     - default_worker is defined
 
 - name: Set activation worker parameters when worker is not defined
   set_fact:
     combined_activation_worker: "{{ _activation_worker | combine(activation_worker, recursive=True) }}"
   when:
-    - worker is not defined
     - activation_worker is defined
