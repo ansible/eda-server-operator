@@ -93,6 +93,10 @@ spec:
               postgres_image_version:
                 description: PostgreSQL container image version to use
                 type: string
+              spec_overrides:
+                description: Overrides for the EDA spec
+                type: object
+                x-kubernetes-preserve-unknown-fields: true
               no_log:
                 description: Configure no_log for no_log tasks
                 type: boolean
