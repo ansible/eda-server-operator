@@ -54,11 +54,11 @@ spec:
 {% endif %}
 {% if combined_activation_worker.node_selector is defined %}
       nodeSelector:
-        {{ combined_activation_worker.node_selector | indent(width=8) }}
+        {{ combined_activation_worker.node_selector | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_activation_worker.tolerations is defined %}
       tolerations:
-        {{ combined_activation_worker.tolerations | indent(width=8) }}
+        {{ combined_activation_worker.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_activation_worker.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
