@@ -53,11 +53,11 @@ spec:
 {% endif %}
 {% if combined_ui.node_selector is defined %}
       nodeSelector:
-        {{ combined_ui.node_selector | indent(width=8) }}
+        {{ combined_ui.node_selector | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_ui.tolerations is defined %}
       tolerations:
-        {{ combined_ui.tolerations | indent(width=8) }}
+        {{ combined_ui.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_ui.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
