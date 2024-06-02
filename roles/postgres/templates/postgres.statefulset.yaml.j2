@@ -45,11 +45,11 @@ spec:
 {% endif %}
 {% if combined_database.node_selector %}
       nodeSelector:
-        {{ combined_database.node_selector | indent(width=8) }}
+        {{ combined_database.node_selector | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_database.tolerations %}
       tolerations:
-        {{ combined_database.tolerations | indent(width=8) }}
+        {{ combined_database.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
 {% if combined_database.postgres_data_volume_init and not is_openshift %}
       initContainers:
