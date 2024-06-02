@@ -16,8 +16,8 @@ _redis:
     requests:
       cpu: 50m
       memory: 100Mi
-  node_selector: ''
-  tolerations: ''
+  node_selector: {}
+  tolerations: []
 
 # Labels defined on the resource, which should be propagated to child resources
 additional_labels: []

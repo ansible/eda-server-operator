@@ -36,9 +36,9 @@ _database:
   storage_requirements:
     requests:
       storage: 8Gi
-  node_selector: ''
+  node_selector: {}
   priority_class: ''
-  tolerations: ''
+  tolerations: []
   postgres_extra_args: ''
   postgres_keep_pvc_after_upgrade: true  # Specify whether or not to keep the old PVC after PostgreSQL upgrades
   postgres_data_volume_init: false
