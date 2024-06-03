@@ -66,6 +66,54 @@ spec:
 {% endif %}
 {% if bundle_ca_crt  %}
       initContainers:
+      - name: wait-for-migrations
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command:
+          - /bin/bash
+          - -c
+          - chmod +x /usr/bin/wait-for-migrations && /usr/bin/wait-for-migrations
+        envFrom:
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+        env:
+        - name: EDA_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+        - name: EDA_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: database
+        - name: EDA_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: port
+        - name: EDA_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: username
+        - name: EDA_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: password
+        - name: EDA_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: '{{ db_fields_encryption_secret_name }}'
+              key: secret_key
+{% if combined_default_worker.resource_requirements is defined %}
+        resources: {{ combined_default_worker.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: wait-for-migrations
+            mountPath: /usr/bin/wait-for-migrations
+            subPath: wait-for-migrations
       - name: configure-bundle-ca-cert
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -156,3 +204,9 @@ spec:
               - key: bundle-ca.crt
                 path: 'bundle-ca.crt'
 {% endif %}
+        - name: wait-for-migrations
+          configMap:
+            name: "{{ ansible_operator_meta.name }}-wait-for-migrations"
+            items:
+              - key: wait-for-migrations
+                path: wait-for-migrations

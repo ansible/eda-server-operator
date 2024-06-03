@@ -19,6 +19,12 @@
     definition: "{{ lookup('template', 'eda.configmap.yaml.j2') }}"
     wait: yes
 
+- name: Apply wait-for-migrations ConfigMap resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'eda.wait-for-migrations.configmap.yaml.j2') }}"
+    wait: yes
+
 - name: Apply deployment resources
   k8s:
     apply: yes
