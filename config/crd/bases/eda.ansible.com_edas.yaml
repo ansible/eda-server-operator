@@ -92,6 +92,7 @@ spec:
                     description: 'The number of gunicorn workers for the api.
                       Default: 2'
                     format: int32
+                    default: 2
                     minimum: 1
                     nullable: false
                     type: integer
@@ -104,7 +105,8 @@ spec:
                     description: 'Size is the size of number of eda-api replicas.
                       Default: 1'
                     format: int32
-                    minimum: 0
+                    default: 1
+                    minimum: 1
                     nullable: true
                     type: integer
                   resource_requirements:
@@ -433,6 +435,7 @@ spec:
                     description: 'Size is the size of number of eda-ui replicas.
                       Default: 1'
                     format: int32
+                    default: 1
                     minimum: 0
                     nullable: true
                     type: integer
@@ -762,6 +765,7 @@ spec:
                     description: 'Size is the size of number of eda-default-worker replicas.
                       Default: 2'
                     format: int32
+                    default: 2
                     minimum: 0
                     nullable: true
                     type: integer
@@ -1091,6 +1095,7 @@ spec:
                     description: 'Size is the size of number of eda-activation-worker replicas.
                       Default: 2'
                     format: int32
+                    default: 2
                     minimum: 0
                     nullable: true
                     type: integer
@@ -1420,6 +1425,7 @@ spec:
                     description: 'Size is the size of number of eda-worker replicas.
                       Default: 2'
                     format: int32
+                    default: 2
                     minimum: 0
                     nullable: true
                     type: integer
@@ -1749,6 +1755,7 @@ spec:
                     description: 'Size is the size of number of eda-scheduler replicas.
                       Default: 2'
                     format: int32
+                    default: 2
                     minimum: 0
                     nullable: true
                     type: integer
