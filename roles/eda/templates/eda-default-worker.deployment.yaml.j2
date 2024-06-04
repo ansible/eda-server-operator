@@ -64,7 +64,6 @@ spec:
       topologySpreadConstraints:
         {{ combined_default_worker.topology_spread_constraints | indent(width=8) }}
 {% endif %}
-{% if bundle_ca_crt  %}
       initContainers:
       - name: wait-for-migrations
         image: {{ _image }}
@@ -72,7 +71,7 @@ spec:
         command:
           - /bin/bash
           - -c
-          - /var/lib/eda/wait-for-migrations
+          - aap-eda-manage wait_for_migrations -t 60
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -110,10 +109,7 @@ spec:
 {% if combined_default_worker.resource_requirements is defined %}
         resources: {{ combined_default_worker.resource_requirements }}
 {% endif %}
-        volumeMounts:
-          - name: wait-for-migrations
-            mountPath: /usr/bin/wait-for-migrations
-            subPath: wait-for-migrations
+{% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -204,9 +200,3 @@ spec:
               - key: bundle-ca.crt
                 path: 'bundle-ca.crt'
 {% endif %}
-        - name: wait-for-migrations
-          configMap:
-            name: "{{ ansible_operator_meta.name }}-wait-for-migrations"
-            items:
-              - key: wait-for-migrations
-                path: wait-for-migrations
