@@ -70,7 +70,7 @@ spec:
         command:
           - /bin/bash
           - -c
-          - chmod +x /usr/bin/wait-for-migrations && /usr/bin/wait-for-migrations
+          - /var/lib/eda/wait-for-migrations
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
