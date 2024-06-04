@@ -70,7 +70,7 @@ spec:
         command:
           - /bin/bash
           - -c
-          - /var/lib/eda/wait-for-migrations
+          - aap-eda-manage wait_for_migrations -t 60
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -108,10 +108,6 @@ spec:
 {% if combined_scheduler.resource_requirements is defined %}
         resources: {{ combined_scheduler.resource_requirements }}
 {% endif %}
-        volumeMounts:
-          - name: wait-for-migrations
-            mountPath: /usr/bin/wait-for-migrations
-            subPath: wait-for-migrations
       containers:
       - name: eda-scheduler
         image: {{ _image }}
@@ -157,13 +153,5 @@ spec:
 {% if combined_scheduler.resource_requirements is defined %}
         resources: {{ combined_scheduler.resource_requirements }}
 {% endif %}
-      volumes:
-        - name: wait-for-migrations
-          configMap:
-            name: "{{ ansible_operator_meta.name }}-wait-for-migrations"
-            items:
-              - key: wait-for-migrations
-                path: wait-for-migrations
-
       restartPolicy: Always
 status: {}
