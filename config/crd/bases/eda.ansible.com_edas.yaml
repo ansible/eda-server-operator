@@ -32,7 +32,6 @@ spec:
           spec:
             description: Spec defines the desired state of EDA
             type: object
-            x-kubernetes-preserve-unknown-fields: true
             required:
             - automation_server_url
             properties:
