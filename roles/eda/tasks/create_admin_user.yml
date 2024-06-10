@@ -23,5 +23,6 @@
   register: result
   changed_when: "'That username is already taken' not in result.stderr"
   failed_when: "'That username is already taken' not in result.stderr and 'Superuser created successfully' not in result.stdout"
+  ignore_errors: true
   no_log: "{{ no_log }}"
   when: users_result.return_code > 0
