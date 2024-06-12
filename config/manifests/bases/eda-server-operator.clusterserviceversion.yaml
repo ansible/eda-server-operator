@@ -518,6 +518,11 @@ spec:
         path: redis
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Disable the default redis deployment if an external Redis is configured
+        displayName: Disable Redis
+        path: redis.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: The number of redis replicas.
         displayName: Replicas
         path: redis.replicas

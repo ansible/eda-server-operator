@@ -2076,6 +2076,9 @@ spec:
               redis:
                 description: 'Defines desired state of cache resources'
                 properties:
+                  disabled:
+                    description: Disables default redis deployment if external redis is configured
+                    type: boolean
                   replicas:
                     description: 'Defines Redis Deployment replicas'
                     format: int32

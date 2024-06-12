@@ -2,7 +2,7 @@
 
 - name: Redis Deployment & Service
   k8s:
-    state: present
+    state: "{{ 'absent' if _eda.redis.disabled else 'present' }}"
     apply: yes
     wait: no
     definition: "{{ lookup('template', 'templates/' + item + '.yaml.j2') | from_yaml }}"

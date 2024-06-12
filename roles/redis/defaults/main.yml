@@ -11,6 +11,7 @@ _redis_image_version: c9s
 
 redis: {}
 _redis:
+  disabled: false
   replicas: 1
   resource_requirements:
     requests:
