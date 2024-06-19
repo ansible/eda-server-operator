@@ -4,11 +4,11 @@
 
 The default PostgreSQL version for the version of EDA bundled with the latest version of the eda-server-operator is PostgreSQL 15. You can find this default for a given version by at the default value for [supported_pg_version](./roles/eda/vars/main.yml).
 
-We only have coverage for the default version of PostgreSQL. Newer versions of PostgreSQL will likely work, but should only be configured as an external database. If your database is managed by the operator (default if you don't specify a `postgres_configuration_secret`), then you should not override the default version as this may cause issues when operator tries to upgrade your postgresql pod.
+We only have coverage for the default version of PostgreSQL. Newer versions of PostgreSQL will likely work, but should only be configured as an external database. If your database is managed by the operator (default if you don't specify a `database.database_secret`), then you should not override the default version as this may cause issues when operator tries to upgrade your postgresql pod.
 
 #### External PostgreSQL Service
 
-To configure EDA to use an external database, the Custom Resource needs to know about the connection details. To do this, create a k8s secret with those connection details and specify the name of the secret as `postgres_configuration_secret` at the CR spec level.
+To configure EDA to use an external database, the Custom Resource needs to know about the connection details. To do this, create a k8s secret with those connection details and specify the name of the secret as `database.database_secret` at the CR spec level.
 
 
 The secret should be formatted as follows:
@@ -43,7 +43,8 @@ Once the secret is created, you can specify it on your spec:
 ---
 spec:
   ...
-  postgres_configuration_secret: <name-of-your-secret>
+  database:
+    database_secret: <name-of-your-secret>
 ```
 
 #### Managed PostgreSQL Service
