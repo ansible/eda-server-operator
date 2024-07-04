@@ -4,7 +4,7 @@ You can constrain the EDA pods created by the operator to run on a certain subse
 
 Each component of EDA has its own `node_selector` and `tolerations` values. The supported components are `ui`, `api`, `default_worker`, `activation_worker`, `worker`, `scheduler`, `redis` and `database`.
 
-|Name   | Description | Type | Default |
+| Name | Description | Type | Default |
 |---|---|---|---|
 | node_selector  | Pods' nodeSelector.  | `dictionary`  | `{}`  |
 | tolerations  | Pods' tolerations  | `list`  | `[]`  |
