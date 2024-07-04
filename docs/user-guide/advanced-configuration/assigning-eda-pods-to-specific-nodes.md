@@ -54,4 +54,4 @@ spec:
   ...
   ```
 
-  For more information about how node selectors and tolerations work, refer to Kubernetes docs on (nodeSelector)[https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector] and (Taints and Tolerations)[https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/].
+  For more information about how node selectors and tolerations work, refer to Kubernetes docs on [nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) and [Taints and Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
