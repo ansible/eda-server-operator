@@ -9,12 +9,13 @@ metadata:
     app.kubernetes.io/component: '{{ deployment_type }}-api'
 spec:
   ports:
-  - port: {{ api_port }}
+  - port: {{ api_nginx_port }}
     protocol: TCP
-    targetPort: {{ api_port }}
+    targetPort: {{ api_nginx_port }}
   selector:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-api'
+
 ---
 apiVersion: v1
 kind: Service

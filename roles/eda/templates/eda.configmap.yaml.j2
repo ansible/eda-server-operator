@@ -17,10 +17,10 @@ data:
 
   # EDA Server
   EDA_ALLOWED_HOSTS: "['*']"
-  EDA_CSRF_TRUSTED_ORIGINS: "http://{{ api_server_name }}:{{ api_port }}"
+  EDA_CSRF_TRUSTED_ORIGINS: "http://{{ api_server_name }}:{{ api_nginx_port }}"
   EDA_MQ_HOST: "{{ ansible_operator_meta.name }}-redis-svc"
   EDA_WEBSOCKET_BASE_URL: "ws://{{ websocket_server_name }}:{{ websocket_port }}"
-  EDA_WEBSOCKET_TOKEN_BASE_URL: "http://{{ api_server_name }}:{{ api_port }}"
+  EDA_WEBSOCKET_TOKEN_BASE_URL: "http://{{ api_server_name }}:{{ api_nginx_port }}"
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
   EDA_MAX_RUNNING_ACTIVATIONS: "12"
 
@@ -76,8 +76,18 @@ data:
             root /usr/share/nginx/html;
 
             location ~ ^/api/eda/v[0-9]+/ {
-                proxy_pass http://{{ api_server_name }}:{{ api_port }};
-                proxy_set_header Origin http://{{ api_server_name }}:{{ api_port }};
+                proxy_pass http://{{ api_server_name }}:{{ api_nginx_port }};
+                proxy_set_header Origin http://{{ api_server_name }}:{{ api_nginx_port }};
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Proto $remote_scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
+
+            location ~ ^/static/ {
+                proxy_pass http://{{ api_server_name }}:{{ api_nginx_port }};
+                proxy_set_header Origin http://{{ api_server_name }}:{{ api_nginx_port }};
                 proxy_set_header Host $http_host;
                 proxy_set_header X-Forwarded-Host $host;
                 proxy_set_header X-Forwarded-Proto $remote_scheme;
