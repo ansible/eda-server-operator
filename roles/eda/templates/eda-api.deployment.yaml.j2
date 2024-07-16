@@ -68,7 +68,10 @@ spec:
       - name: run-migrations
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
-        command: ['aap-eda-manage', 'migrate']
+        command:
+          - /bin/bash
+          - -c
+          - aap-eda-manage migrate
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -109,7 +112,10 @@ spec:
       - name: eda-initial-data
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
-        command: ['aap-eda-manage', 'create_initial_data']
+        command:
+          - /bin/bash
+          - -c
+          - aap-eda-manage create_initial_data && aap-eda-manage collectstatic --noinput
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -148,6 +154,9 @@ spec:
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
 {% if bundle_ca_crt  %}
+        volumeMounts:
+          - name: static-files
+            mountPath: {{ static_path }}
       - name: configure-bundle-ca-cert
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -175,7 +184,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:{{ api_port }} --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
+        - gunicorn --bind 0.0.0.0:{{ api_django_port }} --workers {{ combined_api.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -211,24 +220,27 @@ spec:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
         ports:
-        - containerPort: {{ api_port }}
+        - containerPort: {{ api_django_port }}
         readinessProbe:
           httpGet:
             path: /_healthz
-            port: {{ api_port }}
+            port: {{ api_django_port }}
           failureThreshold: 10
           periodSeconds: 10
           initialDelaySeconds: 20
         livenessProbe:
           httpGet:
             path: /_healthz
-            port: {{ api_port }}
+            port: {{ api_django_port }}
           failureThreshold: 10
           periodSeconds: 10
           initialDelaySeconds: 20
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
+        volumeMounts:
+        - name: static-files
+          mountPath: {{ static_path }}
       - name: daphne
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -282,9 +294,40 @@ spec:
             subPath: bundle-ca.crt
             readOnly: true
 {% endif %}
+      - name: nginx
+        image: {{ _image_web }}
+        ports:
+          - containerPort: {{ api_nginx_port }}
+        volumeMounts:
+          - name: static-files
+            mountPath: {{ static_path }}
+          - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+          - name: nginx-cache
+            mountPath: /var/cache/nginx
+          - name: nginx-run
+            mountPath: /var/run
+          - name: nginx-logs
+            mountPath: /var/log/nginx
       restartPolicy: Always
-{% if bundle_ca_crt %}
       volumes:
+        - name: static-files
+          emptyDir: {}
+        - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-nginx-api-configmap'
+            items:
+              - key: nginx_api_default_conf_template
+                path: nginx.conf
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: nginx-logs
+          emptyDir: {}
+{% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
           emptyDir: {}
         - name: "{{ ansible_operator_meta.name }}-bundle-cacert"

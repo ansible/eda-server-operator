@@ -2,8 +2,10 @@
 # vars file for EDA
 
 api_server_name: "{{ ansible_operator_meta.name }}-api"
-api_port: 8000
+api_django_port: 8002        # port for Django app for nginx to proxy requests to
+api_nginx_port: 8000  # nginx port for api endpoints and static files
 websocket_server_name: "{{ ansible_operator_meta.name }}-daphne"
 websocket_port: 8001
 media_dir: /var/lib/eda/files
+static_path: /var/lib/eda/static
 bundle_ca_crt: ''
