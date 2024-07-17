@@ -7,3 +7,4 @@ metadata:
 spec:
   no_log: false
   automation_server_url: http://foo.bar
+  ui_disabled: true

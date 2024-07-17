@@ -64,6 +64,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - displayName: Disable UI (Headless EDA including only API endpoints)
+        path: ui_disabled
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - displayName: Clean up backup when EDABackup is deleted
         path: clean_backup_on_delete
         x-descriptors:

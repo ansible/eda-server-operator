@@ -6,6 +6,7 @@ kind: 'EDA'
 api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 
 no_log: true
+ui_disabled: false
 
 image_pull_policy: IfNotPresent
 image_pull_secrets: []
