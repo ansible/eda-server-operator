@@ -142,6 +142,8 @@ spec:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
         env:
+        - name: ANSIBLE_LOCAL_TEMP
+          value: "/tmp"
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
