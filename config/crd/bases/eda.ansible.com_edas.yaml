@@ -66,6 +66,9 @@ spec:
                 description: Configure no_log for no log tasks
                 type: boolean
                 default: true
+              ui_disabled:
+                description: Disable the UI for a headless EDA deployment (only API endpoints)
+                type: boolean
               image:
                 description: Registry path to API container image to use
                 type: string

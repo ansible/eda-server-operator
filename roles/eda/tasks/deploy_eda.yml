@@ -19,7 +19,7 @@
     definition: "{{ lookup('template', 'eda.configmap.yaml.j2') }}"
     wait: yes
 
-- name: Apply deployment resources
+- name: Apply Backend deployment resources
   k8s:
     apply: yes
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
@@ -28,12 +28,27 @@
     - 'eda-api.configmap'
     - 'eda-api.service'
     - 'eda-api.deployment'
-    - 'eda-ui.service'
-    - 'eda-ui.deployment'
-    - 'eda-ui.ingress'
     - 'eda-default-worker.deployment'
     - 'eda-activation-worker.deployment'
     - 'eda-scheduler.deployment'
+
+- name: Apply UI deployment resources if UI is enabled
+  k8s:
+    state: "{{ 'present' if not ui_disabled else 'absent' }}"
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: no
+  loop:
+    - 'eda-ui.service'
+    - 'eda-ui.deployment'
+    - 'eda-ui.ingress'
+
+- name: Apply API Route or Ingress if UI is disabled
+  k8s:
+    state: "{{ 'present' if ui_disabled else 'absent' }}"
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: no
+  loop:
+    - 'eda-api.ingress'
 
 - name: Remove legacy EDA worker deployment
   k8s:

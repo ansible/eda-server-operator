@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - SCENARIO: default
+          - SCENARIO: default  # tests headless scenario too
           - SCENARIO: externaldb
           - SCENARIO: ingress
     steps:
@@ -64,12 +64,23 @@ jobs:
           kubectl -n eda get eda eda-demo -o yaml
           kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
 
-      - name: Test EDA API via k8s service
+      - name: Wait for the EDA API pod to be ready
+        run: |
+          kubectl wait --for condition=Ready --timeout=-1s -l app.kubernetes.io/component=eda-api
+
+      - name: Test EDA API via API k8s service
+        run: |
+          kubectl port-forward service/eda-demo-api 8081:8000 &
+          sleep 1
+          curl -s http://localhost:8081/api/eda/v1/status/
+        if: ${{ matrix.SCENARIO == 'default' }}
+
+      - name: Test EDA API via UI k8s service
         run: |
           kubectl port-forward service/eda-demo-ui 8080:80 &
           sleep 1
           curl -s http://localhost:8080/api/eda/v1/status/
-        if: ${{ matrix.SCENARIO != 'ingress' }}
+        if: ${{ matrix.SCENARIO != 'default' }}
 
       - name: Test EDA API via k8s ingress
         run: |
