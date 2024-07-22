@@ -1,0 +1,68 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  automation_server_url: https://awx-awx.apps.aap-dev.ocp4.testing.ansible.com
+  automation_server_ssl_verify: 'no'
+  service_type: ClusterIP
+  ingress_type: Ingress
+  no_log: false
+  image_pull_policy: Always
+  image_pull_secrets:
+    - redhat-operators-pull-secret
+  admin_password_secret: custom-admin-password
+
+  # -- Example image overrides
+  # image: quay.io/ansible/eda-server
+  # image_version: main
+  # image_web: quay.io/ansible/eda-ui
+  # image_web_version: 2.4.300
+  # image_web: quay.io/ansible/eda-ui
+  # image_web_version: latest
+  # image: quay.io/developer/eda-server
+  # image_version: dev
+
+  # -- Example extra settings
+  extra_settings:
+    - setting: EDA_MAX_RUNNING_ACTIVATIONS
+      value: '11'
+    - setting: DEFAULT_PULL_POLICY
+      value: "Always"
+
+  # CA Bundle
+  bundle_cacert_secret: my-custom-certs
+
+  # -- Resource Requirements
+  api:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  ui:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  scheduler:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  default_worker:
+    replicas: 2
+    resource_requirements:
+      requests: {}
+  activation_worker:
+    replicas: 3
+    resource_requirements:
+      requests: {}
+
+  database:
+    resource_requirements:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  # worker:
+  #   replicas: 2
+  #   resource_requirements:
+  #     requests:
+  #       cpu: 50m
+  #       memory: 128Mi

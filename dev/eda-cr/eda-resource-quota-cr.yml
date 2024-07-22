@@ -1,0 +1,54 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda-prod
+spec:
+  automation_server_url: https://awx-awx.apps.aap-dev.ocp4.testing.ansible.com
+  automation_server_ssl_verify: 'no'
+  service_type: ClusterIP
+  ingress_type: Route
+  no_log: false
+  image_pull_policy: Always
+
+  api:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 50m
+        memory: 350Mi
+  ui:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+  scheduler:
+    replicas: 1
+    resource_requirements:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+  database:
+    resource_requirements:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+  worker:
+    replicas: 5
+    resource_requirements:
+      requests:
+        cpu: 25m
+        memory: 200Mi
+
+  default_worker:
+    replicas: 2
+    resource_requirements:
+      requests:
+        cpu: 25m
+        memory: 200Mi
+  activation_worker:
+    replicas: 5
+    resource_requirements:
+      requests:
+        cpu: 25m
+        memory: 150Mi

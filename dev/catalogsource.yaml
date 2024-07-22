@@ -1,0 +1,11 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: dev-eda-operator
+  namespace: partner-eda
+spec:
+  displayName: 'Ansible Dev EDA Operator'
+  image: "quay.io/ansible/eda-server-operator-catalog:0.0.2"
+  publisher: 'Ansible EDA Dev Team'
+  sourceType: grpc
