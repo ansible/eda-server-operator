@@ -2392,6 +2392,7 @@ spec:
                 description: The ingress type to use to reach the deployed instance
                 type: string
                 enum:
+                - None
                 - none
                 - Ingress
                 - ingress

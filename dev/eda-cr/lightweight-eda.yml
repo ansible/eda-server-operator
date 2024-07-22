@@ -1,0 +1,30 @@
+---
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  extra_settings:
+    - setting: GIT_SSL_NO_VERIFY
+      value: "true"
+
+  api:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  ui:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  schedular:
+    replicas: 1
+    resource_requirements:
+      requests: {}
+  default_worker:
+    replicas: 2
+    resource_requirements:
+      requests: {}
+  activation_worker:
+    replicas: 3
+    resource_requirements:
+      requests: {}
