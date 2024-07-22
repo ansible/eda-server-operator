@@ -41,7 +41,7 @@
         api_version: 'route.openshift.io/v1'
         kind: Route
         namespace: '{{ ansible_operator_meta.namespace }}'
-        name: '{{ ansible_operator_meta.name }}'
+        name: '{{ ui_disabled | bool | ternary(ansible_operator_meta.name + "-api", ansible_operator_meta.name) }}'
       register: route_url
 
     - name: Update URL status
