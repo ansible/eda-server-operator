@@ -41,7 +41,9 @@
         api_version: 'route.openshift.io/v1'
         kind: Route
         namespace: '{{ ansible_operator_meta.namespace }}'
-        name: '{{ ansible_operator_meta.name }}'
+        name: '{{ ansible_operator_meta.name }}*'
+        label_selectors:
+          - 'app.kubernetes.io/name={{ ansible_operator_meta.name }}' # matches ui and api route, there should only ever be one or the other
       register: route_url
 
     - name: Update URL status
