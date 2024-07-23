@@ -114,8 +114,8 @@ make deploy IMG=$IMG NAMESPACE=$NAMESPACE
 
 # -- Create CR
 # uncomment the CR you want to use
-# $KUBE_APPLY dev/eda-cr/eda-openshift-cr.yml
-$KUBE_APPLY dev/eda-cr/eda-k8s-ing.yml
+$KUBE_APPLY dev/eda-cr/eda-openshift-cr.yml
+# $KUBE_APPLY dev/eda-cr/eda-k8s-ing.yml
 # $KUBE_APPLY dev/eda-cr/eda-k8s-nodeport-cr.yml
 # $KUBE_APPLY dev/eda-cr/eda-resource-quota-cr.yml
 # $KUBE_APPLY dev/eda-cr/lightweight-eda.yml
