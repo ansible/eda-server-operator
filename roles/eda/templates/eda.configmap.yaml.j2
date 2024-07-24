@@ -24,6 +24,8 @@ data:
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
   EDA_MAX_RUNNING_ACTIVATIONS: "12"
 
+  EDA_STATIC_URL: /api/eda/static/
+
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
@@ -75,21 +77,10 @@ data:
 
             root /usr/share/nginx/html;
 
-            location ~ ^/api/eda/v[0-9]+/ {
+            location ~ ^/api/eda {
                 proxy_pass http://{{ api_server_name }}:{{ api_nginx_port }};
                 proxy_set_header Origin http://{{ api_server_name }}:{{ api_nginx_port }};
                 proxy_set_header Host $http_host;
-                proxy_set_header X-Forwarded-Host $host;
-                proxy_set_header X-Forwarded-Proto $remote_scheme;
-                proxy_set_header X-Forwarded-Port $server_port;
-                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            }
-
-            location ~ ^/static/ {
-                proxy_pass http://{{ api_server_name }}:{{ api_nginx_port }};
-                proxy_set_header Origin http://{{ api_server_name }}:{{ api_nginx_port }};
-                proxy_set_header Host $http_host;
-                proxy_set_header X-Forwarded-Host $host;
                 proxy_set_header X-Forwarded-Proto $remote_scheme;
                 proxy_set_header X-Forwarded-Port $server_port;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

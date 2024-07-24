@@ -18,25 +18,35 @@ data:
         types {
             application/manifest+json webmanifest;
         }
+
+        # Define the upstream gunicorn server
+        upstream gunicorn {
+            server 127.0.0.1:{{ api_django_port }};
+        }
+
         server {
             listen {{ api_nginx_port }};
-            location ^~ /static/ {
+            location ^~ /api/eda/static/ {
                 alias {{ static_path }}/;
                 access_log /var/log/nginx/static_access.log;
                 error_log /var/log/nginx/static_error.log;
             }
+            location ~ ^/api/eda {
+                proxy_pass http://gunicorn;  # Forward requests to Django app
+                proxy_set_header Host $http_host;
+                proxy_set_header X-Forwarded-Host $host;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                proxy_set_header X-Forwarded-Port $server_port;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            }
             location / {
-                proxy_pass http://127.0.0.1:{{ api_django_port }};  # Forward requests to Django app
+                proxy_pass http://gunicorn;  # Forward requests to Django app
                 proxy_set_header Host $host;
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
                 access_log /var/log/nginx/proxy_access.log;
                 error_log /var/log/nginx/proxy_error.log;
-            }
-            # Redirect trailing slash for eda root
-            location = /api/eda {
-                return 301 $scheme://$host/api/eda/;
             }
         }
     }
