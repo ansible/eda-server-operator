@@ -54,7 +54,7 @@ spec:
   host: {{ route_host }}
 {% endif %}
   port:
-    targetPort: '{{ (route_tls_termination_mechanism | lower == "passthrough") | ternary("https", "http") }}'
+    targetPort: '{{ api_nginx_port }}'
   tls:
     insecureEdgeTerminationPolicy: Redirect
     termination: {{ route_tls_termination_mechanism | lower }}
