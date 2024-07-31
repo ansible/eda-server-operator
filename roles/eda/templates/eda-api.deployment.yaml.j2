@@ -153,10 +153,10 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
-{% if bundle_ca_crt  %}
         volumeMounts:
           - name: static-files
             mountPath: {{ static_path }}
+{% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
