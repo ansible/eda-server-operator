@@ -373,6 +373,47 @@ spec:
         path: api.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Defines desired state of eda-webhook deployment resources
+        displayName: Webhook deployment configuration
+        path: webhook
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of gunicorn workers for the Webhook.
+        displayName: Gunicorn Webhook workers
+        path: webhook.gunicorn_workers
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:number
+      - displayName: Webhook server resource requirements
+        path: webhook.resource_requirements
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
+      - description: The number of Webhook replicas.
+        displayName: Replicas
+        path: webhook.replicas
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:podCount
+      - displayName: Node Selector
+        path: webhook.node_selector
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The deployment strategy to use to replace existing pods with
+          new ones.
+        displayName: Strategy
+        path: webhook.strategy
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Node tolerations for the webhook pods.
+        displayName: Tolerations
+        path: webhook.tolerations
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Topology rule(s) for the pods.
+        displayName: Topology Spread Constraints
+        path: webhook.topology_spread_constraints
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-ui deployment resources
         displayName: UI deployment configuration
         path: ui

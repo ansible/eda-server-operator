@@ -2,40 +2,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "{{ ansible_operator_meta.name }}-activation-worker"
-  namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+    app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+  name: '{{ webhook_server_name }}'
+  namespace: '{{ ansible_operator_meta.namespace }}'
 spec:
-  replicas: {{ combined_activation_worker.replicas }}
-{% if combined_activation_worker.strategy is defined %}
+  replicas: {{ combined_webhook.replicas }}
+{% if combined_webhook.strategy is defined %}
   strategy:
-    type: {{ combined_activation_worker.strategy.type }}
-{% if combined_activation_worker.strategy.type == "Recreate" %}
+    type: {{ combined_webhook.strategy.type }}
+{% if combined_webhook.strategy.type == "Recreate" %}
     rollingUpdate: null
-{% elif combined_activation_worker.strategy.type == "RollingUpdate" %}
+{% elif combined_webhook.strategy.type == "RollingUpdate" %}
     rollingUpdate:
-      maxSurge:  {{ combined_activation_worker.strategy.rollingUpdate.maxSurge | default("25%")}}
-      maxUnavailable: {{ combined_activation_worker.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+      maxSurge:  {{ combined_webhook.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_webhook.strategy.rollingUpdate.maxUnavailable | default("25%")}}
 {% endif %}
 {% endif %}
   selector:
     matchLabels:
       app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
       app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
-      app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+      app.kubernetes.io/component: '{{ deployment_type }}-webhook'
   template:
     metadata:
       labels:
         {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
-        app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+        app.kubernetes.io/component: '{{ deployment_type }}-webhook'
       annotations:
-        kubectl.kubernetes.io/default-container: 'eda-activation-worker'
+        kubectl.kubernetes.io/default-container: 'eda-webhook'
 {% for template in [
-    "eda.configmap",
+    "eda-webhook.configmap",
   ] %}
         checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.yaml.j2') | sha1 }}"
 {% endfor %}
@@ -52,17 +52,17 @@ spec:
         - name: {{ secret }}
 {% endfor %}
 {% endif %}
-{% if combined_activation_worker.node_selector is defined %}
+{% if combined_webhook.node_selector is defined %}
       nodeSelector:
-        {{ combined_activation_worker.node_selector | to_nice_yaml | indent(width=8) }}
+        {{ combined_webhook.node_selector | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_activation_worker.tolerations is defined %}
+{% if combined_webhook.tolerations is defined %}
       tolerations:
-        {{ combined_activation_worker.tolerations | to_nice_yaml | indent(width=8) }}
+        {{ combined_webhook.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_activation_worker.topology_spread_constraints is defined %} %}
+{% if combined_webhook.topology_spread_constraints is defined %}
       topologySpreadConstraints:
-        {{ combined_activation_worker.topology_spread_constraints | indent(width=8) }}
+        {{ combined_webhook.topology_spread_constraints | indent(width=8) }}
 {% endif %}
       initContainers:
       - name: wait-for-migrations
@@ -111,8 +111,8 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
-{% if combined_activation_worker.resource_requirements is defined %}
-        resources: {{ combined_activation_worker.resource_requirements }}
+{% if combined_default_worker.resource_requirements is defined %}
+        resources: {{ combined_default_worker.resource_requirements }}
 {% endif %}
 {% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
@@ -124,8 +124,8 @@ spec:
           - |
             mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
             update-ca-trust
-{% if combined_activation_worker.resource_requirements is defined %}
-        resources: {{ combined_activation_worker.resource_requirements }}
+{% if combined_webhook.resource_requirements is defined %}
+        resources: {{ combined_webhook.resource_requirements }}
 {% endif %}
         volumeMounts:
           - name: "ca-trust-extracted"
@@ -136,13 +136,13 @@ spec:
             readOnly: true
 {% endif %}
       containers:
-      - name: eda-activation-worker
+      - name: eda-webhook
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
         - -c
-        - aap-eda-manage rqworker --worker-class aap_eda.core.tasking.ActivationWorker
+        - gunicorn --bind 0.0.0.0:{{ webhook_django_port }} --workers {{ combined_webhook.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -182,13 +182,27 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
-{% if combined_activation_worker.resource_requirements is defined %}
-        resources: {{ combined_activation_worker.resource_requirements }}
+        ports:
+        - containerPort: {{ webhook_django_port }}
+        readinessProbe:
+          httpGet:
+            path: /_healthz
+            port: {{ webhook_django_port }}
+          failureThreshold: 10
+          periodSeconds: 10
+          initialDelaySeconds: 20
+        livenessProbe:
+          httpGet:
+            path: /_healthz
+            port: {{ webhook_django_port }}
+          failureThreshold: 10
+          periodSeconds: 10
+          initialDelaySeconds: 20
+{% if combined_webhook.resource_requirements is defined %}
+        resources: {{ combined_webhook.resource_requirements }}
 {% endif %}
-        volumeMounts:
-          - name: "{{ ansible_operator_meta.name }}-media-data"
-            mountPath: "{{ media_dir }}"
 {% if bundle_ca_crt %}
+        volumeMounts:
           - name: "ca-trust-extracted"
             mountPath: "/etc/pki/ca-trust/extracted"
           - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
@@ -196,9 +210,34 @@ spec:
             subPath: bundle-ca.crt
             readOnly: true
 {% endif %}
+      - name: nginx
+        image: {{ _image_web }}
+        ports:
+          - containerPort: {{ webhook_nginx_port }}
+        volumeMounts:
+          - name: '{{ ansible_operator_meta.name }}-nginx-webhook-conf'
+            mountPath: /etc/nginx/nginx.conf
+            subPath: nginx.conf
+            readOnly: true
+          - name: nginx-cache
+            mountPath: /var/cache/nginx
+          - name: nginx-run
+            mountPath: /var/run
+          - name: nginx-logs
+            mountPath: /var/log/nginx
       restartPolicy: Always
       volumes:
-        - name: {{ ansible_operator_meta.name }}-media-data
+        - name: '{{ ansible_operator_meta.name }}-nginx-webhook-conf'
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-nginx-webhook-configmap'
+            items:
+              - key: nginx_webhook_default_conf_template
+                path: nginx.conf
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-run
+          emptyDir: {}
+        - name: nginx-logs
           emptyDir: {}
 {% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
