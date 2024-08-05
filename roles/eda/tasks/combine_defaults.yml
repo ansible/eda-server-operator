@@ -5,6 +5,7 @@
     combined_api: "{{ _api | combine(api, recursive=True) }}"
     combined_ui: "{{ _ui | combine(ui, recursive=True) }}"
     combined_scheduler: "{{ _scheduler | combine(scheduler, recursive=True) }}"
+    combined_webhook: "{{ _webhook | combine(webhook, recursive=True) }}"
 
 # Backwards compatibility support for worker parameters
 - name: Set defaults for workers # (overridden by worker, default_worker, and activation_worker)

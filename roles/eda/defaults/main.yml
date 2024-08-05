@@ -72,6 +72,17 @@ _scheduler:
   node_selector: {}
   tolerations: []
 
+webhook: {}
+_webhook:
+  gunicorn_workers: 2
+  replicas: 1
+  resource_requirements:
+    requests:
+      cpu: 50m
+      memory: 350Mi
+  node_selector: {}
+  tolerations: []
+
 ui: {}
 _ui:
   replicas: 1

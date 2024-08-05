@@ -31,6 +31,18 @@
     - 'eda-default-worker.deployment'
     - 'eda-activation-worker.deployment'
     - 'eda-scheduler.deployment'
+    - 'eda-webhook.configmap'
+    - 'eda-webhook.service'
+    - 'eda-webhook.deployment'
+
+- name: Apply webhook ingress resources
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: no
+  loop:
+    - 'eda-webhook.ingress'
+  when: not ui_disabled
 
 - name: Apply UI deployment resources if UI is enabled
   k8s:
