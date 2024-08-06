@@ -309,8 +309,6 @@ spec:
             mountPath: /var/cache/nginx
           - name: nginx-run
             mountPath: /var/run
-          - name: nginx-logs
-            mountPath: /var/log/nginx
       restartPolicy: Always
       volumes:
         - name: static-files
@@ -324,8 +322,6 @@ spec:
         - name: nginx-cache
           emptyDir: {}
         - name: nginx-run
-          emptyDir: {}
-        - name: nginx-logs
           emptyDir: {}
 {% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
