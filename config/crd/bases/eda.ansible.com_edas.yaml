@@ -40,6 +40,10 @@ spec:
                 type: array
                 items:
                   type: string
+              public_base_url:
+                description: Public base URL for EDA
+                type: string
+                default: ''
               automation_server_url:
                 description: URL of the AWX automation host to run ansible jobs against
                 type: string
