@@ -6,7 +6,7 @@
 VERSION ?= 0.0.1
 
 # Default ENGINE for building the operator (default docker)
-ENGINE ?= docker
+ENGINE ?= podman
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")

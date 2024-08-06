@@ -100,7 +100,7 @@ fi
 # -- Build & Push Operator Image
 echo "Preparing to build $IMG:$TAG ($IMG:$DEV_TAG) with $ENGINE..."
 sleep 3
-make docker-build docker-push IMG=$IMG
+make docker-build docker-push IMG=$IMG:$TAG
 
 # Tag and Push DEV_TAG Image when DEV_TAG_PUSH is 'True'
 if $DEV_TAG_PUSH ; then
