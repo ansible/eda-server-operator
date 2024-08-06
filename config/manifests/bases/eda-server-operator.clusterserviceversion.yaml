@@ -186,6 +186,10 @@ spec:
       kind: EDA
       name: edas.eda.ansible.com
       specDescriptors:
+      - displayName: Public Base URL
+        path: public_base_url
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
       - displayName: Automation Server URL
         path: automation_server_url
         x-descriptors:
