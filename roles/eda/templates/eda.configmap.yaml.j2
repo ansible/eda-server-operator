@@ -12,7 +12,7 @@ data:
   EDA_DEPLOYMENT_TYPE: "k8s"
 
   # Public URL
-  EDA_WEBHOOK_BASE_URL: "{{ public_base_url }}"
+  EDA_WEBHOOK_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_webhook_prefix_path.lstrip('/') }}"
 
   # EDA Server
   EDA_CONTROLLER_URL: "{{ automation_server_url }}"
