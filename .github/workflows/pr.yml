@@ -14,7 +14,7 @@ jobs:
         include:
           - SCENARIO: default
           - SCENARIO: externaldb
-          # - SCENARIO: ingress  # TODO: This scenario currently fails because ui and webhook ingress cannot have the same host and path in minikube nginx ingress controller
+          - SCENARIO: ingress
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -102,7 +102,7 @@ jobs:
         if: always()
         run: |
           echo ::group::OPERATOR_LOGS
-          kubectl logs -l control-plane=controller-manager --tail=10000 || true
+          kubectl logs -l control-plane=controller-manager --tail=20000 || true
           echo ::endgroup::
           echo ::group::POSTGRES_LOGS
           kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true

@@ -27,6 +27,13 @@ spec:
                 name: '{{ ansible_operator_meta.name }}-ui'
                 port:
                   number: 80
+          - path: '{{ eda_webhook_prefix_path }}'
+            pathType: '{{ ingress_path_type }}'
+            backend:
+              service:
+                name: '{{ ansible_operator_meta.name }}-webhook'
+                port:
+                  number: 8000
 {% if hostname %}      
       host: {{ hostname }}
 {% endif %}      

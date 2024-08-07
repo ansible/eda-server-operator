@@ -109,7 +109,7 @@ if $DEV_TAG_PUSH ; then
 fi
 
 # -- Deploy Operator
-make deploy IMG=$IMG NAMESPACE=$NAMESPACE
+make deploy IMG=$IMG:$TAG NAMESPACE=$NAMESPACE
 
 
 # -- Create CR
