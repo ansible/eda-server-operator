@@ -42,7 +42,11 @@
     wait: no
   loop:
     - 'eda-webhook.ingress'
-  when: not ui_disabled
+  when:
+    - (service_type | lower) == 'route' or ((service_type | lower) == 'ingress' and ui_disabled)
+  # Always runs if service_type: Route
+  # If service_type: Ingress, only run if UI is disabled
+  # If UI is enabled, the webhook ingress is handled by the UI ingress via multiple pathes
 
 - name: Apply UI deployment resources if UI is enabled
   k8s:
