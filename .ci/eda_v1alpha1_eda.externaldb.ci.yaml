@@ -9,3 +9,9 @@ spec:
   automation_server_url: http://foo.bar
   database:
     database_secret: eda-demo-external-database
+
+  # TODO: REMOVE
+  # image: quay.io/ansible/eda-server
+  # image_version: sha-3ad7b96
+  # image_web: quay.io/ansible/eda-ui
+  # image_web_version: 2.4.2119

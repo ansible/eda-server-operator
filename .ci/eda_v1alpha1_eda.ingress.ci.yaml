@@ -8,3 +8,9 @@ spec:
   no_log: false
   automation_server_url: http://foo.bar
   ingress_type: ingress
+
+  # TODO: REMOVE
+  # image: quay.io/ansible/eda-server
+  # image_version: sha-0bc13c3
+  # image_web: quay.io/ansible/eda-ui
+  # image_web_version: 2.4.2119
