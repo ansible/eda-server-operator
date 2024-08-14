@@ -382,6 +382,11 @@ spec:
         path: webhook
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: Webhook custom prefix path
+        displayName: Webhook prefix path
+        path: webhook_prefix
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: The number of gunicorn workers for the Webhook.
         displayName: Gunicorn Webhook workers
         path: webhook.gunicorn_workers
