@@ -74,7 +74,7 @@ _scheduler:
 
 webhook: {}
 _webhook:
-  webhook_prefix: /eda-webhook
+  prefix: /eda-webhook
   gunicorn_workers: 2
   replicas: 1
   resource_requirements:
