@@ -20,7 +20,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: '{{ eda_webhook_prefix_path }}'
+          - path: '/'
             pathType: '{{ ingress_path_type }}'
             backend:
               service:

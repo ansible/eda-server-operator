@@ -11,9 +11,11 @@ data:
   # Operator specific settings
   EDA_DEPLOYMENT_TYPE: "k8s"
 
+  {% if public_base_url and eda_webhook_prefix_path %}
   # Public URL
   EDA_WEBHOOK_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_webhook_prefix_path.lstrip('/') }}"
   EDA_WEBHOOK_MTLS_BASE_URL: "{{ public_base_url.rstrip('/') }}/mtls/{{ eda_webhook_prefix_path.lstrip('/') }}"
+  {% endif %}
 
   # EDA Server
   EDA_CONTROLLER_URL: "{{ automation_server_url }}"

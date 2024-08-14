@@ -10,7 +10,7 @@ media_dir: /var/lib/eda/files
 static_path: /var/lib/eda/static
 bundle_ca_crt: ''
 
-eda_webhook_prefix_path: "{{ eda_webhook_prefix | default('/eda-webhooks') }}"
+eda_webhook_prefix_path: "{{ webhook.prefix | default('/eda-webhooks') }}"
 webhook_nginx_port: 8000
 webhook_server_name: "{{ ansible_operator_meta.name }}-webhook"
 webhook_django_port: 8002
