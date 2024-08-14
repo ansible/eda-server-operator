@@ -432,6 +432,9 @@ spec:
               webhook:
                 description: Defines desired state of eda-webhook resources
                 properties:
+                  eda_webhook_prefix:
+                    description: Prefix for the webhook
+                    type: string
                   gunicorn_workers:
                     description: 'The number of gunicorn workers for the api.
                       Default: 2'
