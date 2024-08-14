@@ -26,7 +26,7 @@ data:
         server {
             listen {{ webhook_nginx_port }};
 
-            location /{{ eda_webhook_prefix_path }}/ {
+            location {{ eda_webhook_prefix_path }}/ {
                 proxy_pass              http://eda-api-webhook-backend/;
                 proxy_set_header        Host $host:$server_port;
                 proxy_set_header        X-Forwarded-Proto $scheme;
