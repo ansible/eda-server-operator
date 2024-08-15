@@ -150,11 +150,6 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
-        - name: EDA_ACTIVATION_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __database_secret }}'
-              key: host
         - name: EDA_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -229,6 +224,11 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        - name: EDA_ACTIVATION_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
         ports:
         - containerPort: {{ api_django_port }}
         readinessProbe:
