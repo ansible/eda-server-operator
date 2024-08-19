@@ -13,8 +13,8 @@ data:
 
   {% if public_base_url and eda_webhook_prefix_path %}
   # Public URL
-  EDA_WEBHOOK_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_webhook_prefix_path.lstrip('/') }}"
-  EDA_WEBHOOK_MTLS_BASE_URL: "@none None"
+  EDA_EVENT_STREAM_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_webhook_prefix_path.lstrip('/') }}"
+  EDA_EVENT_STREAM_MTLS_BASE_URL: "@none None"
   {% endif %}
 
   # EDA Server
