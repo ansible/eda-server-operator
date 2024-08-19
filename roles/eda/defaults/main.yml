@@ -72,9 +72,9 @@ _scheduler:
   node_selector: {}
   tolerations: []
 
-webhook: {}
-_webhook:
-  prefix: /eda-webhook
+event_stream: {}
+_event_stream:
+  prefix: /event-streams
   gunicorn_workers: 2
   replicas: 1
   resource_requirements:
