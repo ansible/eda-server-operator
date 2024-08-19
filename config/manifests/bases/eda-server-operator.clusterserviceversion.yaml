@@ -377,9 +377,9 @@ spec:
         path: api.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Defines desired state of eda-webhook deployment resources
+      - description: Defines desired state of eda-event-stream deployment resources
         displayName: Webhook deployment configuration
-        path: webhook
+        path: event_stream
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Webhook custom prefix path
@@ -389,38 +389,38 @@ spec:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: The number of gunicorn workers for the Webhook.
         displayName: Gunicorn Webhook workers
-        path: webhook.gunicorn_workers
+        path: event_stream.gunicorn_workers
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:number
       - displayName: Webhook server resource requirements
-        path: webhook.resource_requirements
+        path: event_stream.resource_requirements
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
       - description: The number of Webhook replicas.
         displayName: Replicas
-        path: webhook.replicas
+        path: event_stream.replicas
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:podCount
       - displayName: Node Selector
-        path: webhook.node_selector
+        path: event_stream.node_selector
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: The deployment strategy to use to replace existing pods with
           new ones.
         displayName: Strategy
-        path: webhook.strategy
+        path: event_stream.strategy
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:updateStrategy
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Node tolerations for the webhook pods.
+      - description: Node tolerations for the event_stream pods.
         displayName: Tolerations
-        path: webhook.tolerations
+        path: event_stream.tolerations
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Topology rule(s) for the pods.
         displayName: Topology Spread Constraints
-        path: webhook.topology_spread_constraints
+        path: event_stream.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-ui deployment resources

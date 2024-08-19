@@ -31,7 +31,7 @@ spec:
             pathType: '{{ ingress_path_type }}'
             backend:
               service:
-                name: '{{ ansible_operator_meta.name }}-webhook'
+                name: '{{ ansible_operator_meta.name }}-event-stream'
                 port:
                   number: 8000
 {% if hostname %}      

@@ -429,11 +429,11 @@ spec:
                       type: object
                     type: array
                 type: object
-              webhook:
-                description: Defines desired state of eda-webhook resources
+              event_stream:
+                description: Defines desired state of Event Stream resources
                 properties:
                   prefix:
-                    description: Prefix for the webhook
+                    description: Prefix for the Event Stream URL
                     type: string
                   gunicorn_workers:
                     description: 'The number of gunicorn workers for the api.
