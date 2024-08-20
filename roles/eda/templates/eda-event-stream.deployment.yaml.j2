@@ -5,37 +5,37 @@ metadata:
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+    app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
   name: '{{ event_stream_server_name }}'
   namespace: '{{ ansible_operator_meta.namespace }}'
 spec:
-  replicas: {{ combined_webhook.replicas }}
-{% if combined_webhook.strategy is defined %}
+  replicas: {{ combined_event_stream.replicas }}
+{% if combined_event_stream.strategy is defined %}
   strategy:
-    type: {{ combined_webhook.strategy.type }}
-{% if combined_webhook.strategy.type == "Recreate" %}
+    type: {{ combined_event_stream.strategy.type }}
+{% if combined_event_stream.strategy.type == "Recreate" %}
     rollingUpdate: null
-{% elif combined_webhook.strategy.type == "RollingUpdate" %}
+{% elif combined_event_stream.strategy.type == "RollingUpdate" %}
     rollingUpdate:
-      maxSurge:  {{ combined_webhook.strategy.rollingUpdate.maxSurge | default("25%")}}
-      maxUnavailable: {{ combined_webhook.strategy.rollingUpdate.maxUnavailable | default("25%")}}
+      maxSurge:  {{ combined_event_stream.strategy.rollingUpdate.maxSurge | default("25%")}}
+      maxUnavailable: {{ combined_event_stream.strategy.rollingUpdate.maxUnavailable | default("25%")}}
 {% endif %}
 {% endif %}
   selector:
     matchLabels:
       app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
       app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
-      app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+      app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
   template:
     metadata:
       labels:
         {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=8) | trim }}
         {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=8) | trim }}
-        app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+        app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
       annotations:
-        kubectl.kubernetes.io/default-container: 'eda-webhook'
+        kubectl.kubernetes.io/default-container: 'eda-event-stream'
 {% for template in [
-    "eda-webhook.configmap",
+    "eda-event-stream.configmap",
   ] %}
         checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.yaml.j2') | sha1 }}"
 {% endfor %}
@@ -52,17 +52,17 @@ spec:
         - name: {{ secret }}
 {% endfor %}
 {% endif %}
-{% if combined_webhook.node_selector is defined %}
+{% if combined_event_stream.node_selector is defined %}
       nodeSelector:
-        {{ combined_webhook.node_selector | to_nice_yaml | indent(width=8) }}
+        {{ combined_event_stream.node_selector | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_webhook.tolerations is defined %}
+{% if combined_event_stream.tolerations is defined %}
       tolerations:
-        {{ combined_webhook.tolerations | to_nice_yaml | indent(width=8) }}
+        {{ combined_event_stream.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_webhook.topology_spread_constraints is defined %}
+{% if combined_event_stream.topology_spread_constraints is defined %}
       topologySpreadConstraints:
-        {{ combined_webhook.topology_spread_constraints | indent(width=8) }}
+        {{ combined_event_stream.topology_spread_constraints | indent(width=8) }}
 {% endif %}
       initContainers:
       - name: wait-for-migrations
@@ -124,8 +124,8 @@ spec:
           - |
             mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
             update-ca-trust
-{% if combined_webhook.resource_requirements is defined %}
-        resources: {{ combined_webhook.resource_requirements }}
+{% if combined_event_stream.resource_requirements is defined %}
+        resources: {{ combined_event_stream.resource_requirements }}
 {% endif %}
         volumeMounts:
           - name: "ca-trust-extracted"
@@ -136,13 +136,13 @@ spec:
             readOnly: true
 {% endif %}
       containers:
-      - name: eda-webhook
+      - name: eda-event-stream
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:{{ event_stream_django_port }} --workers {{ combined_webhook.gunicorn_workers }} aap_eda.wsgi:application
+        - gunicorn --bind 0.0.0.0:{{ event_stream_django_port }} --workers {{ combined_event_stream.gunicorn_workers }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -198,8 +198,8 @@ spec:
           failureThreshold: 10
           periodSeconds: 10
           initialDelaySeconds: 20
-{% if combined_webhook.resource_requirements is defined %}
-        resources: {{ combined_webhook.resource_requirements }}
+{% if combined_event_stream.resource_requirements is defined %}
+        resources: {{ combined_event_stream.resource_requirements }}
 {% endif %}
 {% if bundle_ca_crt %}
         volumeMounts:
@@ -215,7 +215,7 @@ spec:
         ports:
           - containerPort: {{ event_stream_nginx_port }}
         volumeMounts:
-          - name: '{{ ansible_operator_meta.name }}-nginx-webhook-conf'
+          - name: '{{ ansible_operator_meta.name }}-nginx-event-stream-conf'
             mountPath: /etc/nginx/nginx.conf
             subPath: nginx.conf
             readOnly: true
@@ -225,11 +225,11 @@ spec:
             mountPath: /var/run
       restartPolicy: Always
       volumes:
-        - name: '{{ ansible_operator_meta.name }}-nginx-webhook-conf'
+        - name: '{{ ansible_operator_meta.name }}-nginx-event-stream-conf'
           configMap:
-            name: '{{ ansible_operator_meta.name }}-nginx-webhook-configmap'
+            name: '{{ ansible_operator_meta.name }}-nginx-event-stream-configmap'
             items:
-              - key: nginx_webhook_default_conf_template
+              - key: nginx_event_stream_default_conf_template
                 path: nginx.conf
         - name: nginx-cache
           emptyDir: {}
