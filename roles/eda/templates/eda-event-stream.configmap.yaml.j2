@@ -20,7 +20,7 @@ data:
         }
 
         upstream eda-api-webhook-backend {
-            server 127.0.0.1:{{ webhook_django_port }};
+            server 127.0.0.1:{{ event_stream_django_port }};
         }
 
         server {
