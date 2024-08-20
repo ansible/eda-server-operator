@@ -6,7 +6,7 @@ metadata:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-webhook'
-  name: '{{ webhook_server_name }}'
+  name: '{{ event_stream_server_name }}'
   namespace: '{{ ansible_operator_meta.namespace }}'
 spec:
   replicas: {{ combined_webhook.replicas }}
@@ -213,7 +213,7 @@ spec:
       - name: nginx
         image: {{ _image_web }}
         ports:
-          - containerPort: {{ webhook_nginx_port }}
+          - containerPort: {{ event_stream_nginx_port }}
         volumeMounts:
           - name: '{{ ansible_operator_meta.name }}-nginx-webhook-conf'
             mountPath: /etc/nginx/nginx.conf

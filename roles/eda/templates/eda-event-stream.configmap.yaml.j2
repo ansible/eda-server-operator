@@ -24,7 +24,7 @@ data:
         }
 
         server {
-            listen {{ webhook_nginx_port }};
+            listen {{ event_stream_nginx_port }};
 
             location / {
                 proxy_pass              http://eda-api-webhook-backend/;
