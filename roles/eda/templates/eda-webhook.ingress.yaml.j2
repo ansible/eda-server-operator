@@ -20,7 +20,7 @@ spec:
   rules:
     - http:
         paths:
-          - path: '/'
+          - path: '{{ webhook_ingress_path }}'
             pathType: '{{ ingress_path_type }}'
             backend:
               service:
