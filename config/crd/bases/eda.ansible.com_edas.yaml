@@ -2761,6 +2761,9 @@ spec:
               ingress_class_name:
                 description: The name of ingress class to use instead of the cluster default.
                 type: string
+              webhook_ingress_path:
+                description: The ingress path used to reach the webhook service
+                type: string
               loadbalancer_protocol:
                 description: Protocol to use for the loadbalancer
                 type: string
