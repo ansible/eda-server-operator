@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: '{{ ansible_operator_meta.name }}-nginx-webhook-configmap'
+  name: '{{ ansible_operator_meta.name }}-nginx-event-stream-configmap'
   namespace: '{{ ansible_operator_meta.namespace }}'
 data:
-  nginx_webhook_default_conf_template: |
+  nginx_event_stream_default_conf_template: |
     events {
         worker_connections 1024;
     }
@@ -19,7 +19,7 @@ data:
             application/manifest+json webmanifest;
         }
 
-        upstream eda-api-webhook-backend {
+        upstream eda-api-event-stream-backend {
             server 127.0.0.1:{{ event_stream_django_port }};
         }
 
@@ -27,7 +27,7 @@ data:
             listen {{ event_stream_nginx_port }};
 
             location / {
-                proxy_pass              http://eda-api-webhook-backend/;
+                proxy_pass              http://eda-api-event-stream-backend/;
                 proxy_set_header        Host $host:$server_port;
                 proxy_set_header        X-Forwarded-Proto $scheme;
                 proxy_set_header        X-Forwarded-Host $host;

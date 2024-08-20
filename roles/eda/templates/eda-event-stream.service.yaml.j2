@@ -6,7 +6,7 @@ metadata:
   namespace: "{{ ansible_operator_meta.namespace }}"
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+    app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
 spec:
   ports:
   - port: {{ event_stream_nginx_port }}
@@ -14,4 +14,4 @@ spec:
     targetPort: {{ event_stream_nginx_port }}
   selector:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2")  | indent(width=4) | trim }}
-    app.kubernetes.io/component: '{{ deployment_type }}-webhook'
+    app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
