@@ -10,7 +10,7 @@ media_dir: /var/lib/eda/files
 static_path: /var/lib/eda/static
 bundle_ca_crt: ''
 
-eda_event_stream_prefix_path: "{{ event_stream.prefix | default('/event-streams') }}"
+eda_event_stream_prefix_path: "{{ event_stream.prefix | default('/eda-event-streams') }}"
 event_stream_nginx_port: 8000
 event_stream_server_name: "{{ ansible_operator_meta.name }}-event-stream"
 event_stream_django_port: 8002
