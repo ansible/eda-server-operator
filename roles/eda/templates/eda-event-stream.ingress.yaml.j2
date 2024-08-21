@@ -5,7 +5,7 @@ apiVersion: '{{ ingress_api_version }}'
 {% endif %}
 kind: Ingress
 metadata:
-  name: '{{ ansible_operator_meta.name }}-webhook-ingress'
+  name: '{{ ansible_operator_meta.name }}-event-stream-ingress'
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
@@ -24,7 +24,7 @@ spec:
             pathType: '{{ ingress_path_type }}'
             backend:
               service:
-                name: '{{ ansible_operator_meta.name }}-webhook'
+                name: '{{ ansible_operator_meta.name }}-event-stream'
                 port:
                   number: 8000
 {% if hostname %}
@@ -45,7 +45,7 @@ apiVersion: '{{ route_api_version }}'
 {% endif %}
 kind: Route
 metadata:
-  name: '{{ ansible_operator_meta.name }}-webhook'
+  name: '{{ ansible_operator_meta.name }}-event-stream'
   namespace: '{{ ansible_operator_meta.namespace }}'
   labels:
     {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
@@ -70,7 +70,7 @@ spec:
 {% endif %}
   to:
     kind: Service
-    name: {{ ansible_operator_meta.name }}-webhook
+    name: {{ ansible_operator_meta.name }}-event-stream
     weight: 100
   wildcardPolicy: None
 {% endif %}
