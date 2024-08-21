@@ -8,16 +8,15 @@ api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 no_log: true
 ui_disabled: false
 
-image_pull_policy: Always
+image_pull_policy: IfNotPresent
 image_pull_secrets: []
 
-_image: quay.io/mkanoor/eda-server
-_image_version: eventstream
-# _image_version: "{{ lookup('env', 'DEFAULT_EDA_VERSION') or 'main' }}"
+_image: quay.io/ansible/eda-server
+_image_version: main
+_image_version: "{{ lookup('env', 'DEFAULT_EDA_VERSION') or 'main' }}"
 
-_image_web: quay.io/lgalis/eda-ui
-_image_web_version: _ev_rename
-# _image_web_version: "{{ lookup('env', 'DEFAULT_EDA_UI_VERSION') or 'main' }}"
+_image_web: quay.io/ansible/eda-ui
+_image_web_version: "{{ lookup('env', 'DEFAULT_EDA_UI_VERSION') or 'main' }}"
 
 # Add a nodeSelector for the EDA pods. It must match a node's labels for the pod
 # to be scheduled on that node. Specify as literal block. E.g.:
