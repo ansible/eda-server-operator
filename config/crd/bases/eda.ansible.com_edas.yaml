@@ -2423,6 +2423,9 @@ spec:
               redis:
                 description: 'Defines desired state of cache resources'
                 properties:
+                  redis_secret:
+                    description: Secret where the redis configuration can be found. Set this to us your own external Redis cache. If not specified, this secret will be generated and EDA will not create a managed Redis pod.
+                    type: string
                   replicas:
                     description: 'Defines Redis Deployment replicas'
                     format: int32

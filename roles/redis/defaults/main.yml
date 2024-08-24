@@ -9,6 +9,9 @@ image_pull_secrets: []
 _redis_image: quay.io/sclorg/redis-6-c9s
 _redis_image_version: c9s
 
+redis_type: ''
+redis_config_secret: ''
+
 redis: {}
 _redis:
   replicas: 1

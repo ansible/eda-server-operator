@@ -1,5 +1,0 @@
----
-
-- name: Combine default and custom variables from the CR for each component
-  set_fact:
-    combined_redis: "{{ _redis | combine(redis, recursive=True) }}"
