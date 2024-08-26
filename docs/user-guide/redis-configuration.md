@@ -21,7 +21,7 @@ stringData:
   host: <external ip or url resolvable by the cluster>
   port: <external port, this usually defaults to 6370>
   database: <desired database name>
-  cluster_endpoint: <see Redis Cluster section>
+  cluster_endpoint: <optional - see Redis Cluster section>
   username: <username to connect as>
   password: <password to connect with>
   type: unmanaged
@@ -40,7 +40,7 @@ spec:
 
 #### Redis Cluster
 
-The format of the cluster_endpoint field should of the following format:
+The format of the cluster_endpoint field is:
 
 "<host>:<port>[,<host>:<port>]*"
 

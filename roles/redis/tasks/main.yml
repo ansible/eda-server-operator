@@ -3,7 +3,7 @@
   ansible.builtin.include_tasks: check_external_config.yml
   when: redis_type | length == 0 or redis_type == 'unmanaged'
 
-- name: Check for an external Redis cache
+- name: Check for the default Redis configuration
   ansible.builtin.include_tasks: check_default_config.yml
   when: redis_type | length == 0 or redis_type == 'managed'
 
