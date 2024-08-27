@@ -573,6 +573,11 @@ spec:
         path: redis
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - displayName: External redis configuration secret
+        path: redis.redis_secret
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:io.kubernetes:Secret
       - description: The number of redis replicas.
         displayName: Replicas
         path: redis.replicas

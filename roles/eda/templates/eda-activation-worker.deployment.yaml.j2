@@ -182,6 +182,32 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        - name: EDA_MQ_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ redis_config_secret }}'
+              key: host
+        - name: EDA_MQ_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ redis_config_secret }}'
+              key: port
+        - name: EDA_MQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ redis_config_secret }}'
+              key: username
+        - name: EDA_MQ_USER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ redis_config_secret }}'
+              key: password
+        - name: EDA_MQ_REDIS_HA_CLUSTER_HOSTS
+          valueFrom:
+            secretKeyRef:
+              name: '{{ redis_config_secret }}'
+              key: cluster_endpoint
+              optional: true
 {% if combined_activation_worker.resource_requirements is defined %}
         resources: {{ combined_activation_worker.resource_requirements }}
 {% endif %}

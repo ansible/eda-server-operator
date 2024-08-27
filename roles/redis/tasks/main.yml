@@ -1,11 +1,21 @@
 ---
-# tasks file for EDA
+- name: Check for an external Redis cache
+  ansible.builtin.include_tasks: check_external_config.yml
+  when: redis_type | length == 0 or redis_type == 'unmanaged'
 
-- name: Combine default and custom vars for each component
-  include_tasks: combine_defaults.yml
+- name: Check for the default Redis configuration
+  ansible.builtin.include_tasks: check_default_config.yml
+  when: redis_type | length == 0 or redis_type == 'managed'
 
-- name: Set default redis image to be used
-  import_tasks: set_images.yml
+# This task should only be activated when we don't have an external Redis
+# configuration AND we have never configured a managed Redis deployment.
+- name: Create a default Redis configuration
+  ansible.builtin.include_tasks: create_default_config.yml
+  when: redis_type | length == 0
 
-- name: Create managed Redis deployment
-  import_tasks: create_redis.yml
+# This tasks combines builds the values for creating a managed Redis
+# system.  It is important to keep these tasks together to keep
+# the reconciliation loop tight if we are using an external Redis cache.
+- name: Create a managed Redis deployment
+  ansible.builtin.include_tasks: create_managed_redis.yml
+  when: redis_type == 'managed'
