@@ -26,7 +26,6 @@ data:
   # EDA Server
   EDA_ALLOWED_HOSTS: "['*']"
   EDA_CSRF_TRUSTED_ORIGINS: "http://{{ api_server_name }}:{{ api_nginx_port }}"
-  EDA_MQ_HOST: "{{ ansible_operator_meta.name }}-redis-svc"
   EDA_WEBSOCKET_BASE_URL: "ws://{{ websocket_server_name }}:{{ websocket_port }}"
   EDA_WEBSOCKET_TOKEN_BASE_URL: "http://{{ api_server_name }}:{{ api_nginx_port }}"
   EDA_WEBSOCKET_SSL_VERIFY: "{{ websocket_ssl_verify }}"
