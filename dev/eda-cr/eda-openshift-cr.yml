@@ -13,6 +13,9 @@ spec:
     - redhat-operators-pull-secret
   admin_password_secret: custom-admin-password
 
+  # Disable UI
+  ui_disabled: false
+
   # -- Example image overrides
   # image: quay.io/ansible/eda-server
   # image_version: main
