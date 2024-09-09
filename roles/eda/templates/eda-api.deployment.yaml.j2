@@ -35,6 +35,11 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: 'eda-api'
 {% for template in [
+    "redirect-page.configmap",
+  ] %}
+        checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.html.j2') | sha1 }}"
+{% endfor %}
+{% for template in [
     "eda.configmap",
   ] %}
         checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.yaml.j2') | sha1 }}"
@@ -117,10 +122,7 @@ spec:
       - name: eda-initial-data
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
-        command:
-          - /bin/bash
-          - -c
-          - aap-eda-manage create_initial_data && aap-eda-manage collectstatic --noinput
+        command: ["/bin/bash", "-c", "aap-eda-manage create_initial_data{% if not ui_disabled %} && aap-eda-manage collectstatic --noinput{% endif %}"]
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -160,9 +162,11 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
+{% if not ui_disabled %}
         volumeMounts:
           - name: static-files
             mountPath: {{ static_path }}
+{% endif %}
 {% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
         image: {{ _image }}
@@ -282,9 +286,11 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
+{% if not ui_disabled %}
         volumeMounts:
         - name: static-files
           mountPath: {{ static_path }}
+{% endif %}
       - name: daphne
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -375,8 +381,16 @@ spec:
         ports:
           - containerPort: {{ api_nginx_port }}
         volumeMounts:
+{% if not ui_disabled %}
           - name: static-files
-            mountPath: {{ static_path }}
+            mountPath: '{{ static_path }}'
+{% else %}
+{% if public_base_url is defined %}
+          - name: redirect-page
+            mountPath: '{{ static_path }}/index.html'
+            subPath: redirect-page.html
+{% endif %}
+{% endif %}
           - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
             mountPath: /etc/nginx/nginx.conf
             subPath: nginx.conf
@@ -386,9 +400,21 @@ spec:
           - name: nginx-run
             mountPath: /var/run
       restartPolicy: Always
+
       volumes:
+{% if not ui_disabled %}
         - name: static-files
           emptyDir: {}
+{% else %}
+{% if public_base_url is defined %}
+        - name: redirect-page
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-redirect-page'
+            items:
+              - key: redirect-page.html
+                path: redirect-page.html
+{% endif %}
+{% endif %}
         - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
           configMap:
             name: '{{ ansible_operator_meta.name }}-nginx-api-configmap'
