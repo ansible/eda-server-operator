@@ -65,14 +65,14 @@ jobs:
       - name: Test EDA API via API k8s service
         run: |
           kubectl port-forward service/eda-demo-api 8081:8000 &
-          sleep 1
+          sleep 2
           curl -s http://localhost:8081/api/eda/v1/status/
         if: ${{ matrix.SCENARIO == 'default' }}
 
       - name: Test EDA API via UI k8s service
         run: |
           kubectl port-forward service/eda-demo-ui 8080:80 &
-          sleep 1
+          sleep 2
           curl -s http://localhost:8080/api/eda/v1/status/
         if: ${{ matrix.SCENARIO != 'default' }}
 
