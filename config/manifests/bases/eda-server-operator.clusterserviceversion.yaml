@@ -190,6 +190,8 @@ spec:
         path: public_base_url
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: Automation Server URL
         path: automation_server_url
         x-descriptors:
