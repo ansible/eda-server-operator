@@ -16,7 +16,7 @@ jobs:
         include:
           - SCENARIO: default  # tests headless scenario too
           - SCENARIO: externaldb
-          # - SCENARIO: ingress  # TODO: This scenario currently fails because ui and event_stream ingress cannot have the same host and path in minikube nginx ingress controller
+          - SCENARIO: ingress
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -71,20 +71,20 @@ jobs:
       - name: Test EDA API via API k8s service
         run: |
           kubectl port-forward service/eda-demo-api 8081:8000 &
-          sleep 1
+          sleep 2
           curl -s http://localhost:8081/api/eda/v1/status/
         if: ${{ matrix.SCENARIO == 'default' }}
 
       - name: Test EDA API via UI k8s service
         run: |
           kubectl port-forward service/eda-demo-ui 8080:80 &
-          sleep 1
+          sleep 2
           curl -s http://localhost:8080/api/eda/v1/status/
         if: ${{ matrix.SCENARIO != 'default' }}
 
       - name: Test EDA API via k8s ingress
         run: |
-          IP=$(kubectl get ingress -n eda eda-demo-ingress -o json | jq .status.loadBalancer.ingress[0].ip -r)
+          IP=$(kubectl get ingress -n eda eda-demo-ui-ingress -o json | jq .status.loadBalancer.ingress[0].ip -r)
           curl -s http://${IP}:80/api/eda/v1/status/
         if: ${{ matrix.SCENARIO == 'ingress' }}
 

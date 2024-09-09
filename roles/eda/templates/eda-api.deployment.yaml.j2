@@ -374,7 +374,12 @@ spec:
           - containerPort: {{ api_nginx_port }}
         volumeMounts:
           - name: static-files
-            mountPath: {{ static_path }}
+            mountPath: '{{ static_path }}'
+{% if public_base_url is defined %}
+          - name: redirect-page
+            mountPath: '{{ static_path }}/redirect-page.html'
+            subPath: redirect-page.html
+{% endif %}
           - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
             mountPath: /etc/nginx/nginx.conf
             subPath: nginx.conf
@@ -387,6 +392,14 @@ spec:
       volumes:
         - name: static-files
           emptyDir: {}
+{% if public_base_url is defined %}
+        - name: redirect-page
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-redirect-page'
+            items:
+              - key: redirect-page.html
+                path: redirect-page.html
+{% endif %}
         - name: '{{ ansible_operator_meta.name }}-nginx-api-conf'
           configMap:
             name: '{{ ansible_operator_meta.name }}-nginx-api-configmap'
