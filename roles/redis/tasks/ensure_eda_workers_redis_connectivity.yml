@@ -14,14 +14,17 @@
     label_selectors:
       - "app.kubernetes.io/component={{ item }}"
   loop: "{{ _eda_workers_deployment_list }}"
+  no_log: "{{ no_log }}"
   register: _eda_worker_pod_info
 
 - name: "Check if restart is required"
   vars:
-    _eda_worker_container_status: "{{ item.resources[0].status.containerStatuses[0].state.waiting.reason | default('Running') }}"
+    _eda_worker_crashloopback_check: "{{ item.resources[0].status.containerStatuses[0].state.waiting.reason | default('Running') }}"
+    _eda_worker_completed_check: "{{ item.resources[0].status.containerStatuses[0].lastState.terminated.reason | default('Running') }}"
   ansible.builtin.set_fact:
     _eda_workers_restart_required: true
-  when: _eda_worker_container_status == 'CrashLoopBackOff'
+  when: _eda_worker_crashloopback_check == 'CrashLoopBackOff' or _eda_worker_completed_check == 'Completed'
+  no_log: "{{ no_log }}"
   loop: "{{ _eda_worker_pod_info.results }}"
 
 - name: "Restart all EDA worker pods if restart is required"
@@ -32,4 +35,5 @@
     label_selectors:
       - "app.kubernetes.io/component={{ item }}"
     state: absent
+  no_log: "{{ no_log }}"
   loop: "{{ _eda_workers_deployment_list }}"
