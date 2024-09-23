@@ -19,3 +19,8 @@
 - name: Create a managed Redis deployment
   ansible.builtin.include_tasks: create_managed_redis.yml
   when: redis_type == 'managed'
+
+# REDIS FAILOVER WORKAROUND
+- name: Ensure EDA Redis is in a functional state
+  ansible.builtin.include_tasks: ensure_eda_workers_redis_connectivity.yml
+  when: redis_mode == 'cluster'

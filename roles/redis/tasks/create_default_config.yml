@@ -12,4 +12,5 @@
   ansible.builtin.set_fact:
     redis_type: "managed"
     redis_config_secret: "{{ ansible_operator_meta.name }}-redis-configuration"
+    redis_mode: "standalone"
   when: result is succeeded

@@ -1,0 +1,35 @@
+---
+- name: "Set initial facts"
+  ansible.builtin.set_fact:
+    _eda_workers_restart_required: false
+    _eda_workers_deployment_list:
+      - "eda-activation-worker"
+      - "eda-default-worker"
+      - "eda-scheduler"
+
+- name: "Get EDA worker deployments pods info"
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component={{ item }}"
+  loop: "{{ _eda_workers_deployment_list }}"
+  register: _eda_worker_pod_info
+
+- name: "Check if restart is required"
+  vars:
+    _eda_worker_container_status: "{{ item.resources[0].status.containerStatuses[0].state.waiting.reason | default('Running') }}"
+  ansible.builtin.set_fact:
+    _eda_workers_restart_required: true
+  when: _eda_worker_container_status == 'CrashLoopBackOff'
+  loop: "{{ _eda_worker_pod_info.results }}"
+
+- name: "Restart all EDA worker pods if restart is required"
+  when: _eda_workers_restart_required
+  kubernetes.core.k8s:
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/component={{ item }}"
+    state: absent
+  loop: "{{ _eda_workers_deployment_list }}"

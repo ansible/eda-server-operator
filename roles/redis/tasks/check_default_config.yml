@@ -13,4 +13,5 @@
   ansible.builtin.set_fact:
     redis_type: "{{ _redis_configuration['resources'][0]['data']['type'] | default('') | b64decode }}"
     redis_config_secret: "{{ _redis_configuration['resources'][0]['metadata']['name'] }}"
+    redis_mode: "{{ _redis_configuration['resources'][0]['data']['redis_mode'] | default('') | b64decode }}"
   when: _redis_configuration['resources'][0] is defined
