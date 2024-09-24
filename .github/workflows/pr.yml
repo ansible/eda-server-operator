@@ -78,7 +78,7 @@ jobs:
 
       - name: Test EDA API via k8s ingress
         run: |
-          IP=$(kubectl get ingress -n eda eda-demo-ingress -o json | jq .status.loadBalancer.ingress[0].ip -r)
+          IP=$(kubectl get ingress -n eda eda-demo-ui-ingress -o json | jq .status.loadBalancer.ingress[0].ip -r)
           curl -s http://${IP}:80/api/eda/v1/status/
         if: ${{ matrix.SCENARIO == 'ingress' }}
 
