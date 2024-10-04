@@ -8,6 +8,7 @@
     eda_postgres_port: "{{ pg_config['resources'][0]['data']['port'] | b64decode }}"
     eda_postgres_host: "{{ pg_config['resources'][0]['data']['host'] | b64decode }}"
     eda_postgres_sslmode: "{{ pg_config['resources'][0]['data']['sslmode'] |  default('prefer'|b64encode) | b64decode }}"
+    eda_postgres_sslrootcert: "{{ pg_config['resources'][0]['data']['sslrootcert'] | default(ca_trust_bundle) | b64decode }}"
   no_log: "{{ no_log }}"
 
 - name: Determine if database is managed based on secret values

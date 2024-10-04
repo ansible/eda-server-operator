@@ -2645,6 +2645,9 @@ spec:
                     items:
                       type: string
                     type: array
+                  ca_trust_bundle:
+                    description: Path where the trusted CA bundle is available
+                    type: string
                   priority_class:
                     description: Assign a pre-existing priority class to the postgres pod
                     type: string
