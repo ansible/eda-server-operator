@@ -19,7 +19,7 @@
     namespace: "{{ ansible_operator_meta.namespace }}"
     pod: "{{ eda_api_pod_name }}"
     container: "eda-api"
-    command: bash -c "DJANGO_SUPERUSER_PASSWORD={{ admin_password }} aap-eda-manage createsuperuser --username={{ admin_user | quote }} --email={{ admin_email | quote }} --noinput"
+    command: bash -c "DJANGO_SUPERUSER_PASSWORD={{ admin_password }} ANSIBLE_REVERSE_RESOURCE_SYNC=false aap-eda-manage createsuperuser --username={{ admin_user | quote }} --email={{ admin_email | quote }} --noinput"
   register: result
   changed_when: "'That username is already taken' not in result.stderr"
   failed_when: "'That username is already taken' not in result.stderr and 'Superuser created successfully' not in result.stdout"
