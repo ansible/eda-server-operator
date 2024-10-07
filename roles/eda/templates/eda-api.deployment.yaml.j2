@@ -125,6 +125,8 @@ spec:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
         env:
+        - name: ANSIBLE_REVERSE_RESOURCE_SYNC
+          value: 'true'
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
