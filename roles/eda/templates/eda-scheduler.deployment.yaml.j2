@@ -100,6 +100,12 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
+        - name: EDA_PGSSLMODE
+          value: '{{ eda_postgres_sslmode }}'
+{% if eda_postgres_sslmode in ['verify-ca', 'verify-full'] %}
+        - name: EDA_PGSSLROOTCERT
+          value: '{{ ca_trust_bundle }}'
+{% endif %}
         - name: EDA_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -145,6 +151,12 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: password
+        - name: EDA_PGSSLMODE
+          value: '{{ eda_postgres_sslmode }}'
+{% if eda_postgres_sslmode in ['verify-ca', 'verify-full'] %}
+        - name: EDA_PGSSLROOTCERT
+          value: '{{ ca_trust_bundle }}'
+{% endif %}
         - name: EDA_SECRET_KEY
           valueFrom:
             secretKeyRef:
