@@ -117,6 +117,10 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if combined_activation_worker.resource_requirements is defined %}
         resources: {{ combined_activation_worker.resource_requirements }}
 {% endif %}
@@ -139,6 +143,9 @@ spec:
           - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
             mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
             subPath: bundle-ca.crt
+            readOnly: true
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
             readOnly: true
 {% endif %}
       containers:
@@ -232,6 +239,9 @@ spec:
         volumeMounts:
           - name: "{{ ansible_operator_meta.name }}-media-data"
             mountPath: "{{ media_dir }}"
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if bundle_ca_crt %}
           - name: "ca-trust-extracted"
             mountPath: "/etc/pki/ca-trust/extracted"
@@ -244,6 +254,9 @@ spec:
       volumes:
         - name: {{ ansible_operator_meta.name }}-media-data
           emptyDir: {}
+        - name: pg-ssl-secrets
+          secret:
+            secretName: pg-ssl-secrets
 {% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
           emptyDir: {}

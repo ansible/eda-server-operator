@@ -67,6 +67,10 @@ spec:
       - name: wait-for-migrations
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
         command:
           - /bin/bash
           - -c
@@ -118,6 +122,10 @@ spec:
       - name: eda-scheduler
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
         command:
             - /bin/bash
             - -c
@@ -198,4 +206,8 @@ spec:
         resources: {{ combined_scheduler.resource_requirements }}
 {% endif %}
       restartPolicy: Always
+      volumes:
+        - name: pg-ssl-secrets
+          secret:
+            secretName: pg-ssl-secrets
 status: {}

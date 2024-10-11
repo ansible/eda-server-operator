@@ -117,6 +117,10 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if combined_default_worker.resource_requirements is defined %}
         resources: {{ combined_default_worker.resource_requirements }}
 {% endif %}
@@ -139,6 +143,9 @@ spec:
           - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
             mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
             subPath: bundle-ca.crt
+            readOnly: true
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
             readOnly: true
 {% endif %}
       containers:
@@ -245,6 +252,10 @@ spec:
 {% if combined_event_stream.resource_requirements is defined %}
         resources: {{ combined_event_stream.resource_requirements }}
 {% endif %}
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if bundle_ca_crt %}
         volumeMounts:
           - name: "ca-trust-extracted"
@@ -267,6 +278,9 @@ spec:
             mountPath: /var/cache/nginx
           - name: nginx-run
             mountPath: /var/run
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
       restartPolicy: Always
       volumes:
         - name: '{{ ansible_operator_meta.name }}-nginx-event-stream-conf'
@@ -279,6 +293,9 @@ spec:
           emptyDir: {}
         - name: nginx-run
           emptyDir: {}
+        - name: pg-ssl-secrets
+          secret:
+            secretName: pg-ssl-secrets
 {% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
           emptyDir: {}

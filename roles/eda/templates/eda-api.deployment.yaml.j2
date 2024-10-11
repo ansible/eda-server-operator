@@ -117,6 +117,10 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        volumeMounts:
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
@@ -173,6 +177,9 @@ spec:
         volumeMounts:
           - name: static-files
             mountPath: {{ static_path }}
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
         image: {{ _image }}
@@ -192,6 +199,9 @@ spec:
           - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
             mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
             subPath: bundle-ca.crt
+            readOnly: true
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
             readOnly: true
 {% endif %}
       containers:
@@ -301,6 +311,9 @@ spec:
         volumeMounts:
         - name: static-files
           mountPath: {{ static_path }}
+        - name: pg-ssl-secrets
+          mountPath: '{{ ca_trust_bundle_dir }}'
+          readOnly: true
       - name: daphne
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -391,6 +404,9 @@ spec:
             mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
             subPath: bundle-ca.crt
             readOnly: true
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
 {% endif %}
       - name: nginx
         image: {{ _image_web }}
@@ -407,6 +423,9 @@ spec:
             mountPath: /var/cache/nginx
           - name: nginx-run
             mountPath: /var/run
+          - name: pg-ssl-secrets
+            mountPath: '{{ ca_trust_bundle_dir }}'
+            readOnly: true
       restartPolicy: Always
       volumes:
         - name: static-files
@@ -421,6 +440,9 @@ spec:
           emptyDir: {}
         - name: nginx-run
           emptyDir: {}
+        - name: pg-ssl-secrets
+          secret:
+            secretName: pg-ssl-secrets
 {% if bundle_ca_crt %}
         - name: "ca-trust-extracted"
           emptyDir: {}
