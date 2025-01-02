@@ -400,7 +400,9 @@ spec:
           - name: nginx-run
             mountPath: /var/run
       restartPolicy: Always
-
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_api.resource_requirements }}
+{% endif %}
       volumes:
 {% if not ui_disabled %}
         - name: static-files
