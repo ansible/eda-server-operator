@@ -93,6 +93,15 @@ jobs:
           kubectl wait --for condition=Successful --timeout=600s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml || \
           (echo "Reconciliation loop did not converge within 10 minutes" && kubectl describe -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml && exit 1)
 
+      - name: Check that the EDA demo is running
+        run: |
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=eda-default-worker
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=eda-activation-worker
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=eda-scheduler
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=eda-api
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=database
+          kubectl wait --for condition=Running --timeout=-1s -l app.kubernetes.io/component=cache
+
       - name: Backup EDA demo
         run: |
           kubectl apply -f .ci/eda_v1alpha1_edabackup.ci.yaml
