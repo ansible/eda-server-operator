@@ -38,7 +38,6 @@ spec:
             type: object
           spec:
             type: object
-            x-kubernetes-preserve-unknown-fields: true
             required:
             - deployment_name
             properties:
