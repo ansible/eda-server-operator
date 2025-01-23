@@ -112,7 +112,6 @@ spec:
                       Default: 1'
                     format: int32
                     default: 1
-                    minimum: 1
                     nullable: true
                     type: integer
                   resource_requirements:
@@ -453,7 +452,6 @@ spec:
                       Default: 1'
                     format: int32
                     default: 1
-                    minimum: 1
                     nullable: true
                     type: integer
                   resource_requirements:
