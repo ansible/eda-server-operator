@@ -1,0 +1,93 @@
+---
+- name: Scale down EDA Deployments
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ item }}"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: 0
+  loop:
+    - '{{ ansible_operator_meta.name }}-activation-worker'
+    - '{{ api_server_name }}'
+    - '{{ ansible_operator_meta.name }}-default-worker'
+    - '{{ event_stream_server_name }}'
+    - '{{ ansible_operator_meta.name }}-scheduler'
+
+- name: Scale down EDA ui if enabled
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-ui"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: 0
+  when: not ui_disabled
+
+- name: Check for an external Redis cache
+  ansible.builtin.import_role:
+    name: redis
+    tasks_from: check_external_config
+  when: redis_type | length == 0 or redis_type == 'unmanaged'
+
+- name: Check for the default Redis configuration
+  ansible.builtin.import_role:
+    name: redis
+    tasks_from: check_default_config
+  when: redis_type | length == 0 or redis_type == 'managed'
+
+- name: Create a default Redis configuration
+  ansible.builtin.import_role:
+    name: redis
+    tasks_from: create_default_config
+  when: redis_type | length == 0
+
+- name: Scale down Redis Deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-redis"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: 0
+  when: redis_type == "managed"
+
+- name: Combine postgres default and custom vars for each component
+  ansible.builtin.import_role:
+    name: postgres
+    tasks_from: combine_defaults
+
+- name: Determine and set postgres configuration secret and variables
+  ansible.builtin.import_role:
+    name: postgres
+    tasks_from: set_configuration_secret
+
+- name: Set variables to be used in Postgres templates
+  ansible.builtin.import_role:
+    name: postgres
+    tasks_from: set_variables
+
+- name: Scale down PostgreSQL Statefulset
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "{{ ansible_operator_meta.name }}-postgres-{{ supported_pg_version }}"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec:
+        replicas: 0
+  when: managed_database
+
+- name: End Playbook
+  ansible.builtin.meta: end_play
