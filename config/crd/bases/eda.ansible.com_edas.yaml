@@ -2428,6 +2428,9 @@ spec:
                     description: 'Defines Redis Deployment replicas'
                     format: int32
                     type: integer
+                    default: 1
+                    minimum: 0
+                    maximum: 1
                   node_selector:
                     additionalProperties:
                       type: string
@@ -2822,6 +2825,9 @@ spec:
                 type: string
               force_drop_db:
                 description: Force drop the database before restoring. USE WITH CAUTION!
+                type: boolean
+              idle_deployment:
+                description: Scale down deployments to put EDA into an idle state
                 type: boolean
           status:
             description: Status defines the observed state of EDA

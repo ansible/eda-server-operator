@@ -12,6 +12,7 @@ metadata:
     app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
     app.kubernetes.io/managed-by: 'eda-operator'
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
