@@ -168,3 +168,6 @@ admin_password_secret: ''
 
 # Disable UI container's nginx ipv6 listener
 ipv6_disabled: false
+
+# idle_deployment - Scale down deployments to put EDA into an idle state
+idle_deployment: false

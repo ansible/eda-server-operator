@@ -59,6 +59,13 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      - description: Scale down deployments to put EDA into an idle state
+        displayName: Idle EDA
+        path: idle_deployment
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+        - urn:alm:descriptor:com.tectonic.ui:hidden
       - displayName: No Log Configuration
         path: no_log
         x-descriptors:

@@ -8,6 +8,10 @@
   include_role:
     name: common
 
+- name: Idle EDA
+  include_tasks: idle_deployment.yml
+  when: idle_deployment | bool
+
 - name: Setup Redis
   include_role:
     name: redis
