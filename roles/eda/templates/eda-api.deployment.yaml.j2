@@ -129,6 +129,11 @@ spec:
         env:
         - name: ANSIBLE_REVERSE_RESOURCE_SYNC
           value: 'true'
+        - name: EDA_ACTIVATION_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
