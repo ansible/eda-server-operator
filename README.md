@@ -236,6 +236,14 @@ spec:
 Optionally, it is also recommended to set `event_stream.prefix` with a non guessable value (for example an UUID) to avoid unwanted access to the event streams or DDOS attacks. 
 
 ```yaml
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  event_stream:
+    prefix: "/f743d0ac-f9ca-11ef-9021-482ae389cd08"
+```
 
 ### Additional Advanced Configuration
 - [No Log](./docs/user-guide/advanced-configuration/no-log.md)
