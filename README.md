@@ -218,6 +218,25 @@ spec:
   db_fields_encryption_secret: custom-eda-db-encryption-secret
 ```
 
+### Enable Event Streams
+In order to get working event streams in a standalone deployment, you need to set the application variable `EDA_EVENT_STREAM_BASE_URL` to the URL where EDA Server would be accessible from internet by external services. This value must contain the scheme, public hostname and event stream path (set by default to `/eda-event-streams`) This is needed to generate the correct URLs for the event streams.
+Example:
+
+```yaml
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  extra_settings:
+    - setting: EDA_EVENT_STREAM_BASE_URL
+      value: "https://mypublicdomain.com/eda-event-streams"
+```
+
+Optionally, it is also recommended to set `event_stream.prefix` with a non guessable value (for example an UUID) to avoid unwanted access to the event streams or DDOS attacks. 
+
+```yaml
+
 ### Additional Advanced Configuration
 - [No Log](./docs/user-guide/advanced-configuration/no-log.md)
 - [EDA application settings](./docs/user-guide/advanced-configuration/settings.md)
