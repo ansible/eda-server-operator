@@ -62,7 +62,7 @@ spec:
 {% endif %}
 {% if combined_default_worker.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
-        {{ combined_default_worker.topology_spread_constraints | indent(width=8) }}
+        {{ combined_default_worker.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
       initContainers:
       - name: wait-for-migrations
