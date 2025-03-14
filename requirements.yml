@@ -3,6 +3,6 @@ collections:
   - name: operator_sdk.util
     version: "0.4.0"
   - name: kubernetes.core
-    version: "2.3.1"
+    version: "2.4.2"
   - name: cloud.common
     version: "2.1.1"
