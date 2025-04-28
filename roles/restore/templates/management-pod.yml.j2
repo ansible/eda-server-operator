@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: {{ ansible_operator_meta.name }}-db-management
-  namespace: {{ backup_pvc_namespace }}
+  namespace: "{{ backup_pvc_namespace }}"
   labels:
     app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
     app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
