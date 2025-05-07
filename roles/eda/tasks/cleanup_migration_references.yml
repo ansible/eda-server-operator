@@ -1,0 +1,25 @@
+---
+# This task file removes the old_postgres_configuration_secret reference from the EDA CR
+# after a successful migration to avoid keeping unnecessary references
+
+- name: Get current EDA CR
+  kubernetes.core.k8s_info:
+    api_version: "{{ api_version }}"
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: eda_cr
+
+- name: Remove old_postgres_configuration_secret from EDA CR
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: "{{ api_version }}"
+      kind: "{{ kind }}"
+      metadata:
+        name: "{{ ansible_operator_meta.name }}"
+        namespace: "{{ ansible_operator_meta.namespace }}"
+      spec: "{{ eda_cr.resources[0].spec | combine({'old_postgres_configuration_secret': null}) }}"
+  when:
+    - eda_cr.resources | length > 0
+    - eda_cr.resources[0].spec.old_postgres_configuration_secret is defined

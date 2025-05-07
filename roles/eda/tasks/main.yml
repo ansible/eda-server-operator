@@ -34,6 +34,14 @@
   when:
     - old_pg_config is defined
     - old_pg_config['resources'] | default([]) | length > 0
+  register: migration_result
+
+- name: Cleanup migration references
+  include_tasks: cleanup_migration_references.yml
+  when:
+    - migration_result is defined
+    - migration_result is success
+    - eda_migrated_from_secret is defined
 
 - name: Set EDA app images
   include_tasks: set_images.yml
