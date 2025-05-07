@@ -2829,6 +2829,18 @@ spec:
               idle_deployment:
                 description: Scale down deployments to put EDA into an idle state
                 type: boolean
+              old_postgres_configuration_secret:
+                description: Secret where the old database configuration can be found for data migration
+                type: string
+                maxLength: 255
+                pattern: '^[a-zA-Z0-9][-a-zA-Z0-9]{0,253}[a-zA-Z0-9]$'
+              pg_dump_suffix:
+                description: Additional parameters for the pg_dump command during a migration
+                type: string
+              postgres_label_selector:
+                description: Label selector used to identify postgres pod for data migration
+                type: string
+
           status:
             description: Status defines the observed state of EDA
             properties:
@@ -2846,6 +2858,9 @@ spec:
                 type: string
               upgradedPostgresVersion:
                 description: Status to indicate that the database has been upgraded to the version in the status
+                type: string
+              migratedFromSecret:
+                description: The secret used for migrating an old instance
                 type: string
               image:
                 description: URL of the image used for the deployed instance
