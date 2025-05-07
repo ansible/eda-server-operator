@@ -74,6 +74,10 @@ Use the `pg_dump_suffix` parameter under `EDA.spec` to customize the pg_dump com
 pg_dump_suffix: "--exclude-table-data 'table_name*' --exclude-table-data 'another_table'"
 ```
 
+### Automatic Cleanup
+
+After a successful migration, the operator will automatically remove the `old_postgres_configuration_secret` reference from the EDA CR. This helps keep your CR clean and avoids keeping unnecessary references to resources that are no longer needed.
+
 ## Important Note
 
 If you intend to put all the above in one file, make sure to separate each block with three dashes like so:
