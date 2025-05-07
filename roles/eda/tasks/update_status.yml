@@ -63,3 +63,13 @@
     status:
       upgradedPostgresVersion: "{{ upgraded_postgres_version | string }}"
   when: upgraded_postgres_version is defined
+
+- name: Update migratedFromSecret status
+  operator_sdk.util.k8s_status:
+    api_version: '{{ api_version }}'
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      migratedFromSecret: "{{ eda_migrated_from_secret }}"
+  when: eda_migrated_from_secret is defined

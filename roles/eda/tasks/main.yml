@@ -16,9 +16,24 @@
   include_role:
     name: redis
 
+- name: Check for old postgres configuration
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: '{{ old_postgres_configuration_secret }}'
+  register: old_pg_config
+  no_log: "{{ no_log }}"
+  when: old_postgres_configuration_secret is defined
+
 - name: Setup PostgreSQL Database
   include_role:
     name: postgres
+
+- name: Migrate data from old database
+  include_tasks: migrate_data.yml
+  when:
+    - old_pg_config is defined
+    - old_pg_config['resources'] | default([]) | length > 0
 
 - name: Set EDA app images
   include_tasks: set_images.yml
