@@ -102,6 +102,25 @@ spec:
         path: backupDirectory
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
+      - description: The resulting conditions when a Service Telemetry is instantiated
+        displayName: Conditions
+        path: conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+        properties:
+          lastTransitionTime:
+            type: string
+          reason:
+            type: string
+          status:
+            type: string
+          type:
+            type: string
+          ansibleResult:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
       version: v1alpha1
     - description: Restore a previous eda deployment from an EDABackup. The deployment
         name you provide will be the name of the new EDA CR that will be created.
@@ -186,6 +205,25 @@ spec:
         path: restoreComplete
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:text
+      - description: The resulting conditions when a Service Telemetry is instantiated
+        displayName: Conditions
+        path: conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+        properties:
+          lastTransitionTime:
+            type: string
+          reason:
+            type: string
+          status:
+            type: string
+          type:
+            type: string
+          ansibleResult:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
       version: v1alpha1
     - description: Deploy a new instance of Event-Driven Ansible Server. A standardized
         way to configure and run rulebooks to trigger automation.
@@ -769,6 +807,25 @@ spec:
         path: URL
         x-descriptors:
         - urn:alm:descriptor:org.w3:link
+      - description: The resulting conditions when a Service Telemetry is instantiated
+        displayName: Conditions
+        path: conditions
+        x-descriptors:
+        - urn:alm:descriptor:io.kubernetes.conditions
+        properties:
+          lastTransitionTime:
+            type: string
+          reason:
+            type: string
+          status:
+            type: string
+          type:
+            type: string
+          ansibleResult:
+            type: object
+            x-kubernetes-preserve-unknown-fields: true
+        type: object
+        x-kubernetes-preserve-unknown-fields: true
       version: v1alpha1
   description: |
     An ansible operator for managing the lifecycle of an Event-Driven Ansible

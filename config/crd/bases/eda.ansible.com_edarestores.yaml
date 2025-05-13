@@ -120,6 +120,9 @@ spec:
                       type: string
                     type:
                       type: string
+                    ansibleResult:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
                   type: object
                 type: array
               restoreComplete:
