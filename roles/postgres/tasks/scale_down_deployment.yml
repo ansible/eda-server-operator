@@ -1,26 +1,22 @@
 ---
 
-- name: Check for presence of Deployment
-  k8s_info:
+- name: Get list of deployments matching label selector
+  kubernetes.core.k8s_info:
     api_version: apps/v1
     kind: Deployment
-    name: "{{ ansible_operator_meta.name }}-api"
     namespace: "{{ ansible_operator_meta.namespace }}"
-  register: this_deployment
+    label_selectors:
+      - "app.kubernetes.io/name={{ ansible_operator_meta.name }}"
+  register: matching_deployments
 
-# TODO: Determine if other deployments need to be scaled down too or not
-- name: Scale down Deployment for migration
+- name: Scale down matching deployments for migration
   kubernetes.core.k8s_scale:
     api_version: apps/v1
     kind: Deployment
-    name: "{{ item }}"
+    name: "{{ item.metadata.name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
     replicas: 0
     wait: yes
-  loop:
-    - "{{ ansible_operator_meta.name }}-api"
-    - "{{ ansible_operator_meta.name }}-scheduler"
-    - "{{ ansible_operator_meta.name }}-default-worker"
-    - "{{ ansible_operator_meta.name }}-activation-worker"
-  when: this_deployment['resources'] | length
+  loop: "{{ matching_deployments.resources }}"
+  when: matching_deployments.resources | length > 0
 
