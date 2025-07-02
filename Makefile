@@ -122,6 +122,11 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 	cd config/default && $(KUSTOMIZE) edit set namespace ${NAMESPACE}
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
+.PHONY: undeploy-keep-crd
+undeploy-keep-crd: ## Undeploy controller from the K8s cluster specified in ~/.kube/config. Prevents down.sh from stomping on other CRD's in the same cluster.
+	cd config/default-keep-crd && $(KUSTOMIZE) edit set namespace ${NAMESPACE}
+	$(KUSTOMIZE) build config/default-keep-crd | kubectl delete -f -
+
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
 
