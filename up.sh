@@ -3,6 +3,7 @@
 
 # -- Usage
 #   NAMESPACE=eda TAG=dev QUAY_USER=developer ./up.sh
+#   EDA_CR=dev/eda-cr/eda-k8s-ing.yml ./up.sh
 
 # -- User Variables
 NAMESPACE=${NAMESPACE:-eda}
@@ -10,6 +11,7 @@ QUAY_USER=${QUAY_USER:-developer}
 TAG=${TAG:-$(git rev-parse --short HEAD)}
 DEV_TAG=${DEV_TAG:-dev}
 DEV_TAG_PUSH=${DEV_TAG_PUSH:-true}
+EDA_CR=${EDA_CR:-dev/eda-cr/eda-openshift-cr.yml}
 
 # -- Container Build Engine (podman or docker)
 ENGINE=${ENGINE:-podman}
@@ -111,11 +113,10 @@ fi
 # -- Deploy Operator
 make deploy IMG=$IMG:$TAG NAMESPACE=$NAMESPACE
 
+# -- Print Options for EDA CR
+echo "Available EDA CR files:"
+ls -1 dev/eda-cr
 
 # -- Create CR
-# uncomment the CR you want to use
-$KUBE_APPLY dev/eda-cr/eda-openshift-cr.yml
-# $KUBE_APPLY dev/eda-cr/eda-k8s-ing.yml
-# $KUBE_APPLY dev/eda-cr/eda-k8s-nodeport-cr.yml
-# $KUBE_APPLY dev/eda-cr/eda-resource-quota-cr.yml
-# $KUBE_APPLY dev/eda-cr/lightweight-eda.yml
+echo "Applying EDA CR: $EDA_CR"
+$KUBE_APPLY $EDA_CR
