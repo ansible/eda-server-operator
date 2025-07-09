@@ -171,3 +171,9 @@ ipv6_disabled: false
 
 # idle_deployment - Scale down deployments to put EDA into an idle state
 idle_deployment: false
+
+# timeout defaults for nginx and gunicorn_workers
+client_request_timeout: 30
+eda_gunicorn_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 3) | int }}'
+eda_gunicorn_grace_period: 2
+eda_nginx_read_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 2) | int }}'

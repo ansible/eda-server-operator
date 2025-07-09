@@ -91,6 +91,10 @@ data:
                 proxy_set_header X-Forwarded-Proto $remote_scheme;
                 proxy_set_header X-Forwarded-Port $server_port;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                # Return 503 Service Unavailable with JSON response if gunicorn fails to respond
+                proxy_read_timeout {{ eda_nginx_read_timeout }}s;
+                error_page 504 =503 /json_503;
+                error_page 502 =503 /json_503;  # Optional, in case gunicorn is completely down    
             }
 
             location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
@@ -105,5 +109,18 @@ data:
                 add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
                 try_files $uri $uri/ /index.html =404;
             }
+            location = /json_503 {
+              # Custom JSON response for 503 Service Unavailable
+              internal;
+              add_header Content-Type application/json;
+  
+              # Check if X-Request-ID is set and include it in the response
+              if ($http_x_request_id) {
+                  return 503 '{"status": "error", "message": "Service Unavailable", "code": 503, "request_id": "$http_x_request_id"}';
+              }
+  
+              # If X-Request-ID is not set, just return the basic JSON response
+              return 503 '{"status": "error", "message": "Service Unavailable", "code": 503}';
+          }   
         }
       }
