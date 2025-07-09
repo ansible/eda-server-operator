@@ -22,7 +22,9 @@ Table of Contents
   - [Upgrades](#upgrades)
   - [Advanced Configuration](#advanced-configuration)
     - [Admin user account configuration](#admin-user-account-configuration)
+    - [Allow Local Resource Management](#allow-local-resource-management)
     - [Database Fields Encryption Configuration](#database-fields-encryption-configuration)
+    - [Enable Event Streams](#enable-event-streams)
     - [Additional Advanced Configuration](#additional-advanced-configuration)
   - [Maintainers Docs](#maintainers-docs)
 
@@ -182,6 +184,21 @@ stringData:
   password: mysuperlongpassword
 ```
 
+
+### Allow Local Resource Management
+
+Resources such as users, teams, or organizations are recommended to be managed by the *Platform Provider*. Flag `EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT` can be toggled to instruct whether EDA can create/modify/delete these resources. The following example allows EDA to manage such resources. It is necessary when EDA is deployed alone.
+
+```yaml
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  extra_settings:
+    - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
+      value: true
+```
 
 ### Database Fields Encryption Configuration
 

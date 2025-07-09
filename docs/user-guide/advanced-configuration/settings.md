@@ -14,6 +14,8 @@ spec:
   extra_settings:
     - setting: EDA_MAX_RUNNING_ACTIVATIONS
       value: "12"
+    - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
+      value: true
 
 ```
 
