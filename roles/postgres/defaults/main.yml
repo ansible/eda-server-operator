@@ -53,3 +53,6 @@ image_pull_secrets: []
 
 # Labels defined on the resource, which should be propagated to child resources
 additional_labels: []
+
+# Enable PostgreSQL SCRAM-SHA-256 migration
+postgres_scram_migration_enabled: true
