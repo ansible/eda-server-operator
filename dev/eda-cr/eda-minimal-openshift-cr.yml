@@ -1,0 +1,9 @@
+---
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+  namespace: eda-demo
+spec:
+  ingress_type: route
+  automation_server_url: awx.example.com 

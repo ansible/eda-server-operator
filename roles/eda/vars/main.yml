@@ -14,3 +14,9 @@ eda_event_stream_prefix_path: "{{ event_stream.prefix | default('/eda-event-stre
 event_stream_nginx_port: 8000
 event_stream_server_name: "{{ ansible_operator_meta.name }}-event-stream"
 event_stream_django_port: 8002
+
+# timeout defaults for nginx and gunicorn_workers
+client_request_timeout: 30
+gunicorn_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 3) | int }}'
+gunicorn_timeout_grace_period: 2
+eda_nginx_read_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 2) | int }}'
