@@ -28,8 +28,6 @@ spec:
 
   # -- Example extra settings
   extra_settings:
-    - setting: EDA_MAX_RUNNING_ACTIVATIONS
-      value: '11'
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
       vaue: true
     - setting: DEFAULT_PULL_POLICY
