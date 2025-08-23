@@ -34,7 +34,7 @@ spec:
       value: "Always"
 
   # CA Bundle
-  bundle_cacert_secret: my-custom-certs
+  # bundle_cacert_secret: my-custom-certs
 
   # -- Resource Requirements
   api:
