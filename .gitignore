@@ -8,6 +8,7 @@
 .cache/
 bin
 testbin/*
+hacking/
 /bundle
 /bundle_tmp*
 /bundle.Dockerfile
