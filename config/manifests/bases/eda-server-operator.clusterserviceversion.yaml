@@ -320,8 +320,13 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:io.kubernetes:StorageClass
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Database Extra Arguments
+      - displayName: Database Extra Arguments (Deprecated)
         path: database.postgres_extra_args
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Database Extra Settings
+        path: postgres_extra_settings
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden

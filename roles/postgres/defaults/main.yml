@@ -39,7 +39,8 @@ _database:
   node_selector: {}
   priority_class: ''
   tolerations: []
-  postgres_extra_args: ''
+  postgres_extra_args: ''  # Deprecated
+  postgres_extra_settings: []  # Define postgresql.conf configurations
   postgres_keep_pvc_after_upgrade: true  # Specify whether or not to keep the old PVC after PostgreSQL upgrades
   postgres_data_volume_init: false
   postgres_init_container_commands: |

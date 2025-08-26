@@ -127,8 +127,22 @@ spec:
             - name: postgres-{{ supported_pg_version }}
               mountPath: '{{ _postgres_data_path | dirname }}'
               subPath: '{{ _postgres_data_path | dirname | basename }}'
+{% if combined_database.postgres_extra_settings | length > 0 %}
+            - name: pg-overrides
+              mountPath: /opt/app-root/src/postgresql-cfg
+              readOnly: true
+{% endif %}
 {% if combined_database.resource_requirements is defined %}
           resources: {{ combined_database.resource_requirements }}
+{% endif %}
+{% if combined_database.postgres_extra_settings | length > 0 %}
+      volumes:
+        - name: pg-overrides
+          configMap:
+            name: '{{ ansible_operator_meta.name }}-postgres-extra-settings'
+            items:
+              - key: 99-overrides.conf
+                path: 99-overrides.conf
 {% endif %}
   volumeClaimTemplates:
     - metadata:
