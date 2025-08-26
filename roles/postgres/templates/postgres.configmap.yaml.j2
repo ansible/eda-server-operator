@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: '{{ ansible_operator_meta.name }}-postgres-extra-settings'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    app.kubernetes.io/name: 'postgres-extra-settings-{{ supported_pg_version }}'
+    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/component: 'database'
+    app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/managed-by: 'eda-operator'
+data:
+  99-overrides.conf: |
+{% for pg_setting in combined_database.postgres_extra_settings %}
+{% if pg_setting.value is string %}
+    {{ pg_setting.setting }} = '{{ pg_setting.value }}'
+{% else %}
+    {{ pg_setting.setting }} = {{ pg_setting.value }}
+{% endif %}
+{% endfor %}

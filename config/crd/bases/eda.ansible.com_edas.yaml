@@ -2642,10 +2642,25 @@ spec:
                     description: Customize the postgres init container commands (Non Openshift)
                     type: string
                   postgres_extra_args:
-                    description: Arguments to pass to postgres process
+                    description: (Deprecated, use postgres_extra_settings parameter) Arguments to pass to postgres process
                     items:
                       type: string
                     type: array
+                  postgres_extra_settings:
+                    description: "PostgreSQL configuration settings to be added to postgresql.conf"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        setting:
+                          description: "PostgreSQL configuration parameter name"
+                          type: string
+                        value:
+                          description: "PostgreSQL configuration parameter value"
+                          type: string
+                      required:
+                        - setting
+                        - value
                   priority_class:
                     description: Assign a pre-existing priority class to the postgres pod
                     type: string

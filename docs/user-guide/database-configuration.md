@@ -82,9 +82,9 @@ spec:
         storage: 8Gi
     postgres_storage_class: fast-ssd
     postgres_data_volume_init: true
-    postgres_extra_args:
-      - '-c'
-      - 'max_connections=1000'
+    postgres_extra_settings:
+      - setting: max_connections
+        value: 1000
 ```
 
 **Note**: If `database.postgres_storage_class` is not defined, PostgreSQL will store it's data on a volume using the default storage class for your cluster.
