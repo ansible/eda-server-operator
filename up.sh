@@ -10,6 +10,7 @@ QUAY_USER=${QUAY_USER:-developer}
 TAG=${TAG:-$(git rev-parse --short HEAD)}
 DEV_TAG=${DEV_TAG:-dev}
 DEV_TAG_PUSH=${DEV_TAG_PUSH:-true}
+DEV_CR=${DEV_CR:-dev/eda-cr/eda-openshift-cr.yml}
 
 # -- Container Build Engine (podman or docker)
 ENGINE=${ENGINE:-podman}
@@ -113,8 +114,11 @@ make deploy IMG=$IMG:$TAG NAMESPACE=$NAMESPACE
 
 
 # -- Create CR
+
+set -euxo pipefail && $KUBE_APPLY $DEV_CR
+
 # uncomment the CR you want to use
-$KUBE_APPLY dev/eda-cr/eda-openshift-cr.yml
+# $KUBE_APPLY dev/eda-cr/eda-openshift-cr.yml
 # $KUBE_APPLY dev/eda-cr/eda-k8s-ing.yml
 # $KUBE_APPLY dev/eda-cr/eda-k8s-nodeport-cr.yml
 # $KUBE_APPLY dev/eda-cr/eda-resource-quota-cr.yml
