@@ -8,3 +8,8 @@ spec:
   no_log: false
   automation_server_url: http://foo.bar
   ui_disabled: true
+
+  database:
+    postgres_extra_settings:
+      - setting: max_connections
+        value: '499'

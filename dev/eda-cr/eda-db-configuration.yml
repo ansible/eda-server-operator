@@ -1,0 +1,39 @@
+apiVersion: eda.ansible.com/v1alpha1
+kind: EDA
+metadata:
+  name: eda
+spec:
+  automation_server_url: https://awx-awx.apps.aap-dev.ocp4.testing.ansible.com
+  automation_server_ssl_verify: 'no'
+  service_type: ClusterIP
+  ingress_type: Route
+  no_log: false
+  image_pull_policy: Always
+  image_pull_secrets:
+    - redhat-operators-pull-secret
+
+  # Disable UI
+  ui_disabled: false
+
+  # -- Example extra settings
+  extra_settings:
+    - setting: DEFAULT_PULL_POLICY
+      value: "Always"
+
+  database:
+    # postgres_configuration_secret: eda-pod-external-database   # requires creation of this secret first
+    postgres_extra_settings:
+      - setting: max_connections
+        value: '1000'
+    resource_requirements:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    storage_requirements:
+      requests:
+        storage: 8Gi
+    # postgres_storage_class: fast-ssd   # requires storage class with this name on the cluster to work
+
