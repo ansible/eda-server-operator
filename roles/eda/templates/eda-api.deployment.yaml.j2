@@ -200,7 +200,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:{{ api_django_port }} --workers {{ combined_api.gunicorn_workers }} --timeout {{ gunicorn_timeout }} --graceful-timeout {{ gunicorn_timeout_grace_period }} aap_eda.wsgi:application
+        - gunicorn --bind '{{ api_bind_address }}:{{ api_django_port }}' --workers {{ combined_api.gunicorn_workers }} --timeout {{ gunicorn_timeout }} --graceful-timeout {{ gunicorn_timeout_grace_period }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
@@ -302,7 +302,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - daphne -b 0.0.0.0 -p {{ websocket_port }} aap_eda.asgi:application
+        - daphne -b '{{ api_bind_address }}' -p {{ websocket_port }} aap_eda.asgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
