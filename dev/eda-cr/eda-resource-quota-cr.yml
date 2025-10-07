@@ -11,7 +11,7 @@ spec:
   image_pull_policy: Always
   extra_settings:
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      vaue: true
+      value: true
 
   api:
     replicas: 1

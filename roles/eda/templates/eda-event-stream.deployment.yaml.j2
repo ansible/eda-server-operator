@@ -142,7 +142,7 @@ spec:
         args:
         - /bin/bash
         - -c
-        - gunicorn --bind 0.0.0.0:{{ event_stream_django_port }} --workers {{ combined_event_stream.gunicorn_workers }} --timeout {{ gunicorn_timeout }} --graceful-timeout {{ gunicorn_timeout_grace_period }} aap_eda.wsgi:application
+        - gunicorn --bind '{{ api_bind_address }}:{{ event_stream_django_port }}' --workers {{ combined_event_stream.gunicorn_workers }} --timeout {{ gunicorn_timeout }} --graceful-timeout {{ gunicorn_timeout_grace_period }} aap_eda.wsgi:application
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'

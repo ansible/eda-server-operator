@@ -6,4 +6,4 @@ spec:
   no_log: false
   extra_settings:
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      vaue: true
+      value: true

@@ -26,6 +26,9 @@ data:
 
         server {
             listen {{ api_nginx_port }};
+            {% if not ipv6_disabled | bool %}
+            listen [::]:{{ api_nginx_port }};
+            {% endif %}
             location ^~ /api/eda/static/ {
                 alias {{ static_path }}/;
                 access_log /var/log/nginx/static_access.log;

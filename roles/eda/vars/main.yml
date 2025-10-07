@@ -20,3 +20,6 @@ client_request_timeout: 30
 gunicorn_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 3) | int }}'
 gunicorn_timeout_grace_period: 2
 eda_nginx_read_timeout: '{{ (([(client_request_timeout | int), 10] | max) / 2) | int }}'
+
+# Define which address to bind in the api, depending on the enabled IP version
+api_bind_address: "{{ (ipv6_disabled | bool) | ternary('0.0.0.0', '[::]') }}"

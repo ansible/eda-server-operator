@@ -6,7 +6,7 @@ metadata:
 spec:
   extra_settings:
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      vaue: true
+      value: true
     - setting: GIT_SSL_NO_VERIFY
       value: "true"
 

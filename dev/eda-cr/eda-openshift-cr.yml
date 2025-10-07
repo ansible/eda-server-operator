@@ -29,7 +29,7 @@ spec:
   # -- Example extra settings
   extra_settings:
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      vaue: true
+      value: true
     - setting: DEFAULT_PULL_POLICY
       value: "Always"
 
