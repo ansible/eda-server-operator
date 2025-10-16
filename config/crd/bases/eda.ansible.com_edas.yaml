@@ -34,6 +34,9 @@ spec:
             type: object
             required:
             - automation_server_url
+            x-kubernetes-validations:
+              - rule: "!has(self.event_stream) || !has(self.event_stream.prefix) || !has(self.event_stream.mtls_prefix) || self.event_stream.prefix != self.event_stream.mtls_prefix"
+                message: "Event stream prefix and mtls_prefix cannot be the same."
             properties:
               additional_labels:
                 description: Additional labels defined on the resource, which should be propagated to child resources
@@ -431,6 +434,13 @@ spec:
               event_stream:
                 description: Defines desired state of Event Stream resources
                 properties:
+                  mtls:
+                    description: Enable mTLS for event-stream.
+                    type: boolean
+                    default: true
+                  mtls_prefix:
+                    description: Prefix for the Event Stream mTLS URL
+                    type: string
                   prefix:
                     description: Prefix for the Event Stream URL
                     type: string
