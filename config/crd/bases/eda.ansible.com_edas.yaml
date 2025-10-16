@@ -85,11 +85,17 @@ spec:
               image_web_version:
                 description: UI container image tag or version to use
                 type: string
+              mtls:
+                description: Enable mTLS for webhook and event stream
+                type: boolean
               redis_image:
                 description: Registry path to Redis container image to use
                 type: string
               redis_image_version:
                 description: Redis container image tag or version to use
+                type: string
+              webhook_mtls_base_url:
+                description: Alternative mTLS URL for webhooks. URL will be built by public_base_url if not defined.
                 type: string
               api:
                 description: Defines desired state of eda-api resources
@@ -431,6 +437,9 @@ spec:
               event_stream:
                 description: Defines desired state of Event Stream resources
                 properties:
+                  mtls_base_url:
+                    description: Alternative mTLS URL for event-stream. URL will be built by public_base_url if not defined.
+                    type: string
                   prefix:
                     description: Prefix for the Event Stream URL
                     type: string
