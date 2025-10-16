@@ -13,6 +13,12 @@
   ignore_errors: yes
   changed_when: false
 
+- name: Configure public_base_url
+  ansible.builtin.set_fact:
+    event_stream_base_url: "{{ public_base_url.rstrip('/') }}/{{ event_stream_prefix_path.strip('/') }}"
+    event_stream_mtls_base_url: "{{ public_base_url.rstrip('/') }}/{{ event_stream_mtls_prefix_path }}"
+  when: public_base_url | default('') | length > 0
+
 - name: Apply ConfigMap resources
   k8s:
     apply: yes

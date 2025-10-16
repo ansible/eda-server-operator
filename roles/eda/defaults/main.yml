@@ -166,6 +166,11 @@ admin_user: admin
 admin_email: test@example.com
 admin_password_secret: ''
 
+event_stream_base_url: ""
+event_stream_mtls: "{{ event_stream.mtls | default(true) }}"
+event_stream_mtls_prefix_path: "mtls/{{ event_stream_prefix_path.strip('/') }}"
+event_stream_prefix_path: "{{ event_stream.prefix | default('/eda-event-streams') }}"
+
 # Disable UI container's nginx ipv6 listener
 ipv6_disabled: false
 
