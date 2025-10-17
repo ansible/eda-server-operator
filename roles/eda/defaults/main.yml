@@ -166,6 +166,14 @@ admin_user: admin
 admin_email: test@example.com
 admin_password_secret: ''
 
+mtls: false
+webhook_mtls_slug: 'mtls'
+event_stream_mtls_slug: 'mtls'
+webhook_base_url: ""
+webhook_mtls_base_url: ""
+event_stream_base_url: ""
+event_stream_mtls_base_url: ""
+
 # Disable UI container's nginx ipv6 listener
 ipv6_disabled: false
 

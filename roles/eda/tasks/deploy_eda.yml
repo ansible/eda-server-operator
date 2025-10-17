@@ -13,6 +13,14 @@
   ignore_errors: yes
   changed_when: false
 
+- name: Configure public_base_url
+  ansible.builtin.set_fact:
+    webhook_base_url: "{{ public_base_url.rstrip('/') }}/{{ eda_event_stream_prefix_path.lstrip('/') }}"
+    webhook_mtls_base_url: "{{ public_base_url.rstrip('/') }}/{{ webhook_mtls_slug }}/{{ eda_event_stream_prefix_path.lstrip('/') }}"
+    event_stream_base_url: "{{ event_stream.mtls_base_url | default(public_base_url.rstrip('/') }}/{{ eda_event_stream_prefix_path.lstrip('/')) }}"
+    event_stream_mtls_base_url: "{{ public_base_url.rstrip('/') }}/{{ event_stream_mtls_slug }}/{{ eda_event_stream_prefix_path.lstrip('/') }}"
+  when: public_base_url and eda_event_stream_prefix_path
+
 - name: Apply ConfigMap resources
   k8s:
     apply: yes
