@@ -430,26 +430,37 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of eda-event-stream deployment resources
-        displayName: Webhook deployment configuration
+        displayName: Event-stream deployment configuration
         path: event_stream
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Webhook custom prefix path
-        displayName: Webhook prefix path
-        path: prefix
+      - displayName: Event-stream enable/disable mTLS
+        path: event_stream.mtls
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: The number of gunicorn workers for the Webhook.
-        displayName: Gunicorn Webhook workers
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Event-stream custom mtls prefix path
+        displayName: Event-stream mtls prefix path
+        path: event_stream.mtls_prefix
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:fieldDependency:event_stream.mtls:true
+      - description: Event-stream custom prefix path
+        displayName: Event-stream prefix path
+        path: event_stream.prefix
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: The number of gunicorn workers for the event-stream.
+        displayName: Gunicorn event-stream workers
         path: event_stream.gunicorn_workers
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:number
-      - displayName: Webhook server resource requirements
+      - displayName: Event-stream server resource requirements
         path: event_stream.resource_requirements
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-      - description: The number of Webhook replicas.
+      - description: The number of event-stream replicas.
         displayName: Replicas
         path: event_stream.replicas
         x-descriptors:
