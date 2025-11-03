@@ -11,13 +11,15 @@ data:
   # Operator specific settings
   EDA_DEPLOYMENT_TYPE: "k8s"
 
-  {% if public_base_url and eda_event_stream_prefix_path %}
+{% if event_stream_base_url | length > 0 %}
   # Public URL
-  EDA_WEBHOOK_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_event_stream_prefix_path.lstrip('/') }}"
-  EDA_WEBHOOK_MTLS_BASE_URL: "@none None"
-  EDA_EVENT_STREAM_BASE_URL: "{{ public_base_url.rstrip('/') }}/{{ eda_event_stream_prefix_path.lstrip('/') }}"
+  EDA_EVENT_STREAM_BASE_URL: "{{ event_stream_base_url }}"
+{% if event_stream_mtls | bool %}
+  EDA_EVENT_STREAM_MTLS_BASE_URL: "{{ event_stream_mtls_base_url }}"
+{% else %}
   EDA_EVENT_STREAM_MTLS_BASE_URL: "@none None"
-  {% endif %}
+{% endif %}
+{% endif %}
 
   # EDA Server
   EDA_CONTROLLER_URL: "{{ automation_server_url }}"
