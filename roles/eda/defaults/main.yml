@@ -38,6 +38,7 @@ _api:
       memory: 350Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 # Note: "default-worker: {}" is intentionally excluded here so we know if the user set it
 _default_worker:
@@ -48,6 +49,7 @@ _default_worker:
       memory: 130Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 # Note: "activation-worker: {}" is intentionally excluded here so we know if the user set it
 _activation_worker:
@@ -58,6 +60,7 @@ _activation_worker:
       memory: 150Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 # Note: Deprecated "worker: {}" is intentionally excluded here so we know if the user set it
 _worker: {}
@@ -71,6 +74,7 @@ _scheduler:
       memory: 256Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 event_stream: {}
 _event_stream:
@@ -83,6 +87,7 @@ _event_stream:
       memory: 350Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 ui: {}
 _ui:
@@ -93,6 +98,7 @@ _ui:
       memory: 64Mi
   node_selector: {}
   tolerations: []
+  affinity: {}
 
 # Labels defined on the resource, which should be propagated to child resources
 additional_labels: []
