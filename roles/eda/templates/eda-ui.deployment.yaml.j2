@@ -63,6 +63,10 @@ spec:
       topologySpreadConstraints:
         {{ combined_ui.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
+{% if combined_ui.affinity is defined and combined_ui.affinity | length > 0 %}
+      affinity:
+        {{ combined_ui.affinity | to_nice_yaml | indent(width=8) }}
+{% endif %}
       containers:
       - name: eda-ui
         image: {{ _image_web }}
