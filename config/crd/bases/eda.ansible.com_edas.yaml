@@ -37,6 +37,14 @@ spec:
             x-kubernetes-validations:
               - rule: "!has(self.event_stream) || !has(self.event_stream.prefix) || !has(self.event_stream.mtls_prefix) || self.event_stream.prefix != self.event_stream.mtls_prefix"
                 message: "Event stream prefix and mtls_prefix cannot be the same."
+              - rule: "has(self.image) && has(self.image_version) || !has(self.image) && !has(self.image_version)"
+                message: "Both image and image_version must be set when required"
+              - rule: "has(self.image_web) && has(self.image_web_version) || !has(self.image_web) && !has(self.image_web_version)"
+                message: "Both image_web and image_web_version must be set when required"
+              - rule: "has(self.redis_image) && has(self.redis_image_version) || !has(self.redis_image) && !has(self.redis_image_version)"
+                message: "Both redis_image and redis_image_version must be set when required"
+              - rule: "has(self.postgres_image) && has(self.postgres_image_version) || !has(self.postgres_image) && !has(self.postgres_image_version)"
+                message: "Both postgres_image and postgres_image_version must be set when required"
             properties:
               additional_labels:
                 description: Additional labels defined on the resource, which should be propagated to child resources
