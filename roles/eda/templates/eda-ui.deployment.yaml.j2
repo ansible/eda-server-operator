@@ -61,7 +61,7 @@ spec:
 {% endif %}
 {% if combined_ui.topology_spread_constraints is defined %} %}
       topologySpreadConstraints:
-        {{ combined_ui.topology_spread_constraints | indent(width=8) }}
+        {{ combined_ui.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
       containers:
       - name: eda-ui
