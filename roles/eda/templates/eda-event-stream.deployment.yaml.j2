@@ -64,6 +64,10 @@ spec:
       topologySpreadConstraints:
         {{ combined_event_stream.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
+{% if combined_event_stream.affinity is defined and combined_event_stream.affinity | length > 0 %}
+      affinity:
+        {{ combined_event_stream.affinity | to_nice_yaml | indent(width=8) }}
+{% endif %}
       initContainers:
       - name: wait-for-migrations
         image: {{ _image }}
