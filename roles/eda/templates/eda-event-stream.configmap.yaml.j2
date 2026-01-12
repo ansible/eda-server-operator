@@ -25,6 +25,9 @@ data:
 
         server {
             listen {{ event_stream_nginx_port }};
+            {% if not ipv6_disabled | bool %}
+            listen [::]:{{ event_stream_nginx_port }};
+            {% endif %}
 
             location / {
                 proxy_pass              http://eda-api-event-stream-backend/;
