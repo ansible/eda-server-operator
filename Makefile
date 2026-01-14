@@ -6,7 +6,7 @@
 VERSION ?= 0.0.1
 
 # Default ENGINE for building the operator (default docker)
-ENGINE ?= podman
+ENGINE ?= docker
 
 # CHANNELS define the bundle channels used in the bundle.
 # Add a new line here if you would like to change its default config. (E.g CHANNELS = "candidate,fast,stable")
@@ -100,6 +100,11 @@ docker-buildx: ## Build and push docker image for the manager for cross-platform
 	docker buildx use project-v3-builder
 	- docker buildx build --push $(BUILD_ARGS) --platform=$(PLATFORMS) --tag ${IMG} -f Dockerfile .
 	- docker buildx rm project-v3-builder
+
+.PHONY: podman-buildx
+podman-buildx: ## Build and push podman image for the manager for cross-platform support
+	podman build --platform=$(PLATFORMS) $(BUILD_ARGS) --manifest ${IMG} -f Dockerfile .
+	podman manifest push --all ${IMG} ${IMG}
 
 ##@ Deployment
 
