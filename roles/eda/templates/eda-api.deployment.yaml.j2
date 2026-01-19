@@ -69,6 +69,10 @@ spec:
       topologySpreadConstraints:
         {{ combined_api.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
+{% if combined_api.affinity is defined and combined_api.affinity | length > 0 %}
+      affinity:
+        {{ combined_api.affinity | to_nice_yaml | indent(width=8) }}
+{% endif %}
       initContainers:
       - name: run-migrations
         image: {{ _image }}
