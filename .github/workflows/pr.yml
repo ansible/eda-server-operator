@@ -18,6 +18,9 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
+        with:
+          # Ensures the exact PR commit is checked out
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Start minikube
         run: minikube start --memory=max --cpus=max --vm-driver=docker --extra-config=apiserver.service-node-port-range=80-32000 --kubernetes-version=v1.28.9
@@ -61,6 +64,10 @@ jobs:
           kubectl apply -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
           kubectl -n eda get eda eda-demo -o yaml
           kubectl wait --for condition=Successful --timeout=-1s -f .ci/eda_v1alpha1_eda.${{ matrix.SCENARIO }}.ci.yaml
+
+      # - name: Wait for the EDA API pod to be ready
+      #   run: |
+      #     kubectl wait --for condition=Ready pod --timeout=-1s -l app.kubernetes.io/component=eda-api
 
       - name: Test EDA API via API k8s service
         run: |
