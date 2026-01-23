@@ -246,6 +246,9 @@ spec:
         image: {{ _image_web }}
         ports:
           - containerPort: {{ event_stream_nginx_port }}
+{% if combined_event_stream.resource_requirements is defined %}
+        resources: {{ combined_event_stream.resource_requirements }}
+{% endif %}
         volumeMounts:
           - name: '{{ ansible_operator_meta.name }}-nginx-event-stream-conf'
             mountPath: /etc/nginx/nginx.conf
