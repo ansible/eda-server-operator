@@ -111,8 +111,8 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
-{% if combined_default_worker.resource_requirements is defined %}
-        resources: {{ combined_default_worker.resource_requirements }}
+{% if combined_event_stream.resource_requirements is defined %}
+        resources: {{ combined_event_stream.resource_requirements }}
 {% endif %}
 {% if bundle_ca_crt  %}
       - name: configure-bundle-ca-cert
