@@ -63,6 +63,10 @@ spec:
       topologySpreadConstraints:
         {{ combined_scheduler.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
+{% if combined_scheduler.affinity is defined and combined_scheduler.affinity | length > 0 %}
+      affinity:
+        {{ combined_scheduler.affinity | to_nice_yaml | indent(width=8) }}
+{% endif %}
       initContainers:
       - name: wait-for-migrations
         image: {{ _image }}
