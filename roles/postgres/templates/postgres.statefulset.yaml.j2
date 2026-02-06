@@ -80,6 +80,7 @@ spec:
           imagePullPolicy: '{{ image_pull_policy }}'
           name: postgres
 {% if combined_database.postgres_extra_args %}
+          command: ["run-postgresql"]
           args: {{ combined_database.postgres_extra_args }}
 {% endif %}
           readinessProbe:
