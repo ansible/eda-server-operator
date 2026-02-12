@@ -19,6 +19,14 @@ data:
             application/manifest+json webmanifest;
         }
 
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for" '
+                        'rid=$request_id';
+
+        access_log /dev/stdout main;
+        error_log /dev/stderr warn;
+
         # Define the upstream gunicorn server
         upstream gunicorn {
             server 127.0.0.1:{{ api_django_port }};
@@ -31,8 +39,6 @@ data:
             {% endif %}
             location ^~ /api/eda/static/ {
                 alias {{ static_path }}/;
-                access_log /var/log/nginx/static_access.log;
-                error_log /var/log/nginx/static_error.log;
             }
             location ~ ^/api/eda {
                 proxy_pass http://gunicorn;  # Forward requests to Django app
@@ -49,8 +55,6 @@ data:
             location / {
                 root {{ static_path }};
                 try_files /index.html =404;
-                access_log /var/log/nginx/proxy_access.log;
-                error_log /var/log/nginx/proxy_error.log;
             }
             location = /json_503 {
                 # Custom JSON response for 503 Service Unavailable

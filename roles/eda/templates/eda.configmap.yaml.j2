@@ -62,6 +62,15 @@ data:
         types {
             application/manifest+json webmanifest;
         }
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for" '
+                        'rid=$request_id';
+
+        access_log /dev/stdout main;
+        error_log /dev/stderr warn;
+
         server {
             listen 8080;
             {% if not ipv6_disabled %}
@@ -70,9 +79,6 @@ data:
 
             server_name _;
             server_tokens off;
-
-            access_log off;
-            # error_log off;
 
             autoindex off;
 
