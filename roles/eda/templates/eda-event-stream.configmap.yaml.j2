@@ -14,6 +14,24 @@ data:
             ''      $scheme;
         }
 
+        map $http_x_trusted_proxy $trusted_proxy_present {
+            default "trusted-proxy";
+            ""      "-";
+        }
+
+        map $http_x_dab_jw_token $dab_jwt_present {
+            default "dab-jwt";
+            ""      "-";
+        }
+
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for" '
+                        'rid=$request_id $trusted_proxy_present $dab_jwt_present';
+
+        access_log /dev/stdout main;
+        error_log /dev/stderr warn;
+
         include mime.types;
         types {
             application/manifest+json webmanifest;
