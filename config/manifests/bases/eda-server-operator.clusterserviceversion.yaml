@@ -596,41 +596,6 @@ spec:
         path: activation_worker.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Defines desired state of eda-scheduler deployment resources
-        displayName: Scheduler deployment configuration
-        path: scheduler
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: scheduler pod resource requirements
-        path: scheduler.resource_requirements
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-      - description: The number of scheduler replicas.
-        displayName: Replicas
-        path: scheduler.replicas
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:podCount
-      - displayName: Node Selector
-        path: scheduler.node_selector
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: The deployment strategy to use to replace existing pods with
-          new ones.
-        displayName: Strategy
-        path: scheduler.strategy
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Node tolerations for the scheduler pods.
-        displayName: Tolerations
-        path: scheduler.tolerations
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Topology rule(s) for the pods.
-        displayName: Topology Spread Constraints
-        path: scheduler.topology_spread_constraints
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: Defines desired state of redis deployment resources
         displayName: Redis deployment configuration
         path: redis

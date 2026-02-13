@@ -62,16 +62,6 @@ _activation_worker:
 # Note: Deprecated "worker: {}" is intentionally excluded here so we know if the user set it
 _worker: {}
 
-scheduler: {}
-_scheduler:
-  replicas: 2
-  resource_requirements:
-    requests:
-      cpu: 50m
-      memory: 256Mi
-  node_selector: {}
-  tolerations: []
-
 event_stream: {}
 _event_stream:
   prefix: /event-streams

@@ -25,12 +25,6 @@ spec:
       requests:
         cpu: 25m
         memory: 64Mi
-  scheduler:
-    replicas: 1
-    resource_requirements:
-      requests:
-        cpu: 50m
-        memory: 256Mi
   database:
     resource_requirements:
       requests:

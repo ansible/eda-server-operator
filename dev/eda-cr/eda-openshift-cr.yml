@@ -45,10 +45,6 @@ spec:
     replicas: 1
     resource_requirements:
       requests: {}
-  scheduler:
-    replicas: 1
-    resource_requirements:
-      requests: {}
   default_worker:
     replicas: 2
     resource_requirements:

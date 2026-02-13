@@ -15,7 +15,6 @@
     - '{{ api_server_name }}'
     - '{{ ansible_operator_meta.name }}-default-worker'
     - '{{ event_stream_server_name }}'
-    - '{{ ansible_operator_meta.name }}-scheduler'
 
 - name: Scale down EDA ui if enabled
   kubernetes.core.k8s:

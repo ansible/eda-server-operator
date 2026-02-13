@@ -4,7 +4,6 @@
   set_fact:
     combined_api: "{{ _api | combine(api, recursive=True) }}"
     combined_ui: "{{ _ui | combine(ui, recursive=True) }}"
-    combined_scheduler: "{{ _scheduler | combine(scheduler, recursive=True) }}"
     combined_event_stream: "{{ _event_stream | combine(event_stream, recursive=True) }}"
 
 # Backwards compatibility support for worker parameters
