@@ -43,7 +43,6 @@
     - 'eda-api.deployment'
     - 'eda-default-worker.deployment'
     - 'eda-activation-worker.deployment'
-    - 'eda-scheduler.deployment'
     - 'eda-event-stream.configmap'
     - 'eda-event-stream.service'
     - 'eda-event-stream.deployment'
@@ -84,6 +83,14 @@
     api_version: apps/v1
     kind: Deployment
     name: "{{ ansible_operator_meta.name }}-worker"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    state: absent
+
+- name: Remove legacy EDA scheduler deployment
+  k8s:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-scheduler"
     namespace: "{{ ansible_operator_meta.namespace }}"
     state: absent
 
