@@ -37,14 +37,6 @@ data:
             application/manifest+json webmanifest;
         }
 
-        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
-                        '$status $body_bytes_sent "$http_referer" '
-                        '"$http_user_agent" "$http_x_forwarded_for" '
-                        'rid=$request_id';
-
-        access_log /dev/stdout main;
-        error_log /dev/stderr warn;
-
         # Define the upstream gunicorn server
         upstream gunicorn {
             server 127.0.0.1:{{ api_django_port }};
