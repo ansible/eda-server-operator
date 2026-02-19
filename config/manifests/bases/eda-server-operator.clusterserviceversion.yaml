@@ -378,16 +378,6 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Redis Image
-        path: redis_image
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
-      - displayName: Redis Image Version
-        path: redis_image_version
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:hidden
       - description: Defines desired state of eda-api deployment resources
         displayName: API deployment configuration
         path: api
@@ -594,42 +584,6 @@ spec:
       - description: Topology rule(s) for the pods.
         displayName: Topology Spread Constraints
         path: activation_worker.topology_spread_constraints
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Defines desired state of redis deployment resources
-        displayName: Redis deployment configuration
-        path: redis
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: External redis configuration secret
-        path: redis.redis_secret
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:io.kubernetes:Secret
-      - description: The number of redis replicas.
-        displayName: Replicas
-        path: redis.replicas
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:podCount
-      - displayName: Node Selector
-        path: redis.node_selector
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - description: Deployment strategy to use to replace existing pods with new
-          ones.
-        displayName: Strategy
-        path: redis.strategy
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:updateStrategy
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-      - displayName: Redis deployment resource requirements
-        path: redis.resource_requirements
-        x-descriptors:
-        - urn:alm:descriptor:com.tectonic.ui:advanced
-        - urn:alm:descriptor:com.tectonic.ui:resourceRequirements
-      - description: Node tolerations for the Redis pods.
-        displayName: Tolerations
-        path: redis.tolerations
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
       - displayName: Service Type
