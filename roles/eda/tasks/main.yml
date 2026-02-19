@@ -12,10 +12,6 @@
   include_tasks: idle_deployment.yml
   when: idle_deployment | bool
 
-- name: Setup Redis
-  include_role:
-    name: redis
-
 - name: Check for old postgres configuration
   kubernetes.core.k8s_info:
     kind: Secret

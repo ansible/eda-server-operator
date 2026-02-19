@@ -29,37 +29,6 @@
         replicas: 0
   when: not ui_disabled
 
-- name: Check for an external Redis cache
-  ansible.builtin.import_role:
-    name: redis
-    tasks_from: check_external_config
-  when: redis_type | length == 0 or redis_type == 'unmanaged'
-
-- name: Check for the default Redis configuration
-  ansible.builtin.import_role:
-    name: redis
-    tasks_from: check_default_config
-  when: redis_type | length == 0 or redis_type == 'managed'
-
-- name: Create a default Redis configuration
-  ansible.builtin.import_role:
-    name: redis
-    tasks_from: create_default_config
-  when: redis_type | length == 0
-
-- name: Scale down Redis Deployment
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: "{{ ansible_operator_meta.name }}-redis"
-        namespace: "{{ ansible_operator_meta.namespace }}"
-      spec:
-        replicas: 0
-  when: redis_type == "managed"
-
 - name: Combine postgres default and custom vars for each component
   ansible.builtin.import_role:
     name: postgres
