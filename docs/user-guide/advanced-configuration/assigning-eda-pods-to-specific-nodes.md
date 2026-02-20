@@ -2,7 +2,7 @@
 
 You can constrain the EDA pods created by the operator to run on a certain subset of nodes. `node_selector` and `tolerations` contrain the EDA pods to run only on the nodes that match the specified key/value pairs. 
 
-Each component of EDA has its own `node_selector` and `tolerations` values. The supported components are `ui`, `api`, `default_worker`, `activation_worker`, `worker`, `redis` and `database`.
+Each component of EDA has its own `node_selector` and `tolerations` values. The supported components are `ui`, `api`, `default_worker`, `activation_worker`, `worker` and `database`.
 
 | Name | Description | Type | Default |
 |---|---|---|---|
