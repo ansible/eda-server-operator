@@ -21,9 +21,23 @@ kubectl delete edarestore --all
 # Delete old operator deployment
 kubectl delete deployment eda-server-operator-controller-manager
 
+# Parse command line arguments
+ALL_FLAG=false
+for arg in "$@"; do
+  case $arg in
+    --all)
+      ALL_FLAG=true
+      shift
+      ;;
+  esac
+done
+
 # Deploy Operator
-make undeploy IMG=$IMG NAMESPACE=$NAMESPACE
+if [ "$ALL_FLAG" = true ]; then
+  make undeploy IMG=$IMG NAMESPACE=$NAMESPACE
+else
+  make undeploy-keep-crd IMG=$IMG NAMESPACE=$NAMESPACE
+fi
 
 # Remove PVCs
 kubectl delete pvc postgres-15-$EDA_CR-postgres-15-0
-
