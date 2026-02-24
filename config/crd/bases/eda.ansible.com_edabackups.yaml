@@ -77,6 +77,10 @@ spec:
               backup_storage_class:
                 description: Storage class to use when creating PVC for backup
                 type: string
+              create_backup_pvc:
+                description: Automatically create the backup PVC if backup_pvc is defined but does not exist
+                type: boolean
+                default: true
               clean_backup_on_delete:
                 description: Flag to indicate if backup should be deleted on PVC if EDABackup object is deleted
                 type: boolean
