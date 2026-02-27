@@ -21,3 +21,34 @@
 - name: Create managed Postgres StatefulSet if no external db is defined
   import_tasks: create_managed_postgres.yml
   when: managed_database
+
+# Event stream database user configuration
+- name: Determine and set event stream postgres configuration secret
+  import_tasks: set_event_stream_secret.yml
+
+- name: Check for AAP managed PostgreSQL
+  kubernetes.core.k8s_info:
+    kind: Pod
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/managed-by=aap-gateway-operator"
+      - "app.kubernetes.io/component=database"
+  register: aap_managed_postgres_pod
+  when: not managed_database
+
+- name: Validate event stream configuration for external database
+  ansible.builtin.fail:
+    msg: >-
+      When using an external database, you must provide event stream database credentials.
+      Specify 'event_stream.database_secret' in your EDA CR with a pre-created secret
+      containing the event stream user credentials. The secret must contain: username,
+      password, host, port, database, and sslmode keys. The event stream database user
+      must be pre-created on your external database with CONNECT privilege.
+  when:
+    - not managed_database
+    - aap_managed_postgres_pod['resources'] | default([]) | length == 0
+    - event_stream.database_secret is not defined or not event_stream.database_secret
+
+- name: Create event stream database user in PostgreSQL
+  ansible.builtin.import_tasks: create_event_stream_user.yml
+  when: managed_database or (aap_managed_postgres_pod['resources'] | default([]) | length > 0)
