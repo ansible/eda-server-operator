@@ -30,4 +30,6 @@ restore_resource_requirements:
 set_self_labels: true
 
 spec_overrides: {}
+
+force_drop_db: false
 ...

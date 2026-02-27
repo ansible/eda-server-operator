@@ -8,5 +8,4 @@ _postgres_image_version: latest
 backup_api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 backup_kind: 'EDABackup'
 
-force_drop_db: false
 pg_drop_create: ''
