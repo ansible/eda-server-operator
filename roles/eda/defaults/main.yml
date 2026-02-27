@@ -161,6 +161,10 @@ event_stream_mtls: "{{ event_stream.mtls | default(true) }}"
 event_stream_mtls_prefix_path: "mtls/{{ event_stream_prefix_path.strip('/') }}"
 event_stream_prefix_path: "{{ event_stream.prefix | default('/eda-event-streams') }}"
 
+# Event stream database configuration
+event_stream_database_username: eda_event_stream
+event_stream_pg_sslmode: "prefer"
+
 # Disable UI container's nginx ipv6 listener
 ipv6_disabled: false
 
