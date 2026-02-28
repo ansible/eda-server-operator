@@ -268,6 +268,7 @@ spec:
 - [Deploy a Specific Version of EDA](./docs/user-guide/advanced-configuration/deploying-a-specific-version.md)
 - [Trusting a Custom Certificate Authority](./docs/user-guide/advanced-configuration/trusting-a-custom-certificate-authority.md)
 - [Database Configuration](./docs/user-guide/database-configuration.md)
+- [Redis Removal Notice](./docs/user-guide/redis-configuration.md)
 
 ## Maintainers Docs
 

@@ -4,6 +4,21 @@
 - name: Combine default and custom vars for each component
   include_tasks: combine_defaults.yml
 
+- name: Warn if user still references redis configuration
+  ansible.builtin.debug:
+    msg: >-
+      [DEPRECATION WARNING] Redis configuration detected in the EDA custom
+      resource spec but Redis is no longer used by EDA. The 'redis' section
+      (including 'redis.redis_secret') will be ignored. EDA now uses
+      dispatcherd (backed by PostgreSQL) for task queuing. Please remove
+      the 'redis' section from your EDA custom resource spec at your
+      earliest convenience. No data migration from Redis is required as
+      task state is persisted in PostgreSQL.
+  when:
+    - redis is defined
+    - redis is mapping
+    - redis | length > 0
+
 - name: Configure cluster
   include_role:
     name: common
