@@ -48,6 +48,23 @@ In the event you need to recover the backup see the [restore role documentation]
 **Note**: Do not delete the namespace/project, as that will delete the backup and the backup's PVC as well.
 
 
+#### Redis Removal
+
+Starting with this version, the EDA operator **no longer deploys or supports Redis**. EDA now uses [dispatcherd](https://github.com/ansible/dispatcherd), a PostgreSQL `pg_notify`-based task queuing system that eliminates the need for a separate Redis instance.
+
+**What happens automatically during the upgrade:**
+
+- The operator deletes any existing managed Redis Deployment (`<name>-redis`), Service (`<name>-redis-svc`), and Secret (`<name>-redis-configuration`).
+- No data migration is required — Redis was used only for transient message queuing (`emptyDir` storage), and all durable task state is persisted in PostgreSQL.
+
+**What you need to do:**
+
+- **Remove the `redis` section from your EDA CR spec when convenient.** If your CR still contains a `redis` section, the operator will log a deprecation warning and ignore it — the upgrade will proceed normally. You should remove the `redis:` block at your earliest convenience.
+- **Decommission any external Redis instance** that was dedicated to EDA. No EDA component connects to Redis anymore.
+- The `redis_image` and `redis_image_version` CR fields have also been removed.
+
+For more details, see the [Redis Removal Notice](../user-guide/redis-configuration.md).
+
 #### PostgreSQL Upgrade Considerations
 
 If there is a PostgreSQL major version upgrade, after the data directory on the PVC is migrated to the new version, the old PVC is kept by default.
