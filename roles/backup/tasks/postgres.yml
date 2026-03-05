@@ -63,19 +63,23 @@
     command: >-
       mkdir -p {{ backup_dir }}
 
+- name: Set database filename
+  set_fact:
+    _db_filename: "{{ use_db_compression | bool | ternary('eda.db.gz', 'eda.db') }}"
+
 - name: Precreate file for database dump
   k8s_exec:
     namespace: "{{ backup_pvc_namespace }}"
     pod: "{{ ansible_operator_meta.name }}-db-management"
     command: >-
-      touch {{ backup_dir }}/eda.db
+      touch {{ backup_dir }}/{{ _db_filename }}
 
 - name: Set permissions on file for database dump
   k8s_exec:
     namespace: "{{ backup_pvc_namespace }}"
     pod: "{{ ansible_operator_meta.name }}-db-management"
     command: >-
-      bash -c "chmod 660 {{ backup_dir }}/eda.db && chown :root {{ backup_dir }}/eda.db"
+      bash -c "chmod 660 {{ backup_dir }}/{{ _db_filename }} && chown :root {{ backup_dir }}/{{ _db_filename }}"
 
 - name: Set full resolvable host name for postgres pod
   set_fact:
@@ -91,6 +95,7 @@
       -d {{ eda_postgres_database }}
       -p {{ eda_postgres_port }}
       -F custom
+      {{ use_db_compression | bool | ternary('-Z 9', '') }}
       {{ pg_dump_suffix }}
   no_log: "{{ no_log }}"
 
@@ -116,7 +121,7 @@
       trap 'end_keepalive \"$keepalive_file\" \"$keepalive_pid\"' EXIT SIGINT SIGTERM
       echo keepalive_pid: $keepalive_pid
       set -e -o pipefail
-      PGPASSWORD='{{ eda_postgres_pass }}' {{ pgdump }} > {{ backup_dir }}/eda.db
+      PGPASSWORD='{{ eda_postgres_pass }}' {{ pgdump }} > {{ backup_dir }}/{{ _db_filename }}
       set +e +o pipefail
       echo 'Successful'
       "
