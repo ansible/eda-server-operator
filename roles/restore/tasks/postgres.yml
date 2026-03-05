@@ -69,6 +69,18 @@
     resolvable_db_host: "{{ (eda_postgres_type == 'managed') | ternary(eda_postgres_host + '.' + ansible_operator_meta.namespace + '.svc.' + cluster_name, eda_postgres_host) }}"
   no_log: "{{ no_log }}"
 
+- name: Find database file
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: >-
+      bash -c "ls {{ backup_dir }}/eda.db.gz 2>/dev/null || ls {{ backup_dir }}/eda.db 2>/dev/null"
+  register: _db_file_result
+
+- name: Set database filename for restore
+  set_fact:
+    _db_filename: "{{ _db_file_result.stdout | trim | basename }}"
+
 - name: Set pg_restore command
   set_fact:
     pg_restore: >-
@@ -142,7 +154,7 @@
       echo keepalive_pid: $keepalive_pid
       set -e -o pipefail
       {{ pg_drop_create }}
-      cat {{ backup_dir }}/eda.db | PGPASSWORD='{{ eda_postgres_pass }}' {{ pg_restore }}
+      cat {{ backup_dir }}/{{ _db_filename }} | PGPASSWORD='{{ eda_postgres_pass }}' {{ pg_restore }}
       PG_RC=$?
       set +e +o pipefail
       exit $PG_RC
