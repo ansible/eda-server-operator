@@ -52,8 +52,19 @@ jobs:
       - name: Set context to eda namespace
         run: kubectl config set-context --current --namespace=eda
 
-      - name: Create postgresl secret for external database
+      - name: Create postgresql secret for external database
         run: kubectl apply -f .ci/eda-external-database.secret.yaml
+        if: ${{ matrix.SCENARIO == 'externaldb' }}
+
+      - name: Create event stream database user in external postgresql
+        run: |
+          eval $(minikube -p minikube docker-env)
+          docker exec postgresql psql -U eda -d eda -c "CREATE USER eda_event_stream WITH PASSWORD 'eda_event_stream';"
+          docker exec postgresql psql -U eda -d eda -c "GRANT CONNECT ON DATABASE eda TO eda_event_stream;"
+        if: ${{ matrix.SCENARIO == 'externaldb' }}
+
+      - name: Create event stream postgresql secret for external database
+        run: kubectl apply -f .ci/eda-event-stream-external-database.secret.yaml
         if: ${{ matrix.SCENARIO == 'externaldb' }}
 
       - name: Create the EDA demo CR
