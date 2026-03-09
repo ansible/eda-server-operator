@@ -1,0 +1,19 @@
+---
+- name: Check for an external Redis configuration
+  kubernetes.core.k8s_info:
+    kind: Secret
+    namespace: '{{ ansible_operator_meta.namespace }}'
+    name: '{{ redis.redis_secret }}'
+  register: _redis_configuration
+  when:
+    - redis is defined
+    - redis | length
+    - redis.redis_secret is defined
+    - redis.redis_secret | length
+  no_log: "{{ no_log }}"
+
+- name: Set Redis configuration values for an external Redis configuration
+  ansible.builtin.set_fact:
+    redis_type: 'unmanaged'
+    redis_config_secret: "{{ _redis_configuration['resources'][0]['metadata']['name'] }}"
+  when: _redis_configuration['resources'][0] is defined
