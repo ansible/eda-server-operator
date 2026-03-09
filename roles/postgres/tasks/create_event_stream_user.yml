@@ -1,41 +1,8 @@
 ---
 # Create event stream database user in PostgreSQL
-# Supports both EDA managed and AAP managed databases
-
-- name: For EDA managed postgres, use the standard label selector
-  when: managed_database
-  block:
-    - name: Set Default label selector for custom resource generated postgres
-      ansible.builtin.set_fact:
-        postgres_label_selector: "app.kubernetes.io/instance=postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}"
-      when: postgres_label_selector is not defined
-
-    - name: Get the postgres pod information for event stream user creation
-      kubernetes.core.k8s_info:
-        kind: Pod
-        namespace: "{{ ansible_operator_meta.namespace }}"
-        label_selectors:
-          - "{{ postgres_label_selector }}"
-        field_selectors:
-          - status.phase=Running
-      register: postgres_pod
-
-    - name: Wait for PostgreSQL to be ready for event stream user creation
-      kubernetes.core.k8s_info:
-        kind: Pod
-        namespace: '{{ ansible_operator_meta.namespace }}'
-        label_selectors:
-          - "{{ postgres_label_selector }}"
-        field_selectors:
-          - status.phase=Running
-      register: postgres_pod
-      until:
-        - "postgres_pod['resources'] | length"
-        - "postgres_pod['resources'][0]['status']['phase'] == 'Running'"
-        - "postgres_pod['resources'][0]['status']['containerStatuses'][0]['ready'] == true"
-      delay: 5
-      retries: 60
-      when: postgres_pod['resources'] | default([]) | length == 0
+#
+# For EDA managed databases, postgres_pod is already set by create_managed_postgres.yml
+# For AAP managed databases, we use aap_managed_postgres_pod from main.yml
 
 - name: Use AAP managed postgres pod
   ansible.builtin.set_fact:
