@@ -97,10 +97,10 @@ spec:
                 description: UI container image tag or version to use
                 type: string
               redis_image:
-                description: Registry path to Redis container image to use
+                description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA. It will be removed in a future apiVersion."
                 type: string
               redis_image_version:
-                description: Redis container image tag or version to use
+                description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA. It will be removed in a future apiVersion."
                 type: string
               api:
                 description: Defines desired state of eda-api resources
@@ -2107,13 +2107,13 @@ spec:
                     type: array
                 type: object
               redis:
-                description: 'Defines desired state of cache resources'
+                description: "DEPRECATED: Redis is no longer used by EDA. This entire section is ignored. EDA now uses dispatcherd (backed by PostgreSQL) for task queuing. It will be removed in a future apiVersion."
                 properties:
                   redis_secret:
-                    description: Secret where the redis configuration can be found. Set this to us your own external Redis cache. If not specified, this secret will be generated and EDA will not create a managed Redis pod.
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     type: string
                   replicas:
-                    description: 'Defines Redis Deployment replicas'
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     format: int32
                     type: integer
                     default: 1
@@ -2122,10 +2122,10 @@ spec:
                   node_selector:
                     additionalProperties:
                       type: string
-                    description: NodeSelector for the EDA pods.
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     type: object
                   resource_requirements:
-                    description: Resource requirements for the Redis container
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     properties:
                       claims:
                         description: "Claims lists the names of resources, defined
@@ -2172,8 +2172,7 @@ spec:
                         type: object
                     type: object
                   strategy:
-                    description: The deployment strategy to use to replace existing
-                      pods with new ones.
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     properties:
                       rollingUpdate:
                         description: 'Rolling update config params. Present only if
@@ -2223,7 +2222,7 @@ spec:
                         type: string
                     type: object
                   tolerations:
-                    description: Node tolerations for the EDA pods.
+                    description: "DEPRECATED: This field is ignored. Redis is no longer used by EDA."
                     items:
                       description: The pod this Toleration is attached to tolerates
                         any taint that matches the triple <key,value,effect> using
