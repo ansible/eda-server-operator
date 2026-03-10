@@ -1,0 +1,70 @@
+---
+# Create event stream database user in PostgreSQL
+#
+# For EDA managed databases, postgres_pod is already set by create_managed_postgres.yml
+# For AAP managed databases, we use aap_managed_postgres_pod from main.yml
+
+- name: Use AAP managed postgres pod
+  ansible.builtin.set_fact:
+    postgres_pod: "{{ aap_managed_postgres_pod }}"
+  when:
+    - not managed_database
+    - aap_managed_postgres_pod['resources'] | default([]) | length > 0
+
+- name: Check if event stream database user exists
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ event_stream_postgres_user }}'"
+  register: event_stream_user_exists
+  when:
+    - postgres_pod['resources'] | length > 0
+
+- name: Create event stream database user
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "CREATE USER \"{{ event_stream_postgres_user }}\" WITH PASSWORD '{{ event_stream_postgres_pass }}';"
+  register: create_event_stream_user_result
+  failed_when: create_event_stream_user_result.rc != 0
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+    - event_stream_user_exists.stdout | default('') | trim != '1'
+
+- name: Update event stream database user password
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "ALTER USER \"{{ event_stream_postgres_user }}\" WITH PASSWORD '{{ event_stream_postgres_pass }}';"
+  register: update_event_stream_user_result
+  failed_when: update_event_stream_user_result.rc != 0
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+    - event_stream_user_exists.stdout | default('') | trim == '1'
+
+- name: Grant CONNECT privilege to event stream user
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "GRANT CONNECT ON DATABASE \"{{ eda_postgres_database }}\" TO \"{{ event_stream_postgres_user }}\";"
+  register: grant_connect_result
+  failed_when: grant_connect_result.rc != 0
+  when:
+    - postgres_pod['resources'] | length > 0
+
+- name: Log event stream user creation result
+  ansible.builtin.debug:
+    msg: "Event stream database user '{{ event_stream_postgres_user }}' configured successfully"
+  when:
+    - grant_connect_result is defined
+    - grant_connect_result.rc == 0
