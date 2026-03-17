@@ -91,6 +91,10 @@ spec:
                 description: Enable compression for database dumps. When true, pg_dump uses built-in compression. Default is false.
                 type: boolean
                 default: false
+              use_archive_compression:
+                description: Enable compression for non-database backup artifacts. Default is false.
+                type: boolean
+                default: false
               postgres_label_selector:
                 description: Label selector used to identify postgres pod for backing up data
                 type: string

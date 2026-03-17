@@ -95,7 +95,7 @@
       -d {{ eda_postgres_database }}
       -p {{ eda_postgres_port }}
       -F custom
-      {{ use_db_compression | bool | ternary('-Z 9', '') }}
+      {{ use_db_compression | bool | ternary('', '-Z 0') }}
       {{ pg_dump_suffix }}
   no_log: "{{ no_log }}"
 

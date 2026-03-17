@@ -37,6 +37,9 @@ pg_dump_suffix: ''
 # Enable compression for database dumps
 use_db_compression: false
 
+# Enable compression for non-database backup artifacts
+use_archive_compression: false
+
 # Maintain some of the recommended `app.kubernetes.io/*` labels on the resource (self)
 set_self_labels: true
 ...

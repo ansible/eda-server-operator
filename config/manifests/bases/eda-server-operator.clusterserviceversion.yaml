@@ -91,6 +91,12 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+      - description: Enable compression for non-database backup artifacts
+        displayName: Use Archive Compression
+        path: use_archive_compression
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - displayName: Set default labels on EDA resource
         path: set_self_labels
         x-descriptors:
