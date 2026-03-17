@@ -124,6 +124,8 @@ spec:
 
 The EDA operator automatically creates a dedicated PostgreSQL user (`eda_event_stream`) for event stream operations. This user has minimal privileges (CONNECT only) to reduce the security impact if credentials are exposed in Decision Environments.
 
+> **Important**: The event stream database user must reside on the same PostgreSQL instance as the main EDA database. The `host`, `port`, and `database` fields in the event stream secret should match those of the main EDA database secret — they are used for operator-internal bookkeeping and do not configure a separate database connection.
+
 ##### Managed Database
 
 For managed databases (when no `database.database_secret` is specified), the operator automatically:
