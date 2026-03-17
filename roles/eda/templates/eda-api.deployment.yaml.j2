@@ -177,10 +177,7 @@ spec:
               name: '{{ __event_stream_database_secret }}'
               key: password
         - name: EDA_EVENT_STREAM_DB_SSLMODE
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __event_stream_database_secret }}'
-              key: sslmode
+          value: '{{ event_stream_postgres_sslmode }}'
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}

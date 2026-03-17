@@ -2,14 +2,6 @@
 # Create event stream database user in PostgreSQL
 #
 # For EDA managed databases, postgres_pod is already set by create_managed_postgres.yml
-# For AAP managed databases, we use aap_managed_postgres_pod from main.yml
-
-- name: Use AAP managed postgres pod
-  ansible.builtin.set_fact:
-    postgres_pod: "{{ aap_managed_postgres_pod }}"
-  when:
-    - not managed_database
-    - aap_managed_postgres_pod['resources'] | default([]) | length > 0
 
 - name: Check if event stream database user exists
   kubernetes.core.k8s_exec:
@@ -61,10 +53,3 @@
   failed_when: grant_connect_result.rc != 0
   when:
     - postgres_pod['resources'] | length > 0
-
-- name: Log event stream user creation result
-  ansible.builtin.debug:
-    msg: "Event stream database user '{{ event_stream_postgres_user }}' configured successfully"
-  when:
-    - grant_connect_result is defined
-    - grant_connect_result.rc == 0
