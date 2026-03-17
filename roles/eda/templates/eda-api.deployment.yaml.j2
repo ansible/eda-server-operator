@@ -49,6 +49,7 @@ spec:
   ] %}
         checksum-secret-{{ secret }}: "{{ lookup('ansible.builtin.vars', secret, default='')["resources"][0]["data"] | default('') | sha1 }}"
 {% endfor %}
+        checksum-secret-event-stream-db: "{{ event_stream_pg_config['resources'][0]['data'] | default('') | sha1 }}"
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if image_pull_secrets | length > 0 %}
@@ -164,6 +165,19 @@ spec:
             secretKeyRef:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
+        # Event stream specific database credentials
+        - name: EDA_EVENT_STREAM_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_stream_database_secret }}'
+              key: username
+        - name: EDA_EVENT_STREAM_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_stream_database_secret }}'
+              key: password
+        - name: EDA_EVENT_STREAM_DB_SSLMODE
+          value: '{{ event_stream_postgres_sslmode }}'
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}

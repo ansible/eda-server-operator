@@ -9,6 +9,7 @@
       adminPasswordSecret: "{{ __admin_password_secret['resources'][0]['metadata']['name'] }}"
       adminUser: "{{ admin_user }}"
       databaseConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
+      eventStreamDatabaseConfigurationSecret: "{{ __event_stream_database_secret }}"
       dbFieldsEncryptionSecret: "{{ db_fields_encryption_secret_name }}"
       image: "{{ _image }}"
 

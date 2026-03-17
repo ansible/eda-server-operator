@@ -119,3 +119,62 @@ spec:
       chown 26:0 /var/lib/pgsql/data
       chmod 700 /var/lib/pgsql/data
 ```
+
+#### Event Stream Database User
+
+The EDA operator automatically creates a dedicated PostgreSQL user (`eda_event_stream`) for event stream operations. This user has minimal privileges (CONNECT only) to reduce the security impact if credentials are exposed in Decision Environments.
+
+> **Important**: The event stream database user must reside on the same PostgreSQL instance as the main EDA database. The `host`, `port`, and `database` fields in the event stream secret should match those of the main EDA database secret — they are used for operator-internal bookkeeping and do not configure a separate database connection.
+
+##### Managed Database
+
+For managed databases (when no `database.database_secret` is specified), the operator automatically:
+
+1. Generates credentials and stores them in a secret named `<instance-name>-event-stream-postgres-configuration`
+2. Creates the `eda_event_stream` user with CONNECT privilege on the EDA database
+3. Injects the credentials into the event-stream deployment
+
+No additional configuration is required for managed databases.
+
+##### External Database
+
+For external databases, you must manually create the event stream database user before deploying EDA:
+
+1. Create the `eda_event_stream` user with CONNECT privilege:
+
+```sql
+CREATE USER eda_event_stream WITH PASSWORD 'your-secure-password';
+GRANT CONNECT ON DATABASE eda TO eda_event_stream;
+```
+
+2. Create a Kubernetes secret with the event stream database credentials:
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: <resourcename>-event-stream-postgres-configuration
+  namespace: <target namespace>
+stringData:
+  username: eda_event_stream
+  password: <password>
+  database: eda
+  port: "5432"
+  host: <external postgres host>
+  sslmode: prefer
+  type: unmanaged
+type: Opaque
+```
+
+3. Reference the secret in your EDA CR:
+
+```yaml
+---
+spec:
+  ...
+  event_stream:
+    database_secret: <resourcename>-event-stream-postgres-configuration
+```
+
+**Note**: The variable `sslmode` is valid for `external` databases only. The allowed values are: `prefer`, `disable`, `allow`, `require`, `verify-ca`, `verify-full`.

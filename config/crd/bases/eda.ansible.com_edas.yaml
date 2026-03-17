@@ -37,6 +37,8 @@ spec:
             x-kubernetes-validations:
               - rule: "!has(self.event_stream) || !has(self.event_stream.prefix) || !has(self.event_stream.mtls_prefix) || self.event_stream.prefix != self.event_stream.mtls_prefix"
                 message: "Event stream prefix and mtls_prefix cannot be the same."
+              - rule: "!has(self.event_stream) || !has(self.event_stream.database_secret) || !has(self.database) || !has(self.database.database_secret) || self.event_stream.database_secret != self.database.database_secret"
+                message: "Event stream database_secret must be different from the main database.database_secret."
               - rule: "has(self.image) && has(self.image_version) || !has(self.image) && !has(self.image_version)"
                 message: "Both image and image_version must be set when required"
               - rule: "has(self.image_web) && has(self.image_web_version) || !has(self.image_web) && !has(self.image_web_version)"
@@ -442,6 +444,13 @@ spec:
               event_stream:
                 description: Defines desired state of Event Stream resources
                 properties:
+                  database_secret:
+                    description: |
+                      Name of a pre-existing secret containing event stream database credentials.
+                      If not provided, credentials will be auto-generated for managed databases.
+                      Secret must contain keys: username, password, database, host, port, sslmode, type.
+                      For external databases, the user must be pre-created with CONNECT privilege on the EDA database.
+                    type: string
                   mtls:
                     description: Enable mTLS for event-stream.
                     type: boolean
