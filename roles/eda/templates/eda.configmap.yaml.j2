@@ -34,6 +34,17 @@ data:
 
   EDA_STATIC_URL: /api/eda/static/
 
+  # Resource Server configuration
+  # Detect gateway deployment via either the operator variable or
+  # the extra_settings injected by the gateway-operator.
+{% set _behind_gateway = (resource_server_url | default('') | length > 0) or (extra_settings | default([]) | selectattr('setting', 'equalto', 'EDA_RESOURCE_SERVER__URL') | list | length > 0) %}
+{% if resource_server_url | default('') | length > 0 %}
+  EDA_RESOURCE_SERVER__URL: "{{ resource_server_url }}"
+{% endif %}
+{% if not _behind_gateway %}
+  EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT: "True"
+{% endif %}
+
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
