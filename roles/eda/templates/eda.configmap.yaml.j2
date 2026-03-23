@@ -34,6 +34,12 @@ data:
 
   EDA_STATIC_URL: /api/eda/static/
 
+  # Resource Server configuration
+{% if not (public_base_url | default('') | length > 0) %}
+  EDA_RESOURCE_SERVER__URL: ""
+  EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT: "True"
+{% endif %}
+
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
