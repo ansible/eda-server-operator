@@ -9,9 +9,18 @@
       adminPasswordSecret: "{{ __admin_password_secret['resources'][0]['metadata']['name'] }}"
       adminUser: "{{ admin_user }}"
       databaseConfigurationSecret: "{{ pg_config['resources'][0]['metadata']['name'] }}"
-      eventStreamDatabaseConfigurationSecret: "{{ __event_stream_database_secret }}"
       dbFieldsEncryptionSecret: "{{ db_fields_encryption_secret_name }}"
       image: "{{ _image }}"
+
+- name: Update event stream database secret status
+  operator_sdk.util.k8s_status:
+    api_version: '{{ api_version }}'
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      eventStreamDatabaseConfigurationSecret: "{{ __event_stream_database_secret }}"
+  when: __event_stream_database_secret is defined
 
 - block:
     - name: Retrieve instance version

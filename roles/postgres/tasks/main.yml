@@ -25,6 +25,7 @@
 # Event stream database user configuration
 - name: Determine and set event stream postgres configuration secret
   import_tasks: set_event_stream_secret.yml
+  when: managed_database | bool or (event_stream.database_secret is defined and event_stream.database_secret | length > 0)
 
 - name: Validate event stream configuration for external database
   ansible.builtin.fail:
