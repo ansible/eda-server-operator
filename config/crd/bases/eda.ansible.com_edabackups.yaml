@@ -87,6 +87,10 @@ spec:
               pg_dump_suffix:
                 description: Additional parameters for the pg_dump command
                 type: string
+              use_db_compression:
+                description: Enable compression for database dumps using pg_dump built-in compression.
+                type: boolean
+                default: true
               postgres_label_selector:
                 description: Label selector used to identify postgres pod for backing up data
                 type: string
