@@ -11,6 +11,7 @@
     command: >-
       psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ event_stream_postgres_user }}'"
   register: event_stream_user_exists
+  no_log: "{{ no_log }}"
   when:
     - postgres_pod['resources'] | length > 0
 
