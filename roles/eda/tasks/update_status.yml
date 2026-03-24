@@ -12,6 +12,16 @@
       dbFieldsEncryptionSecret: "{{ db_fields_encryption_secret_name }}"
       image: "{{ _image }}"
 
+- name: Update event stream database secret status
+  operator_sdk.util.k8s_status:
+    api_version: '{{ api_version }}'
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      eventStreamDatabaseConfigurationSecret: "{{ __event_stream_database_secret }}"
+  when: __event_stream_database_secret is defined
+
 - block:
     - name: Retrieve instance version
       k8s_exec:

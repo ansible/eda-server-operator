@@ -9,3 +9,5 @@ spec:
   automation_server_url: http://foo.bar
   database:
     database_secret: eda-demo-external-database
+  event_stream:
+    database_secret: eda-demo-event-stream-external-database
