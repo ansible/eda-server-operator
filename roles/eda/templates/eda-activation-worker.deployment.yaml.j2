@@ -60,7 +60,7 @@ spec:
       tolerations:
         {{ combined_activation_worker.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_activation_worker.topology_spread_constraints is defined %} %}
+{% if combined_activation_worker.topology_spread_constraints is defined %}
       topologySpreadConstraints:
         {{ combined_activation_worker.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
