@@ -44,3 +44,19 @@
 - name: Create event stream database user in PostgreSQL
   ansible.builtin.import_tasks: create_event_stream_user.yml
   when: managed_database | bool
+
+# Event persistence database configuration
+# Event persistence is opt-in only. The database is only provisioned when
+# the user explicitly sets event_persistence.deploy_db: true in the CR,
+# or when the AAP gateway operator provides a database_secret.
+- name: Determine and set event persistence postgres configuration secret
+  import_tasks: set_event_persistence_secret.yml
+  when: >-
+    event_persistence.deploy_db | default(false) | bool or
+    (event_persistence.database_secret is defined and event_persistence.database_secret | length > 0)
+
+- name: Create event persistence database in PostgreSQL
+  ansible.builtin.import_tasks: create_event_persistence_db.yml
+  when:
+    - event_persistence.deploy_db | default(false) | bool
+    - managed_database | bool

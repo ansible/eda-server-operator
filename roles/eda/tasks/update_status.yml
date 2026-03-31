@@ -22,6 +22,16 @@
       eventStreamDatabaseConfigurationSecret: "{{ __event_stream_database_secret }}"
   when: __event_stream_database_secret is defined
 
+- name: Update event persistence database secret status
+  operator_sdk.util.k8s_status:
+    api_version: '{{ api_version }}'
+    kind: "{{ kind }}"
+    name: "{{ ansible_operator_meta.name }}"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    status:
+      eventPersistenceDatabaseConfigurationSecret: "{{ __event_persistence_database_secret }}"
+  when: __event_persistence_database_secret is defined
+
 - block:
     - name: Retrieve instance version
       k8s_exec:

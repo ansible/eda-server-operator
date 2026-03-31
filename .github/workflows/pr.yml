@@ -15,6 +15,7 @@ jobs:
           - SCENARIO: default
           - SCENARIO: externaldb
           - SCENARIO: ingress
+          - SCENARIO: event_persistence
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4

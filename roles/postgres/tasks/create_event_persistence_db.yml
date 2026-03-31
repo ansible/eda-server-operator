@@ -1,0 +1,70 @@
+---
+# Create event persistence database and user in PostgreSQL
+#
+# For EDA managed databases, postgres_pod is already set by create_managed_postgres.yml
+
+- name: Check if event persistence database user exists
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -tAc "SELECT 1 FROM pg_roles WHERE rolname = '{{ event_persistence_postgres_user }}'"
+  register: event_persistence_user_exists
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+
+- name: Create event persistence database user
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "CREATE USER \"{{ event_persistence_postgres_user }}\" WITH PASSWORD '{{ event_persistence_postgres_pass }}';"
+  register: create_event_persistence_user_result
+  failed_when: create_event_persistence_user_result.rc != 0
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+    - event_persistence_user_exists.stdout | default('') | trim != '1'
+
+- name: Update event persistence database user password
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "ALTER USER \"{{ event_persistence_postgres_user }}\" WITH PASSWORD '{{ event_persistence_postgres_pass }}';"
+  register: update_event_persistence_user_result
+  failed_when: update_event_persistence_user_result.rc != 0
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+    - event_persistence_user_exists.stdout | default('') | trim == '1'
+
+- name: Check if event persistence database exists
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -tAc "SELECT 1 FROM pg_database WHERE datname = '{{ event_persistence_pg_config['resources'][0]['data']['database'] | b64decode }}'"
+  register: event_persistence_db_exists
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+
+- name: Create event persistence database
+  kubernetes.core.k8s_exec:
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    pod: "{{ postgres_pod['resources'][0]['metadata']['name'] }}"
+    container: postgres
+    command: >-
+      psql -c "CREATE DATABASE \"{{ event_persistence_pg_config['resources'][0]['data']['database'] | b64decode }}\" WITH OWNER \"{{ event_persistence_postgres_user }}\";"
+  register: create_event_persistence_db_result
+  failed_when: create_event_persistence_db_result.rc != 0
+  no_log: "{{ no_log }}"
+  when:
+    - postgres_pod['resources'] | length > 0
+    - event_persistence_db_exists.stdout | default('') | trim != '1'

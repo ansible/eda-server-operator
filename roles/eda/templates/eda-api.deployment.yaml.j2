@@ -52,6 +52,9 @@ spec:
 {% if event_stream_pg_config is defined %}
         checksum-secret-event-stream-db: "{{ event_stream_pg_config['resources'][0]['data'] | default('') | sha1 }}"
 {% endif %}
+{% if event_persistence_pg_config is defined %}
+        checksum-secret-event-persistence-db: "{{ event_persistence_pg_config['resources'][0]['data'] | default('') | sha1 }}"
+{% endif %}
     spec:
       serviceAccountName: '{{ ansible_operator_meta.name }}'
 {% if image_pull_secrets | length > 0 %}
@@ -182,6 +185,36 @@ spec:
         - name: EDA_EVENT_STREAM_DB_SSLMODE
           value: '{{ event_stream_postgres_sslmode }}'
 {% endif %}
+{% if __event_persistence_database_secret is defined %}
+        # Event persistence database credentials
+        - name: EDA_EVENT_PERSISTENCE_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
+        - name: EDA_EVENT_PERSISTENCE_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: port
+        - name: EDA_EVENT_PERSISTENCE_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: database
+        - name: EDA_EVENT_PERSISTENCE_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: username
+        - name: EDA_EVENT_PERSISTENCE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: password
+        - name: EDA_EVENT_PERSISTENCE_PGSSLMODE
+          value: '{{ event_persistence_postgres_sslmode }}'
+{% endif %}
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
@@ -258,6 +291,36 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: host
+{% if __event_persistence_database_secret is defined %}
+        # Event persistence database credentials
+        - name: EDA_EVENT_PERSISTENCE_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
+        - name: EDA_EVENT_PERSISTENCE_DB_PORT
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: port
+        - name: EDA_EVENT_PERSISTENCE_DB_NAME
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: database
+        - name: EDA_EVENT_PERSISTENCE_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: username
+        - name: EDA_EVENT_PERSISTENCE_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: password
+        - name: EDA_EVENT_PERSISTENCE_PGSSLMODE
+          value: '{{ event_persistence_postgres_sslmode }}'
+{% endif %}
         ports:
         - containerPort: {{ api_django_port }}
         readinessProbe:

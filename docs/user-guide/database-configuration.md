@@ -178,3 +178,30 @@ spec:
 ```
 
 **Note**: The variable `sslmode` is valid for `external` databases only. The allowed values are: `prefer`, `disable`, `allow`, `require`, `verify-ca`, `verify-full`.
+
+#### Event Persistence Database
+
+The EDA operator supports provisioning a dedicated PostgreSQL database (`eda_event_persistence`) for event persistence. This database stores in-flight events during activation processing to prevent event loss during planned or unplanned downtime.
+
+Unlike the event stream database user (which shares the main EDA database), the event persistence feature requires a **separate database** with its own user.
+
+**Event persistence is opt-in.** The database is only provisioned when you explicitly set `event_persistence.deploy_db: true` in your EDA CR. When not enabled, the `EDA_EVENT_PERSISTENCE_DB_*` environment variables are not set, and the event persistence feature remains disabled in EDA.
+
+To enable event persistence:
+
+```yaml
+---
+spec:
+  ...
+  event_persistence:
+    deploy_db: true
+```
+
+The operator will automatically:
+
+1. Generate credentials and store them in a secret named `<instance-name>-event-persistence-postgres-configuration`
+2. Create the `eda_event_persistence` user on the managed PostgreSQL instance
+3. Create the `eda_event_persistence` database owned by that user
+4. Inject the credentials into the API and activation worker deployments
+
+**Note**: For external database deployments, event persistence database credentials are not managed by the operator. Users with external databases can configure event persistence by creating a Rule Engine credential directly in EDA with their external database details.
