@@ -31,7 +31,7 @@
         command: >-
           bash -c "echo 'import pkg_resources;
           print(pkg_resources.get_distribution(\"aap-eda\").version)'
-          | aap-eda-manage shell"
+          | aap-eda-manage shell --no-imports"
       register: instance_version
       changed_when: false
 

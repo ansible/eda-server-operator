@@ -9,7 +9,7 @@
       User = get_user_model();
       nsu = User.objects.filter(is_superuser=True, username=\"{{ admin_user }}\").count();
       exit(0 if nsu > 0 else 1)'
-      | aap-eda-manage shell"
+      | aap-eda-manage shell --no-imports"
   ignore_errors: true
   register: users_result
   changed_when: users_result.return_code > 0
