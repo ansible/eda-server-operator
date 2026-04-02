@@ -17,6 +17,7 @@ jobs:
           - SCENARIO: default  # tests headless scenario too
           - SCENARIO: externaldb
           - SCENARIO: ingress
+          - SCENARIO: event_persistence
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4

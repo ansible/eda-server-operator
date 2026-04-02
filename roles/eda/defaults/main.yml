@@ -165,6 +165,10 @@ event_stream_prefix_path: "{{ event_stream.prefix | default('/eda-event-streams'
 event_stream_database_username: eda_event_stream
 event_stream_pg_sslmode: "prefer"
 
+# Event persistence database configuration
+event_persistence: {}
+event_persistence_pg_sslmode: "prefer"
+
 # Disable UI container's nginx ipv6 listener
 ipv6_disabled: false
 

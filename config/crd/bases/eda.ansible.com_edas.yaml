@@ -441,6 +441,27 @@ spec:
                       type: object
                     type: array
                 type: object
+              event_persistence:
+                description: |
+                  Defines desired state of Event Persistence database.
+                  Event persistence is opt-in. Set deploy_db: true to provision a dedicated
+                  database for persisting in-flight events during activation processing.
+                properties:
+                  deploy_db:
+                    description: |
+                      Deploy the event persistence database.
+                      When true, the operator will create a dedicated database and auto-generate
+                      credentials for event persistence. When false or omitted, event persistence
+                      is not configured automatically in EDA.
+                    type: boolean
+                    default: false
+                  database_secret:
+                    description: |
+                      Name of a pre-existing secret containing event persistence database credentials.
+                      This is primarily used internally when deployed via the AAP gateway operator.
+                      If not provided, credentials will be auto-generated for managed databases.
+                    type: string
+                type: object
               event_stream:
                 description: Defines desired state of Event Stream resources
                 properties:

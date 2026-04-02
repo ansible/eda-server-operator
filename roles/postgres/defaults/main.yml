@@ -49,6 +49,10 @@ _database:
   database_secret: ''  # Name of k8s secret containing postgres host, username, password, database, port, and type
 
 
+# Event persistence database configuration
+event_persistence_database_name: "eda_event_persistence"
+event_persistence_database_username: "eda_event_persistence"
+
 image_pull_policy: IfNotPresent
 image_pull_secrets: []
 
