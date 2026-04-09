@@ -1,66 +1,53 @@
-# Contributing
+# Contributing to EDA Server Operator
 
+Hi there! We're excited to have you as a contributor.
 
-## Development Environment
+Have questions about this document or anything not covered here? Please file an issue at [https://github.com/ansible/eda-server-operator/issues](https://github.com/ansible/eda-server-operator/issues).
 
-There are a couple ways to make and test changes to an Ansible operator. The easiest way is to build and deploy the operator from your branch using the make targets. This is closed to how the operator will be used, and is what is documented below. However, it may be useful to run the EDA Operator roles directly on your local machine for faster iteration. This involves a bit more set up, and is described in the [Debugging docs](./docs/debugging.md).
+## Things to know prior to submitting code
 
-First, you need to have a k8s cluster up. If you don't already have a k8s cluster, you can use minikube to start a lightweight k8s cluster locally by following these [minikube test cluster docs](./docs/minikube-test-cluster.md).
+- All code submissions are done through pull requests against the `main` branch.
+- All PRs must have a single commit. Make sure to `squash` any changes into a single commit.
+- Take care to make sure no merge commits are in the submission, and use `git rebase` vs `git merge` for this reason.
+- If collaborating with someone else on the same branch, consider using `--force-with-lease` instead of `--force`. This will prevent you from accidentally overwriting commits pushed by someone else. For more information, see [git push --force-with-lease](https://git-scm.com/docs/git-push#git-push---force-with-leaseltrefnamegt).
+- We ask all of our community members and contributors to adhere to the [Ansible code of conduct](http://docs.ansible.com/ansible/latest/community/code_of_conduct.html). If you have questions, or need assistance, please reach out to our community team at [codeofconduct@ansible.com](mailto:codeofconduct@ansible.com).
 
+## Setting up your development environment
 
+See [docs/development.md](docs/development.md) for prerequisites, build/deploy instructions, and available Makefile targets.
 
-### Build Operator Image
+For faster iteration, you can also run the EDA Operator roles directly on your local machine. See the [Debugging docs](docs/debugging.md) for details.
 
-Clone the eda-server-operator
+## Submitting your work
 
+1. From your fork's `main` branch, create a new branch to stage your changes.
+```sh
+git checkout -b <branch-name>
 ```
-git clone git@github.com:ansible/eda-server-operator.git
+2. Make your changes.
+3. Test your changes (see [Testing](#testing) below).
+4. Commit your changes.
+```sh
+git add <FILES>
+git commit -m "My message here"
 ```
+5. Create your [pull request](https://github.com/ansible/eda-server-operator/pulls).
 
-Create an image repo in your user called `eda-server-operator` on [quay.io](https://quay.io) or your preferred image registry. 
+> **Note**: If you have multiple commits, make sure to `squash` them into a single commit before submitting.
 
-Build & push the operator image
+## Testing
 
-```
-export QUAY_USER=username
-export TAG=feature-branch
-make docker-build docker-push IMG=quay.io/$QUAY_USER/eda-server-operator:$TAG
-```
+All changes must be tested before submission:
 
+- **Linting** (required for all PRs): `make lint`
+- See the [Testing section in docs/development.md](docs/development.md#testing) for details on running tests locally.
 
-### Deploy EDA Operator
+## Reporting Issues
 
+We welcome your feedback, and encourage you to file an issue when you run into a problem at [https://github.com/ansible/eda-server-operator/issues](https://github.com/ansible/eda-server-operator/issues).
 
-1. Log in to your K8s or Openshift cluster.
+## Getting Help
 
-```
-kubectl login <cluster-url>
-```
+### Forum
 
-2. Run the `make deploy` target
-
-```
-NAMESPACE=eda IMG=quay.io/$QUAY_USER/eda-server-operator:$TAG make deploy
-```
-> **Note** The `latest` tag on the quay.io/ansible/eda-server-operator repo is the latest _released_ (tagged) version and the `main` tag is built from the HEAD of the `main` branch. To deploy with the latest code in `main` branch, check out the main branch, and use `IMG=quay.io/ansible/eda-server-operator:main` instead.
-
-
-### Create an EDA CR
-
-Create a yaml file defining the EDA custom resource
-
-```yaml
-# eda.yaml
-apiVersion: eda.ansible.com/v1alpha1
-kind: EDA
-metadata:
-  name: my-eda
-spec:
-  automation_server_url: https://awx-host
-```
-
-3. Now apply this yaml
-
-```bash
-$ kubectl apply -f eda.yaml
-```
+Join the [Ansible Forum](https://forum.ansible.com) for questions, help, and development discussions. Search for posts tagged with [`eda`](https://forum.ansible.com/tag/eda) or start a new discussion.

@@ -3,7 +3,7 @@ kind: EDA
 metadata:
   name: eda
 spec:
-  automation_server_url: https://awx-awx.apps.aap-dev.ocp4.testing.ansible.com
+  automation_server_url: https://awx.example.com
   automation_server_ssl_verify: 'no'
   service_type: ClusterIP
   ingress_type: Route
@@ -34,7 +34,7 @@ spec:
       value: "Always"
 
   # CA Bundle
-  bundle_cacert_secret: my-custom-certs
+  # bundle_cacert_secret: my-custom-certs
 
   # -- Resource Requirements
   api:
