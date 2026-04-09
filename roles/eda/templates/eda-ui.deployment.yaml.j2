@@ -59,7 +59,7 @@ spec:
       tolerations:
         {{ combined_ui.tolerations | to_nice_yaml | indent(width=8) }}
 {% endif %}
-{% if combined_ui.topology_spread_constraints is defined %} %}
+{% if combined_ui.topology_spread_constraints is defined %}
       topologySpreadConstraints:
         {{ combined_ui.topology_spread_constraints | to_nice_yaml | indent(width=8) }}
 {% endif %}
