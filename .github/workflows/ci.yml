@@ -127,6 +127,8 @@ jobs:
           echo ::endgroup::
           echo ::group::EDA_API_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-api --tail=1000 || true
+          kubectl logs -l app.kubernetes.io/component=eda-api -c run-migrations --tail=1000 || true
+          kubectl logs -l app.kubernetes.io/component=eda-api -c eda-initial-data --tail=1000 || true
           echo ::endgroup::
           echo ::group::EDA_UI_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-ui --tail=1000 || true
