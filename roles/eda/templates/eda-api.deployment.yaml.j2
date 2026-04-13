@@ -44,6 +44,9 @@ spec:
   ] %}
         checksum-{{ template | replace('/', '-') }}: "{{ lookup('template', template + '.yaml.j2') | sha1 }}"
 {% endfor %}
+{% if http_proxy or https_proxy or no_proxy %}
+        checksum-eda-proxy-env-configmap: "{{ lookup('template', 'eda-proxy-env.configmap.yaml.j2') | sha1 }}"
+{% endif %}
 {% for secret in [
     "secrets/db_fields_encryption",
   ] %}
@@ -86,6 +89,9 @@ spec:
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-proxy-env'
+              optional: true
         env:
         - name: EDA_DB_HOST
           valueFrom:
@@ -132,6 +138,9 @@ spec:
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-proxy-env'
+              optional: true
         env:
         - name: ANSIBLE_REVERSE_RESOURCE_SYNC
           value: 'false'
@@ -255,6 +264,9 @@ spec:
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-proxy-env'
+              optional: true
         env:
         - name: EDA_DB_HOST
           valueFrom:
@@ -355,6 +367,9 @@ spec:
         envFrom:
           - configMapRef:
               name: '{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties'
+          - configMapRef:
+              name: '{{ ansible_operator_meta.name }}-proxy-env'
+              optional: true
         env:
         - name: EDA_DB_HOST
           valueFrom:
