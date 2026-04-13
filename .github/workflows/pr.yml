@@ -117,7 +117,12 @@ jobs:
           kubectl logs -l control-plane=controller-manager --tail=20000 || true
           echo ::endgroup::
           echo ::group::POSTGRES_LOGS
-          kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true
+          if [[ "${{ matrix.SCENARIO }}" == "externaldb" ]]; then
+            eval $(minikube -p minikube docker-env)
+            docker logs postgresql --tail 1000 || true
+          else
+            kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true
+          fi
           echo ::endgroup::
           echo ::group::EDA_API_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-api --tail=1000 || true
