@@ -119,9 +119,6 @@ jobs:
           echo ::group::POSTGRES_LOGS
           kubectl logs -l app.kubernetes.io/component=database --tail=1000 || true
           echo ::endgroup::
-          echo ::group::REDIS_LOGS
-          kubectl logs -l app.kubernetes.io/component=cache --tail=1000 || true
-          echo ::endgroup::
           echo ::group::EDA_API_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-api --tail=1000 || true
           echo ::endgroup::
@@ -133,9 +130,6 @@ jobs:
           echo ::endgroup::
           echo ::group::EDA_ACTIVATION_WORKER_LOGS
           kubectl logs -l app.kubernetes.io/component=eda-activation-worker --tail=1000 || true
-          echo ::endgroup::
-          echo ::group::EDA_SCHEDULER_LOGS
-          kubectl logs -l app.kubernetes.io/component=eda-scheduler --tail=1000 || true
           echo ::endgroup::
   validate-bundle:
     runs-on: ubuntu-latest
