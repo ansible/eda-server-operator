@@ -9,8 +9,7 @@ IMAGE_TAG_BASE ?= quay.io/ansible/eda-server-operator
 NAMESPACE ?= eda
 DEPLOYMENT_NAME ?= eda-server-operator-controller-manager
 
-# Dev CR applied by _eda-apply-cr with URL substitution (not by common DEV_CR mechanism)
-_EDA_DEV_CR ?= dev/eda-cr/eda-openshift-cr.yml
+DEV_CR ?= dev/eda-cr/eda-openshift-cr.yml
 
 # AWX connection (required for EDA)
 AUTOMATION_SERVER_URL ?=
@@ -37,20 +36,24 @@ operator-up: _operator-build-and-push _operator-deploy _operator-wait-ready _ope
 
 .PHONY: _eda-apply-cr
 _eda-apply-cr:
-	@if [ "$(CREATE_CR)" != "true" ] || [ ! -f "$(_EDA_DEV_CR)" ]; then exit 0; fi
+	@if [ "$(CREATE_CR)" != "true" ] || [ ! -f "$(DEV_CR)" ]; then exit 0; fi
 	@if [ -z "$(AUTOMATION_SERVER_URL)" ]; then \
 		echo "ERROR: AUTOMATION_SERVER_URL is required. Set it or run 'make awx-url AWX_NAMESPACE=<ns>' to discover it." >&2; \
 		exit 1; \
 	fi
-	@echo "Applying dev CR: $(_EDA_DEV_CR) (automation_server_url=$(AUTOMATION_SERVER_URL))"
-	@sed 's|https://awx.example.com|$(AUTOMATION_SERVER_URL)|g' $(_EDA_DEV_CR) | $(KUBECTL) apply -n $(NAMESPACE) -f -
+	@echo "Applying dev CR: $(DEV_CR) (automation_server_url=$(AUTOMATION_SERVER_URL))"
+	@sed 's|https://awx.example.com|$(AUTOMATION_SERVER_URL)|g' $(DEV_CR) | $(KUBECTL) apply -n $(NAMESPACE) -f -
 
 .PHONY: awx-url
-awx-url: ## Discover AWX route URL (use AWX_NAMESPACE to set namespace, default: awx)
+awx-url: ## Discover AWX URL (route on OCP, ingress on k8s; use AWX_NAMESPACE to set namespace, default: awx)
 	@URL=$$($(KUBECTL) get route -n $(AWX_NAMESPACE) -l app.kubernetes.io/managed-by=awx-operator \
 		-o jsonpath='https://{.items[0].spec.host}' 2>/dev/null); \
 	if [ -z "$$URL" ] || [ "$$URL" = "https://" ]; then \
-		echo "ERROR: No AWX route found in namespace $(AWX_NAMESPACE)" >&2; \
+		URL=$$($(KUBECTL) get ingress -n $(AWX_NAMESPACE) -l app.kubernetes.io/managed-by=awx-operator \
+			-o jsonpath='https://{.items[0].spec.rules[0].host}' 2>/dev/null); \
+	fi; \
+	if [ -z "$$URL" ] || [ "$$URL" = "https://" ]; then \
+		echo "ERROR: No AWX route or ingress found in namespace $(AWX_NAMESPACE)" >&2; \
 		exit 1; \
 	fi; \
 	echo "$$URL"
