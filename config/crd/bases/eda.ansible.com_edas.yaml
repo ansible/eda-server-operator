@@ -2558,9 +2558,18 @@ spec:
               force_drop_db:
                 description: Force drop the database before restoring. USE WITH CAUTION!
                 type: boolean
+              http_proxy:
+                description: HTTP proxy URL to configure on EDA containers
+                type: string
+              https_proxy:
+                description: HTTPS proxy URL to configure on EDA containers
+                type: string
               idle_deployment:
                 description: Scale down deployments to put EDA into an idle state
                 type: boolean
+              no_proxy:
+                description: Comma-separated list of hosts that bypass the proxy on EDA containers
+                type: string
               old_postgres_configuration_secret:
                 description: Secret where the old database configuration can be found for data migration
                 type: string

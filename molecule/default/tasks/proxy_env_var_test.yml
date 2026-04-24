@@ -1,0 +1,144 @@
+---
+- name: Patch EDA CR to set proxy env vars
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    name: eda-sample
+    namespace: '{{ namespace }}'
+    definition:
+      spec:
+        http_proxy: 'http://localhost:3128'
+        https_proxy: 'http://localhost:3128'
+        no_proxy: 'localhost,127.0.0.1,.cluster.local,.svc'
+
+# -------------------------------------------------------------------------
+# ConfigMap assertions
+# -------------------------------------------------------------------------
+- name: Wait for proxy-env ConfigMap to be created
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: ConfigMap
+    name: 'eda-sample-proxy-env'
+  register: proxy_configmap
+  until: proxy_configmap.resources | length > 0
+  retries: 30
+  delay: 10
+
+- name: Assert proxy-env ConfigMap has correct data
+  ansible.builtin.assert:
+    that:
+      - proxy_configmap.resources[0].data.HTTP_PROXY == 'http://localhost:3128'
+      - proxy_configmap.resources[0].data.http_proxy == 'http://localhost:3128'
+      - proxy_configmap.resources[0].data.HTTPS_PROXY == 'http://localhost:3128'
+      - proxy_configmap.resources[0].data.https_proxy == 'http://localhost:3128'
+      - proxy_configmap.resources[0].data.NO_PROXY == 'localhost,127.0.0.1,.cluster.local,.svc'
+      - proxy_configmap.resources[0].data.no_proxy == 'localhost,127.0.0.1,.cluster.local,.svc'
+    fail_msg: proxy-env ConfigMap is missing one or more expected proxy values
+
+# -------------------------------------------------------------------------
+# Deployment envFrom assertions
+# -------------------------------------------------------------------------
+- name: Get eda-api deployment
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: Deployment
+    label_selectors:
+      - app.kubernetes.io/name = eda-sample
+      - app.kubernetes.io/component = eda-api
+  register: api_deployment
+
+- name: Assert eda-api containers reference proxy-env ConfigMap via envFrom
+  ansible.builtin.assert:
+    that:
+      - api_deployment.resources[0].spec.template.spec.containers |
+        map(attribute='envFrom', default=[]) | flatten |
+        selectattr('configMapRef.name', 'defined') |
+        selectattr('configMapRef.name', 'equalto', 'eda-sample-proxy-env') | list | length > 0
+    fail_msg: eda-api containers are missing envFrom reference to eda-sample-proxy-env
+
+- name: Get eda-default-worker deployment
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: Deployment
+    label_selectors:
+      - app.kubernetes.io/name = eda-sample
+      - app.kubernetes.io/component = eda-default-worker
+  register: default_worker_deployment
+
+- name: Assert eda-default-worker containers reference proxy-env ConfigMap via envFrom
+  ansible.builtin.assert:
+    that:
+      - default_worker_deployment.resources[0].spec.template.spec.containers |
+        map(attribute='envFrom', default=[]) | flatten |
+        selectattr('configMapRef.name', 'defined') |
+        selectattr('configMapRef.name', 'equalto', 'eda-sample-proxy-env') | list | length > 0
+    fail_msg: eda-default-worker containers are missing envFrom reference to eda-sample-proxy-env
+
+- name: Get eda-activation-worker deployment
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: Deployment
+    label_selectors:
+      - app.kubernetes.io/name = eda-sample
+      - app.kubernetes.io/component = eda-activation-worker
+  register: activation_worker_deployment
+
+- name: Assert eda-activation-worker containers reference proxy-env ConfigMap via envFrom
+  ansible.builtin.assert:
+    that:
+      - activation_worker_deployment.resources[0].spec.template.spec.containers |
+        map(attribute='envFrom', default=[]) | flatten |
+        selectattr('configMapRef.name', 'defined') |
+        selectattr('configMapRef.name', 'equalto', 'eda-sample-proxy-env') | list | length > 0
+    fail_msg: eda-activation-worker containers are missing envFrom reference to eda-sample-proxy-env
+
+- name: Get eda-event-stream deployment
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: Deployment
+    label_selectors:
+      - app.kubernetes.io/name = eda-sample
+      - app.kubernetes.io/component = eda-event-stream
+  register: event_stream_deployment
+
+- name: Assert eda-event-stream containers reference proxy-env ConfigMap via envFrom
+  ansible.builtin.assert:
+    that:
+      - event_stream_deployment.resources[0].spec.template.spec.containers |
+        map(attribute='envFrom', default=[]) | flatten |
+        selectattr('configMapRef.name', 'defined') |
+        selectattr('configMapRef.name', 'equalto', 'eda-sample-proxy-env') | list | length > 0
+    fail_msg: eda-event-stream containers are missing envFrom reference to eda-sample-proxy-env
+
+# -------------------------------------------------------------------------
+# Cleanup and verify ConfigMap removal
+# -------------------------------------------------------------------------
+- name: Clear proxy env vars from EDA CR after test
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    name: eda-sample
+    namespace: '{{ namespace }}'
+    definition:
+      spec:
+        http_proxy: null
+        https_proxy: null
+        no_proxy: null
+
+- name: Wait for proxy-env ConfigMap to be deleted
+  kubernetes.core.k8s_info:
+    namespace: '{{ namespace }}'
+    kind: ConfigMap
+    name: 'eda-sample-proxy-env'
+  register: proxy_configmap_after
+  until: proxy_configmap_after.resources | length == 0
+  retries: 30
+  delay: 10
+
+- name: Assert proxy-env ConfigMap is removed when proxy vars cleared
+  ansible.builtin.assert:
+    that:
+      - proxy_configmap_after.resources | length == 0
+    fail_msg: proxy-env ConfigMap still exists after clearing proxy vars from CR
