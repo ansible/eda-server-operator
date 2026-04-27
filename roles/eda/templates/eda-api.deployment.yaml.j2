@@ -352,10 +352,20 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
-{% if not ui_disabled %}
+{% if not ui_disabled or bundle_ca_crt %}
         volumeMounts:
+{% if not ui_disabled %}
         - name: static-files
           mountPath: {{ static_path }}
+{% endif %}
+{% if bundle_ca_crt %}
+        - name: "ca-trust-extracted"
+          mountPath: "/etc/pki/ca-trust/extracted"
+        - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+          mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
+          subPath: bundle-ca.crt
+          readOnly: true
+{% endif %}
 {% endif %}
       - name: daphne
         image: {{ _image }}
