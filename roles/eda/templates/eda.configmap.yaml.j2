@@ -34,6 +34,10 @@ data:
 
   EDA_STATIC_URL: /api/eda/static/
 
+{% if combined_activation_worker.activation_job_namespace | default('') | length > 0 %}
+  EDA_ACTIVATION_JOB_NAMESPACE: "{{ combined_activation_worker.activation_job_namespace }}"
+{% endif %}
+
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
