@@ -1,0 +1,65 @@
+# RBAC resources for cross-namespace activation job pods.
+# Created when activation_job_namespace is set on the EDA CR.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: '{{ ansible_operator_meta.name }}-activation-job-manager'
+  namespace: '{{ combined_activation_worker.activation_job_namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - pods
+      - pods/log
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: '{{ ansible_operator_meta.name }}-activation-job-manager'
+  namespace: '{{ combined_activation_worker.activation_job_namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(width=4) | trim }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: '{{ ansible_operator_meta.name }}-activation-job-manager'
+subjects:
+  - kind: ServiceAccount
+    name: '{{ ansible_operator_meta.name }}'
+    namespace: '{{ ansible_operator_meta.namespace }}'

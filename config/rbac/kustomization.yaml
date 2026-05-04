@@ -12,3 +12,5 @@ resources:
 - metrics_auth_role.yaml
 - metrics_auth_role_binding.yaml
 - metrics_reader_role.yaml
+- activation_job_namespace_role.yaml
+- activation_job_namespace_role_binding.yaml

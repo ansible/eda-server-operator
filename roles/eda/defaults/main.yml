@@ -61,6 +61,7 @@ _activation_worker:
   node_selector: {}
   tolerations: []
   affinity: {}
+  activation_job_namespace: ""
 
 # Note: Deprecated "worker: {}" is intentionally excluded here so we know if the user set it
 _worker: {}
