@@ -38,6 +38,44 @@
     wait: yes
   when: public_base_url is defined
 
+- name: Look up existing ConfigMap for previous activation_job_namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    name: "{{ ansible_operator_meta.name }}-{{ deployment_type }}-env-properties"
+  register: _eda_env_cm
+
+- name: Record previous activation_job_namespace from ConfigMap
+  ansible.builtin.set_fact:
+    _previous_activation_job_namespace: >-
+      {{ (_eda_env_cm.resources | first).data.EDA_ACTIVATION_JOB_NAMESPACE | default('') }}
+  when:
+    - _eda_env_cm.resources | length > 0
+    - (_eda_env_cm.resources | first).data is defined
+
+- name: Apply cross-namespace RBAC for activation job pods
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'eda-activation-job-namespace-rbac.yaml.j2') }}"
+    wait: yes
+  when: combined_activation_worker.activation_job_namespace | default('') | length > 0
+
+- name: Remove cross-namespace RBAC when activation_job_namespace is unset
+  k8s:
+    state: absent
+    api_version: rbac.authorization.k8s.io/v1
+    kind: "{{ item.kind }}"
+    name: "{{ ansible_operator_meta.name }}-activation-job-manager"
+    namespace: "{{ _previous_activation_job_namespace }}"
+  loop:
+    - { kind: RoleBinding }
+    - { kind: Role }
+  when:
+    - combined_activation_worker.activation_job_namespace | default('') | length == 0
+    - _previous_activation_job_namespace | default('') | length > 0
+  ignore_errors: yes
+
 - name: Apply Backend deployment resources
   k8s:
     apply: yes

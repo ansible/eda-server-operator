@@ -1479,6 +1479,13 @@ spec:
               activation_worker:
                 description: Defines desired state of eda-activation-worker resources
                 properties:
+                  activation_job_namespace:
+                    description: Kubernetes namespace where activation job pods are
+                      created. When set, jobs run in this namespace instead of the
+                      EDA operator namespace. The operator creates the necessary
+                      RBAC to allow the EDA service account to manage resources
+                      in the target namespace.
+                    type: string
                   node_selector:
                     additionalProperties:
                       type: string
