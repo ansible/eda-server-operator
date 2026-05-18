@@ -58,6 +58,7 @@ _activation_worker:
       memory: 150Mi
   node_selector: {}
   tolerations: []
+  activation_job_namespace: ""
 
 # Note: Deprecated "worker: {}" is intentionally excluded here so we know if the user set it
 _worker: {}
