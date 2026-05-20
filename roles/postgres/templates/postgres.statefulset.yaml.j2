@@ -37,6 +37,9 @@ spec:
         checksum-secret-postgres_configuration_secret: "{{ lookup('ansible.builtin.vars', '__database_secret', default='')["resources"][0]["data"] | default('') | sha1 }}"
     spec:
       securityContext:
+{% if postgres_security_context_settings|length %}
+        {{ postgres_security_context_settings | to_nice_yaml | indent(8) }}
+{% endif %}
         allowPrivilegeEscalation: false
         capabilities:
           drop: ["ALL"]
