@@ -20,4 +20,3 @@ images:
 patches:
 - path: manager_image.yaml
 - path: debug_logs_patch.yaml
-- path: ../default/manager_auth_proxy_patch.yaml
