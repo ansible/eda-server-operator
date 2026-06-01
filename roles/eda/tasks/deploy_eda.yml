@@ -74,7 +74,6 @@
   when:
     - _previous_activation_job_namespace | default('') | length > 0
     - combined_activation_worker.activation_job_namespace | default('') != _previous_activation_job_namespace
-  ignore_errors: yes
 
 - name: Apply Backend deployment resources
   k8s:
