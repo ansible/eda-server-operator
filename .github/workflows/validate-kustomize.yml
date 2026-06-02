@@ -1,0 +1,37 @@
+---
+name: Validate Kustomize
+
+on:
+  pull_request:
+
+jobs:
+  validate-kustomize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Install kustomize
+        run: |
+          set -euxo pipefail
+          make kustomize
+          echo "$(pwd)/bin" >> $GITHUB_PATH
+
+      - name: Validate all kustomization.yaml files
+        run: |
+          set -euxo pipefail
+          failed=0
+          while IFS= read -r f; do
+            dir=$(dirname "$f")
+            echo "--- Validating $dir ---"
+            if ! kustomize build "$dir" > /dev/null; then
+              echo "::error file=$f::kustomize build failed for $dir"
+              failed=1
+            else
+              echo "✓ $dir OK"
+            fi
+          done < <(find . -name "kustomization.yaml" -not -path "*/vendor/*")
+          exit $failed
