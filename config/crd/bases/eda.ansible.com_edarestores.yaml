@@ -95,6 +95,10 @@ spec:
               postgres_image_version:
                 description: PostgreSQL container image version to use
                 type: string
+              postgres_skip_data:
+                description: Skip PostgresSQL database restore.
+                type: boolean
+                default: false
               spec_overrides:
                 description: Overrides for the EDA spec
                 type: object
@@ -130,4 +134,7 @@ spec:
                 type: array
               restoreComplete:
                 description: Restore process complete
+                type: boolean
+              restorePostgres:
+                description: Restore PostgreSQL data
                 type: boolean
