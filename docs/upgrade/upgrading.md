@@ -66,15 +66,3 @@ Starting with this version, the EDA operator **no longer deploys or uses Redis**
 > **Note:** The `redis` fields remain in the CRD schema for backward compatibility but are marked as deprecated. They will be removed in a future `apiVersion`.
 
 For more details, see the [Redis Deprecation Notice](../user-guide/redis-configuration.md).
-
-#### PostgreSQL Upgrade Considerations
-
-If there is a PostgreSQL major version upgrade, after the data directory on the PVC is migrated to the new version, the old PVC is kept by default.
-This provides the ability to roll back if needed, but can take up extra storage space in your cluster unnecessarily. By default, the postgres pvc from the previous version will remain unless you manually remove it, or have the `database.postgres_keep_pvc_after_upgrade` parameter set to false. You can configure it to be deleted automatically
-after a successful upgrade by setting the following variable on the EDA spec.
-
-```yaml
-  spec:
-    database:
-        postgres_keep_pvc_after_upgrade: false
-```
