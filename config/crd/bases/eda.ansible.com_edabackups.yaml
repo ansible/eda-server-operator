@@ -100,6 +100,10 @@ spec:
               postgres_image_version:
                 description: PostgreSQL container image version to use
                 type: string
+              postgres_skip_data:
+                description: Skip PostgresSQL database dump.
+                type: boolean
+                default: false
               no_log:
                 description: Configure no_log for no_log tasks
                 type: boolean
@@ -135,3 +139,6 @@ spec:
               backupClaim:
                 description: Backup persistent volume claim
                 type: string
+              backupPostgres:
+                description: Backup PostgreSQL data
+                type: boolean

@@ -93,3 +93,18 @@
     name: "{{ deployment_name }}"
     namespace: "{{ ansible_operator_meta.namespace }}"
   register: this_eda
+
+- name: Determine the timestamp for the backup once for all nodes
+  set_fact:
+    now: '{{ lookup("pipe", "date +%F-%T") }}'
+
+- name: Set backup directory name
+  set_fact:
+    backup_dir: "/backups/eda-openshift-backup-{{ now }}"
+
+- name: Create directory for backup
+  k8s_exec:
+    namespace: "{{ backup_pvc_namespace }}"
+    pod: "{{ ansible_operator_meta.name }}-db-management"
+    command: >-
+      mkdir -p {{ backup_dir }}
