@@ -1476,6 +1476,9 @@ spec:
                       type: object
                     type: array
                 type: object
+              activation_job_namespace:
+                description: Namespace where activation job pods will run. Creates the namespace and grants required permissions automatically.
+                type: string
               activation_worker:
                 description: Defines desired state of eda-activation-worker resources
                 properties:

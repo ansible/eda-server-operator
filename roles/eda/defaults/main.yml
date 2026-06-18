@@ -26,6 +26,8 @@ _image_web_version: "{{ lookup('env', 'DEFAULT_EDA_UI_VERSION') or 'main' }}"
 #     kubernetes.io/arch: amd64
 #     kubernetes.io/os: linux
 
+activation_job_namespace: ''
+
 websocket_ssl_verify: false
 
 api: {}

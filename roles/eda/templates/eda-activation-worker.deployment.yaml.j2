@@ -251,6 +251,10 @@ spec:
         - name: EDA_EVENT_PERSISTENCE_PGSSLMODE
           value: '{{ event_persistence_postgres_sslmode }}'
 {% endif %}
+{% if activation_job_namespace %}
+        - name: EDA_ACTIVATION_JOB_NAMESPACE
+          value: '{{ activation_job_namespace }}'
+{% endif %}
 {% if combined_activation_worker.resource_requirements is defined %}
         resources: {{ combined_activation_worker.resource_requirements }}
 {% endif %}

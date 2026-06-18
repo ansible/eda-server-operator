@@ -4,6 +4,13 @@ kind: Role
 metadata:
   name: eda-manager-role
 rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - create
   ##
   ## Base operator rules
   ##
