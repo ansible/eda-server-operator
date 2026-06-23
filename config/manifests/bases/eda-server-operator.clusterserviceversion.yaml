@@ -59,6 +59,11 @@ spec:
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Skip PostgreSQL database dump
+        path: postgres_skip_data
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - description: Scale down deployments to put EDA into an idle state
         displayName: Idle EDA
         path: idle_deployment
@@ -185,6 +190,11 @@ spec:
         path: postgres_image_version
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:hidden
+      - displayName: Skip PostgreSQL database restore
+        path: postgres_skip_data
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
       - displayName: EDA Spec Overrides
         path: spec_overrides
         x-descriptors:
