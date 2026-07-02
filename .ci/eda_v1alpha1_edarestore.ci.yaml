@@ -3,7 +3,7 @@ kind: EDARestore
 metadata:
   name: eda-demo-restore
   annotations:
-    "ansible.sdk.operatorframework.io/verbosity": "5"
+    "ansible.sdk.operatorframework.io/verbosity": "2"
 spec:
   no_log: false
   deployment_name: eda-demo
