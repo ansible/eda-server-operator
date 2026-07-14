@@ -239,6 +239,14 @@ spec:
             mountPath: /var/cache/nginx
           - name: nginx-run
             mountPath: /var/run
+{% if bundle_ca_crt %}
+          - name: "ca-trust-extracted"
+            mountPath: "/etc/pki/ca-trust/extracted"
+          - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+            mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
+            subPath: bundle-ca.crt
+            readOnly: true
+{% endif %}
       restartPolicy: Always
       volumes:
         - name: '{{ ansible_operator_meta.name }}-nginx-event-stream-conf'
