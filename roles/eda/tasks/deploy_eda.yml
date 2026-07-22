@@ -25,6 +25,14 @@
     definition: "{{ lookup('template', 'eda.configmap.yaml.j2') }}"
     wait: yes
 
+- name: Set gateway and controller hostnames for NO_PROXY exclusion
+  ansible.builtin.set_fact:
+    _gateway_hostname: >-
+      {{ extra_settings | default([]) | selectattr('setting', 'equalto', 'EDA_ANSIBLE_BASE_JWT_KEY')
+         | map(attribute='value') | select | list | first | default('')
+         | urlsplit('hostname') }}
+    _controller_hostname: "{{ automation_server_url | default('') | urlsplit('hostname') }}"
+
 - name: Apply proxy environment ConfigMap
   k8s:
     apply: yes

@@ -16,7 +16,13 @@ data:
 {% if http_proxy or https_proxy or no_proxy %}
 {% set _no_proxy_list = (no_proxy | default('')).split(',') | map('trim') | select | list %}
 {% set _required = ['localhost', '127.0.0.1', '::1', '[::1]', '.svc', '.svc.cluster.local', ansible_operator_meta.name, ansible_operator_meta.name + '.' + ansible_operator_meta.namespace, ansible_operator_meta.name + '-api', ansible_operator_meta.name + '-api.' + ansible_operator_meta.namespace, ansible_operator_meta.name + '-daphne', ansible_operator_meta.name + '-daphne.' + ansible_operator_meta.namespace] %}
+{% if _gateway_hostname | default('') %}
+{% set _required = (_required + [_gateway_hostname, _gateway_hostname + '.' + ansible_operator_meta.namespace]) | unique %}
+{% endif %}
+{% if _controller_hostname | default('') %}
+{% set _required = (_required + [_controller_hostname, _controller_hostname + '.' + ansible_operator_meta.namespace]) | unique %}
+{% endif %}
 {% set _augmented = (_no_proxy_list + _required) | unique | join(',') %}
-  NO_PROXY: {{ _augmented | to_yaml }}
-  no_proxy: {{ _augmented | to_yaml }}
+  NO_PROXY: '{{ _augmented }}'
+  no_proxy: '{{ _augmented }}'
 {% endif %}
