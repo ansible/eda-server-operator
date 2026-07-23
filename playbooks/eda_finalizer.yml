@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  gather_facts: no
+  collections:
+    - kubernetes.core
+  tasks:
+    - name: Delete all activation Jobs
+      k8s:
+        api_version: batch/v1
+        kind: Job
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        state: absent
+        label_selectors:
+          - "app=eda"
