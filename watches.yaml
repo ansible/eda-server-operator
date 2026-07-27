@@ -3,6 +3,9 @@
   group: eda.ansible.com
   kind: EDA
   playbook: playbooks/eda.yml
+  finalizer:
+    name: eda.ansible.com/finalizer
+    playbook: playbooks/eda_finalizer.yml
 
 - version: v1alpha1
   group: eda.ansible.com
