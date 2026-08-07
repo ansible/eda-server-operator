@@ -1,0 +1,85 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{ ansible_operator_meta.name }}-api'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-api'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-api'
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from the OpenShift router (Routes) and ingress controllers
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              policy-group.network.openshift.io/ingress: ""
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: {{ api_nginx_port }}
+    # Allow traffic from the gateway operator (reverse proxy) and other AAP
+    # component pods that call the EDA API
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/managed-by
+                operator: In
+                values:
+                  - '{{ deployment_type }}-operator'
+                  - 'aap-gateway-operator'
+        - podSelector:
+            matchLabels:
+              control-plane: controller-manager
+      ports:
+        - protocol: TCP
+          port: {{ api_nginx_port }}
+        - protocol: TCP
+          port: {{ websocket_port }}
+  egress:
+    # Allow DNS resolution via OpenShift DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+    # Allow egress to managed PostgreSQL
+{% if managed_database | bool %}
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: database
+              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+      ports:
+        - protocol: TCP
+          port: {{ eda_postgres_port | default('5432') }}
+{% else %}
+    # External database — destination is user-configured, allow on the port
+    - ports:
+        - protocol: TCP
+          port: {{ eda_postgres_port | default('5432') }}
+{% endif %}
+    # Allow egress to the gateway API for JWT validation and service mesh calls
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/managed-by: 'aap-gateway-operator'
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080

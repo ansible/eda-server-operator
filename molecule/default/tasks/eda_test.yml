@@ -12,7 +12,62 @@
   vars:
     cr_file: 'eda_v1alpha1_eda.yaml'
 
-- name: Add assertions here
-  assert:
-    that: false
-    fail_msg: FIXME Add real assertions for your operator
+- name: Verify default-deny NetworkPolicy exists
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ namespace }}-default-deny'
+  register: np_default_deny
+  until: np_default_deny.resources | length > 0
+  retries: 10
+  delay: 5
+
+- name: Assert default-deny selects eda-operator managed pods and denies all traffic
+  ansible.builtin.assert:
+    that:
+      - np_default_deny.resources[0].spec.podSelector.matchExpressions | length == 1
+      - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].key == 'app.kubernetes.io/managed-by'
+      - "'eda-operator' in np_default_deny.resources[0].spec.podSelector.matchExpressions[0].values"
+      - "'Ingress' in np_default_deny.resources[0].spec.policyTypes"
+      - "'Egress' in np_default_deny.resources[0].spec.policyTypes"
+      - np_default_deny.resources[0].spec.ingress is not defined or np_default_deny.resources[0].spec.ingress | length == 0
+      - np_default_deny.resources[0].spec.egress is not defined or np_default_deny.resources[0].spec.egress | length == 0
+    fail_msg: "default-deny NetworkPolicy does not match expected spec: {{ np_default_deny.resources }}"
+
+- name: Verify postgres NetworkPolicy exists
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ namespace }}-postgres-15'
+  register: np_postgres
+  until: np_postgres.resources | length > 0
+  retries: 10
+  delay: 5
+
+- name: Assert postgres NetworkPolicy allows app=eda ingress for activation Job pod pg_notify connectivity
+  ansible.builtin.assert:
+    that:
+      - np_postgres.resources[0].spec.podSelector.matchLabels['app.kubernetes.io/component'] == 'database'
+      - np_postgres.resources[0].spec.ingress | length > 0
+      - np_postgres.resources[0].spec.ingress[0].from | selectattr('podSelector.matchLabels.app', 'defined') | selectattr('podSelector.matchLabels.app', 'equalto', 'eda') | list | length > 0
+    fail_msg: "Postgres NetworkPolicy missing app=eda ingress rule: {{ np_postgres.resources }}"
+
+- name: Verify per-workload NetworkPolicies exist
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ namespace }}-{{ item }}'
+  register: np_workload
+  until: np_workload.resources | length > 0
+  retries: 10
+  delay: 5
+  loop:
+    - api
+    - ui
+    - default-worker
+    - activation-worker
+    - event-stream
+    - db-management

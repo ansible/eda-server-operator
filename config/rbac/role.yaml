@@ -81,13 +81,24 @@ rules:
       - watch
   - apiGroups:
       - apps
-      - networking.k8s.io
     resources:
       - deployments
       - daemonsets
       - replicasets
       - statefulsets
+    verbs:
+      - get
+      - list
+      - create
+      - delete
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
       - ingresses
+      - networkpolicies
     verbs:
       - get
       - list

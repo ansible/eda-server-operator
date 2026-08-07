@@ -1,0 +1,42 @@
+---
+- name: Apply default deny NetworkPolicy for EDA operand pods
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'default-deny.networkpolicy.yaml.j2') }}"
+
+- name: Apply EDA API NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'eda-api.networkpolicy.yaml.j2') }}"
+
+- name: Apply EDA UI NetworkPolicy
+  kubernetes.core.k8s:
+    state: "{{ 'present' if not ui_disabled else 'absent' }}"
+    apply: true
+    definition: "{{ lookup('template', 'eda-ui.networkpolicy.yaml.j2') }}"
+
+- name: Apply EDA default-worker NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'eda-default-worker.networkpolicy.yaml.j2') }}"
+
+- name: Apply EDA activation-worker NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'eda-activation-worker.networkpolicy.yaml.j2') }}"
+
+- name: Apply EDA event-stream NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'eda-event-stream.networkpolicy.yaml.j2') }}"
+
+- name: Apply db-management NetworkPolicy for backup and restore pods
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'db-management.networkpolicy.yaml.j2') }}"

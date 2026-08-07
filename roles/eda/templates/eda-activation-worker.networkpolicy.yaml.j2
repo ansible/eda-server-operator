@@ -1,0 +1,65 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{ ansible_operator_meta.name }}-activation-worker'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic only from other EDA operator-managed pods (task dispatch)
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+  egress:
+    # Allow DNS resolution via OpenShift DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+    # Allow egress to managed PostgreSQL (task queue and pg_notify)
+{% if managed_database | bool %}
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/component: database
+              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+      ports:
+        - protocol: TCP
+          port: {{ eda_postgres_port | default('5432') }}
+{% else %}
+    # External database — destination is user-configured, allow on the port
+    - ports:
+        - protocol: TCP
+          port: {{ eda_postgres_port | default('5432') }}
+{% endif %}
+    # Allow egress to the gateway API for JWT validation
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/managed-by: 'aap-gateway-operator'
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
+    # Activation workers create and manage Job pods via the Kubernetes API.
+    # Unrestricted egress is required because event source destinations are
+    # user-defined and cannot be enumerated at policy creation time.
+    - {}
