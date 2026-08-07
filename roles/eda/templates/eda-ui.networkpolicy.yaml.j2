@@ -17,7 +17,8 @@ spec:
     - Ingress
     - Egress
   ingress:
-    # Allow traffic from the OpenShift router (Routes) and ingress controllers
+    # Allow traffic from the OpenShift router (Routes) and ingress controllers.
+    # The UI nginx container listens on 8080, not api_nginx_port (8000).
     - from:
         - namespaceSelector:
             matchLabels:
@@ -27,7 +28,7 @@ spec:
               network.openshift.io/policy-group: ingress
       ports:
         - protocol: TCP
-          port: {{ api_nginx_port }}
+          port: 8080
     # Allow traffic from the gateway operator (reverse proxy)
     - from:
         - podSelector:
@@ -42,7 +43,7 @@ spec:
               control-plane: controller-manager
       ports:
         - protocol: TCP
-          port: {{ api_nginx_port }}
+          port: 8080
   egress:
     # Allow DNS resolution via OpenShift DNS
     - to:

@@ -12,12 +12,16 @@
   vars:
     cr_file: 'eda_v1alpha1_eda.yaml'
 
+- name: Set EDA resource name from sample CR
+  ansible.builtin.set_fact:
+    eda_cr_name: "{{ lookup('file', samples_dir + '/eda_v1alpha1_eda.yaml') | from_yaml | json_query('metadata.name') }}"
+
 - name: Verify default-deny NetworkPolicy exists
   kubernetes.core.k8s_info:
     api_version: networking.k8s.io/v1
     kind: NetworkPolicy
     namespace: '{{ namespace }}'
-    name: '{{ namespace }}-default-deny'
+    name: '{{ eda_cr_name }}-default-deny'
   register: np_default_deny
   until: np_default_deny.resources | length > 0
   retries: 10
@@ -28,6 +32,7 @@
     that:
       - np_default_deny.resources[0].spec.podSelector.matchExpressions | length == 1
       - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].key == 'app.kubernetes.io/managed-by'
+      - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].operator == 'In'
       - "'eda-operator' in np_default_deny.resources[0].spec.podSelector.matchExpressions[0].values"
       - "'Ingress' in np_default_deny.resources[0].spec.policyTypes"
       - "'Egress' in np_default_deny.resources[0].spec.policyTypes"
@@ -40,7 +45,7 @@
     api_version: networking.k8s.io/v1
     kind: NetworkPolicy
     namespace: '{{ namespace }}'
-    name: '{{ namespace }}-postgres-15'
+    name: '{{ eda_cr_name }}-postgres-{{ supported_pg_version }}'
   register: np_postgres
   until: np_postgres.resources | length > 0
   retries: 10
@@ -59,15 +64,25 @@
     api_version: networking.k8s.io/v1
     kind: NetworkPolicy
     namespace: '{{ namespace }}'
-    name: '{{ namespace }}-{{ item }}'
+    name: '{{ eda_cr_name }}-{{ item }}'
   register: np_workload
   until: np_workload.resources | length > 0
   retries: 10
   delay: 5
-  loop:
-    - api
-    - ui
-    - default-worker
-    - activation-worker
-    - event-stream
-    - db-management
+  loop: "{{ ['api', 'default-worker', 'activation-worker', 'event-stream', 'db-management'] + ([] if ui_disabled | bool else ['ui']) }}"
+
+- name: Assert UI NetworkPolicy is absent when ui_disabled
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-ui'
+  register: np_ui_absent
+  when: ui_disabled | bool
+
+- name: Assert UI NetworkPolicy is absent when ui_disabled
+  ansible.builtin.assert:
+    that:
+      - np_ui_absent.resources | length == 0
+    fail_msg: "UI NetworkPolicy should be absent when ui_disabled=true"
+  when: ui_disabled | bool
