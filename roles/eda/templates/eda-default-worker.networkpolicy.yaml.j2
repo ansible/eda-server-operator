@@ -60,3 +60,7 @@ spec:
           port: 8000
         - protocol: TCP
           port: 8080
+    # Default-worker executes user-defined tasks (git clones, SCM syncs,
+    # webhook calls). Destinations are user-configured and cannot be
+    # enumerated at policy creation time.
+    - {}
