@@ -37,7 +37,7 @@ spec:
                 operator: In
                 values:
                   - '{{ deployment_type }}-operator'
-                  - 'aap-gateway-operator'
+                  - 'aap-operator'
         - podSelector:
             matchLabels:
               control-plane: controller-manager
@@ -77,7 +77,7 @@ spec:
     - to:
         - podSelector:
             matchLabels:
-              app.kubernetes.io/managed-by: 'aap-gateway-operator'
+              app.kubernetes.io/managed-by: 'aap-operator'
       ports:
         - protocol: TCP
           port: 8000
