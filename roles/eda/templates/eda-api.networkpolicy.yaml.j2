@@ -96,3 +96,8 @@ spec:
           port: 8000
         - protocol: TCP
           port: 8080
+    # Allow egress to user-configured external services (external secret
+    # managers such as HashiCorp Vault, fetched by daphne during websocket
+    # handshake when credentials use external SMS). Destinations are
+    # user-defined and cannot be enumerated at policy creation time.
+    - {}

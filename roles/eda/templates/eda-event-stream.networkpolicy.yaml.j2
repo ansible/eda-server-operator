@@ -67,6 +67,11 @@ spec:
           port: 8000
         - protocol: TCP
           port: 8080
+    # Allow egress to user-configured external services (external secret
+    # managers such as HashiCorp Vault, fetched when event stream credentials
+    # use external SMS). Destinations are user-defined and cannot be
+    # enumerated at policy creation time.
+    - {}
     # Allow egress to managed PostgreSQL (event stream uses a dedicated DB user
     # and pg_notify for event dispatch)
 {% if managed_database | bool %}
