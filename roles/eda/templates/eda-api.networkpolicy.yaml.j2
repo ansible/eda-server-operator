@@ -46,6 +46,16 @@ spec:
           port: {{ api_nginx_port }}
         - protocol: TCP
           port: {{ websocket_port }}
+    # Allow websocket connections from activation Job pods (created at runtime
+    # by activation workers, not operator-managed — carry only app: eda).
+    # ansible_rulebook connects to daphne via websocket for rulebook execution.
+    - from:
+        - podSelector:
+            matchLabels:
+              app: eda
+      ports:
+        - protocol: TCP
+          port: {{ websocket_port }}
   egress:
     # Allow DNS resolution via OpenShift DNS
     - to:
