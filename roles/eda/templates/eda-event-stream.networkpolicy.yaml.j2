@@ -55,6 +55,18 @@ spec:
           port: 5353
         - protocol: UDP
           port: 5353
+    # Allow egress to the gateway API for JWT public key fetch
+    # (ansible_base cert.py calls the gateway on every event stream POST to
+    # validate the X-Trusted-Proxy header)
+    - to:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/managed-by: 'aap-operator'
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
     # Allow egress to managed PostgreSQL (event stream uses a dedicated DB user
     # and pg_notify for event dispatch)
 {% if managed_database | bool %}
