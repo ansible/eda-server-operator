@@ -70,34 +70,8 @@ spec:
           port: 5353
         - protocol: UDP
           port: 5353
-    # Allow egress to managed PostgreSQL
-{% if managed_database | bool %}
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: database
-              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
-      ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% else %}
-    # External database — destination is user-configured, allow on the port
-    - ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% endif %}
-    # Allow egress to the gateway API for JWT validation and service mesh calls
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/managed-by: 'aap-operator'
-      ports:
-        - protocol: TCP
-          port: 8000
-        - protocol: TCP
-          port: 8080
-    # Allow egress to user-configured external services (external secret
-    # managers such as HashiCorp Vault, fetched by daphne during websocket
-    # handshake when credentials use external SMS). Destinations are
+    # Unrestricted egress required for user-configured external services
+    # (external SMS such as HashiCorp Vault, fetched by daphne during websocket
+    # handshake; gateway JWT key fetch; postgres). Destinations are
     # user-defined and cannot be enumerated at policy creation time.
     - {}

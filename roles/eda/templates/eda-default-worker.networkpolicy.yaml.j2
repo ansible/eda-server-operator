@@ -34,33 +34,8 @@ spec:
           port: 5353
         - protocol: UDP
           port: 5353
-    # Allow egress to managed PostgreSQL (dispatcherd task queue)
-{% if managed_database | bool %}
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: database
-              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
-      ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% else %}
-    # External database — destination is user-configured, allow on the port
-    - ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% endif %}
-    # Allow egress to the gateway API for JWT validation and service calls
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/managed-by: 'aap-operator'
-      ports:
-        - protocol: TCP
-          port: 8000
-        - protocol: TCP
-          port: 8080
-    # Default-worker executes user-defined tasks (git clones, SCM syncs,
-    # webhook calls). Destinations are user-configured and cannot be
-    # enumerated at policy creation time.
+    # Unrestricted egress required: default-worker executes user-defined tasks
+    # (git clones, SCM syncs, webhook calls) and may call external SMS.
+    # Destinations are user-configured and cannot be enumerated at policy
+    # creation time.
     - {}

@@ -55,37 +55,9 @@ spec:
           port: 5353
         - protocol: UDP
           port: 5353
-    # Allow egress to the gateway API for JWT public key fetch
-    # (ansible_base cert.py calls the gateway on every event stream POST to
-    # validate the X-Trusted-Proxy header)
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/managed-by: 'aap-operator'
-      ports:
-        - protocol: TCP
-          port: 8000
-        - protocol: TCP
-          port: 8080
-    # Allow egress to user-configured external services (external secret
-    # managers such as HashiCorp Vault, fetched when event stream credentials
-    # use external SMS). Destinations are user-defined and cannot be
-    # enumerated at policy creation time.
+    # Unrestricted egress required: event stream validates the X-Trusted-Proxy
+    # header by fetching the gateway JWT public key, connects to postgres via
+    # pg_notify, and may call external SMS when event stream credentials use
+    # an external secret manager. Destinations cannot be enumerated at policy
+    # creation time.
     - {}
-    # Allow egress to managed PostgreSQL (event stream uses a dedicated DB user
-    # and pg_notify for event dispatch)
-{% if managed_database | bool %}
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: database
-              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
-      ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% else %}
-    # External database — destination is user-configured, allow on the port
-    - ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% endif %}

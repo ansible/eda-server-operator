@@ -33,33 +33,8 @@ spec:
           port: 5353
         - protocol: UDP
           port: 5353
-    # Allow egress to managed PostgreSQL (task queue and pg_notify)
-{% if managed_database | bool %}
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/component: database
-              app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
-      ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% else %}
-    # External database — destination is user-configured, allow on the port
-    - ports:
-        - protocol: TCP
-          port: {{ eda_postgres_port | default('5432') }}
-{% endif %}
-    # Allow egress to the gateway API for JWT validation
-    - to:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/managed-by: 'aap-operator'
-      ports:
-        - protocol: TCP
-          port: 8000
-        - protocol: TCP
-          port: 8080
-    # Activation workers create and manage Job pods via the Kubernetes API.
-    # Unrestricted egress is required because event source destinations are
-    # user-defined and cannot be enumerated at policy creation time.
+    # Unrestricted egress required: activation workers create and manage Job
+    # pods via the Kubernetes API, connect to user-defined event source
+    # destinations, and may call external SMS. Destinations cannot be
+    # enumerated at policy creation time.
     - {}
