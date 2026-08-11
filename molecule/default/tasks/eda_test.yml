@@ -33,7 +33,8 @@
       - np_default_deny.resources[0].spec.podSelector.matchExpressions | length == 1
       - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].key == 'app.kubernetes.io/managed-by'
       - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].operator == 'In'
-      - "'eda-operator' in np_default_deny.resources[0].spec.podSelector.matchExpressions[0].values"
+      - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].values | length == 1
+      - np_default_deny.resources[0].spec.podSelector.matchExpressions[0].values[0] == deployment_type + '-operator'
       - "'Ingress' in np_default_deny.resources[0].spec.policyTypes"
       - "'Egress' in np_default_deny.resources[0].spec.policyTypes"
       - np_default_deny.resources[0].spec.ingress is not defined or np_default_deny.resources[0].spec.ingress | length == 0
