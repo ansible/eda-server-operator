@@ -8,9 +8,6 @@ api_version: '{{ deployment_type }}.ansible.com/v1alpha1'
 no_log: true
 ui_disabled: false
 
-# Keep in sync with roles/postgres/vars/main.yml
-supported_pg_version: 15
-
 image_pull_policy: IfNotPresent
 image_pull_secrets: []
 

@@ -1,4 +1,8 @@
 ---
+- name: Load postgres role vars for supported_pg_version
+  ansible.builtin.include_vars:
+    file: "{{ role_path }}/../postgres/vars/main.yml"
+
 - name: Apply default deny NetworkPolicy for EDA operand pods
   kubernetes.core.k8s:
     state: present
