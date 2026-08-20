@@ -14,15 +14,7 @@ spec:
       app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
       app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
   policyTypes:
-    - Ingress
     - Egress
-  ingress:
-    # Allow traffic only from other EDA operator-managed pods (e.g. api pod
-    # dispatching tasks to the worker via dispatcherd/postgres LISTEN/NOTIFY)
-    - from:
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
   egress:
     # Allow DNS resolution via OpenShift DNS
     - to:

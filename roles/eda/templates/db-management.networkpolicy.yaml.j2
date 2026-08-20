@@ -12,6 +12,7 @@ spec:
       app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
       app.kubernetes.io/component: '{{ deployment_type }}'
   policyTypes:
+    - Ingress
     - Egress
   egress:
     # Allow DNS resolution via OpenShift DNS
