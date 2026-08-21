@@ -1,0 +1,6 @@
+---
+- name: Apply PostgreSQL NetworkPolicy
+  kubernetes.core.k8s:
+    state: present
+    apply: true
+    definition: "{{ lookup('template', 'postgres.networkpolicy.yaml.j2') }}"

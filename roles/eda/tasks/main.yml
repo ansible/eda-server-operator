@@ -74,6 +74,9 @@
     - ingress_type | lower == 'route'
     - route_tls_secret | length
 
+- name: Apply NetworkPolicies for EDA operand pods
+  include_tasks: networkpolicy.yml
+
 - name: Deploy EDA
   include_tasks: deploy_eda.yml
 

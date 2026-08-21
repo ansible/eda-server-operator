@@ -1,0 +1,33 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{ ansible_operator_meta.name }}-activation-worker'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS resolution via OpenShift DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+    # Unrestricted egress required: activation workers create and manage Job
+    # pods via the Kubernetes API, connect to user-defined event source
+    # destinations, and may call external SMS. Destinations cannot be
+    # enumerated at policy creation time.
+    - {}

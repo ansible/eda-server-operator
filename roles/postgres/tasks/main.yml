@@ -13,6 +13,12 @@
 - name: Set variables to be used in Postgres templates
   import_tasks: set_variables.yml
 
+# NetworkPolicy must be applied before the StatefulSet so deny is in place
+# before any database pod starts
+- name: Apply PostgreSQL NetworkPolicy
+  import_tasks: networkpolicy.yml
+  when: managed_database
+
 # Managed Database block
 - name: Check PostgreSQL version to determine if an upgrade is needed
   import_tasks: check_postgres_version.yml

@@ -1,0 +1,77 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{ ansible_operator_meta.name }}-api'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    {{ lookup("template", "../common/templates/labels/common.yaml.j2") | indent(4) | trim }}
+    app.kubernetes.io/component: '{{ deployment_type }}-api'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: '{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+      app.kubernetes.io/component: '{{ deployment_type }}-api'
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from the OpenShift router (Routes) and ingress controllers
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              policy-group.network.openshift.io/ingress: ""
+        - namespaceSelector:
+            matchLabels:
+              network.openshift.io/policy-group: ingress
+      ports:
+        - protocol: TCP
+          port: {{ api_nginx_port }}
+    # Allow traffic from the gateway operator (reverse proxy) and other AAP
+    # component pods that call the EDA API
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/managed-by
+                operator: In
+                values:
+                  - '{{ deployment_type }}-operator'
+                  - 'aap-operator'
+        - podSelector:
+            matchLabels:
+              control-plane: controller-manager
+      ports:
+        - protocol: TCP
+          port: {{ api_nginx_port }}
+        - protocol: TCP
+          port: {{ websocket_port }}
+    # Allow traffic from activation Job pods (created at runtime by activation
+    # workers, not operator-managed — carry only app: eda).
+    # ansible_rulebook connects to daphne (websocket_port) for rulebook
+    # execution and to the API (api_nginx_port) for token refresh.
+    - from:
+        - podSelector:
+            matchLabels:
+              app: eda
+      ports:
+        - protocol: TCP
+          port: {{ websocket_port }}
+        - protocol: TCP
+          port: {{ api_nginx_port }}
+  egress:
+    # Allow DNS resolution via OpenShift DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353
+    # Unrestricted egress required for user-configured external services
+    # (external SMS such as HashiCorp Vault, fetched by daphne during websocket
+    # handshake; gateway JWT key fetch; postgres). Destinations are
+    # user-defined and cannot be enumerated at policy creation time.
+    - {}

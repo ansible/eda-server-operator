@@ -1,0 +1,55 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: '{{ ansible_operator_meta.name }}-postgres-{{ supported_pg_version }}'
+  namespace: '{{ ansible_operator_meta.namespace }}'
+  labels:
+    app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
+    app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: '{{ ansible_operator_meta.name }}'
+    app.kubernetes.io/managed-by: '{{ deployment_type }}-operator'
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: 'postgres-{{ supported_pg_version }}'
+      app.kubernetes.io/instance: 'postgres-{{ supported_pg_version }}-{{ ansible_operator_meta.name }}'
+      app.kubernetes.io/component: database
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from EDA operator-managed pods and the operator
+    # controller-manager (for DB initialization)
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/managed-by
+                operator: In
+                values:
+                  - '{{ deployment_type }}-operator'
+                  - 'aap-operator'
+        - podSelector:
+            matchLabels:
+              control-plane: controller-manager
+        # EDA activation Job pods (created at runtime by activation workers,
+        # not operator-managed — carry only app: eda, no managed-by label).
+        # Event stream activations connect to Postgres via pg_notify.
+        - podSelector:
+            matchLabels:
+              app: eda
+      ports:
+        - protocol: TCP
+          port: {{ eda_postgres_port | default('5432') }}
+  egress:
+    # Allow DNS resolution via OpenShift DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - protocol: TCP
+          port: 5353
+        - protocol: UDP
+          port: 5353

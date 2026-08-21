@@ -80,14 +80,10 @@ rules:
       - update
       - watch
   - apiGroups:
-      - apps
       - networking.k8s.io
     resources:
-      - deployments
-      - daemonsets
-      - replicasets
-      - statefulsets
       - ingresses
+      - networkpolicies
     verbs:
       - get
       - list
