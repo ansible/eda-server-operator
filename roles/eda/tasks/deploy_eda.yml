@@ -35,6 +35,27 @@
     - _eda_env_cm.resources | length > 0
     - (_eda_env_cm.resources | first).data is defined
 
+- name: Apply cross-namespace RBAC for activation job pods
+  k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'eda-activation-job-namespace-rbac.yaml.j2') }}"
+    wait: yes
+  when: combined_activation_worker.activation_job_namespace | default('') | length > 0
+
+- name: Remove cross-namespace RBAC from previous namespace
+  k8s:
+    state: absent
+    api_version: rbac.authorization.k8s.io/v1
+    kind: "{{ item.kind }}"
+    name: "{{ ansible_operator_meta.name }}-activation-job-manager"
+    namespace: "{{ _previous_activation_job_namespace }}"
+  loop:
+    - { kind: RoleBinding }
+    - { kind: Role }
+  when:
+    - _previous_activation_job_namespace | default('') | length > 0
+    - combined_activation_worker.activation_job_namespace | default('') != _previous_activation_job_namespace
+
 - name: Apply ConfigMap resources
   k8s:
     apply: yes
@@ -61,27 +82,6 @@
     definition: "{{ lookup('template', 'redirect-page.configmap.html.j2') }}"
     wait: yes
   when: public_base_url is defined
-
-- name: Apply cross-namespace RBAC for activation job pods
-  k8s:
-    apply: yes
-    definition: "{{ lookup('template', 'eda-activation-job-namespace-rbac.yaml.j2') }}"
-    wait: yes
-  when: combined_activation_worker.activation_job_namespace | default('') | length > 0
-
-- name: Remove cross-namespace RBAC from previous namespace
-  k8s:
-    state: absent
-    api_version: rbac.authorization.k8s.io/v1
-    kind: "{{ item.kind }}"
-    name: "{{ ansible_operator_meta.name }}-activation-job-manager"
-    namespace: "{{ _previous_activation_job_namespace }}"
-  loop:
-    - { kind: RoleBinding }
-    - { kind: Role }
-  when:
-    - _previous_activation_job_namespace | default('') | length > 0
-    - combined_activation_worker.activation_job_namespace | default('') != _previous_activation_job_namespace
 
 - name: Apply Backend deployment resources
   k8s:
