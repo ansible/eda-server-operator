@@ -34,11 +34,20 @@ spec:
             matchLabels:
               control-plane: controller-manager
         # EDA activation Job pods (created at runtime by activation workers,
-        # not operator-managed — carry only app: eda, no managed-by label).
+        # not operator-managed, carry only app: eda, no managed-by label).
         # Event stream activations connect to Postgres via pg_notify.
+{% if combined_activation_worker.activation_job_namespace | default('') | length > 0 %}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ combined_activation_worker.activation_job_namespace }}'
+          podSelector:
+            matchLabels:
+              app: eda
+{% else %}
         - podSelector:
             matchLabels:
               app: eda
+{% endif %}
       ports:
         - protocol: TCP
           port: {{ eda_postgres_port | default('5432') }}
