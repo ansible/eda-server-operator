@@ -9,10 +9,6 @@ spec:
   ingress_type: Route
   no_log: false
   image_pull_policy: Always
-  extra_settings:
-    - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      value: true
-
   api:
     replicas: 1
     resource_requirements:
