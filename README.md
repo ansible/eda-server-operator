@@ -187,7 +187,9 @@ stringData:
 
 ### Allow Local Resource Management
 
-Resources such as users, teams, or organizations are recommended to be managed by the *Platform Provider*. Flag `EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT` can be toggled to instruct whether EDA can create/modify/delete these resources. The following example allows EDA to manage such resources. It is necessary when EDA is deployed alone.
+Resources such as users, teams, or organizations are recommended to be managed by the *Platform Provider*. When EDA is deployed standalone (without `public_base_url`), the operator automatically sets `EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT` to `True` and clears `EDA_RESOURCE_SERVER__URL`, enabling local user/team/organization management and session-based login.
+
+If you need to override this behavior in a standalone deployment, use `extra_settings`:
 
 ```yaml
 apiVersion: eda.ansible.com/v1alpha1
@@ -197,7 +199,7 @@ metadata:
 spec:
   extra_settings:
     - setting: EDA_ALLOW_LOCAL_RESOURCE_MANAGEMENT
-      value: true
+      value: false
 ```
 
 ### Database Fields Encryption Configuration
