@@ -47,13 +47,22 @@ spec:
         - protocol: TCP
           port: {{ websocket_port }}
     # Allow traffic from activation Job pods (created at runtime by activation
-    # workers, not operator-managed — carry only app: eda).
+    # workers, not operator-managed, carry only app: eda).
     # ansible_rulebook connects to daphne (websocket_port) for rulebook
     # execution and to the API (api_nginx_port) for token refresh.
     - from:
+{% if combined_activation_worker.activation_job_namespace | default('') | length > 0 %}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: '{{ combined_activation_worker.activation_job_namespace }}'
+          podSelector:
+            matchLabels:
+              app: eda
+{% else %}
         - podSelector:
             matchLabels:
               app: eda
+{% endif %}
       ports:
         - protocol: TCP
           port: {{ websocket_port }}

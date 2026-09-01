@@ -16,6 +16,7 @@ jobs:
           - SCENARIO: externaldb
           - SCENARIO: ingress
           - SCENARIO: event_persistence
+          - SCENARIO: activation_job_namespace
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -67,6 +68,10 @@ jobs:
       - name: Create event stream postgresql secret for external database
         run: kubectl apply -f .ci/eda-event-stream-external-database.secret.yaml
         if: ${{ matrix.SCENARIO == 'externaldb' }}
+
+      - name: Create activation job namespace
+        run: kubectl create namespace eda-jobs
+        if: ${{ matrix.SCENARIO == 'activation_job_namespace' }}
 
       - name: Create the EDA demo CR
         run: |
