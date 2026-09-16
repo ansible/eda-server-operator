@@ -37,6 +37,15 @@ jobs:
           echo $(minikube ip)   eda-postgresql | sudo tee -a /etc/hosts
         if: ${{ matrix.SCENARIO == 'externaldb' }}
 
+      - name: Debug Docker/Buildx
+        run: |
+          docker version
+          docker info
+          docker buildx version
+          docker buildx ls
+          docker context ls
+          docker image inspect moby/buildkit:buildx-stable-1 || true
+
       - name: Build the EDA operator container image
         run: |
           eval $(minikube -p minikube docker-env)
