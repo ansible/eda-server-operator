@@ -45,3 +45,7 @@ spec:
     storage_requirements:
       requests:
         storage: 20Gi
+  event_stream:
+    database_secret: eda-sample-event-stream-postgres-external
+  event_persistence:
+    deploy_db: true

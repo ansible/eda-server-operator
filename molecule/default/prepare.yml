@@ -26,3 +26,27 @@
       command: '{{ kustomize }} edit set namespace {{ namespace }}'
       args:
         chdir: '{{ config_dir }}/testing'
+
+    - name: Ensure the test namespace exists
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: '{{ namespace }}'
+
+    - name: Pre-create the "VSO-managed" event stream postgres secret
+      kubernetes.core.k8s:
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: '{{ guard_test_event_stream_secret }}'
+            namespace: '{{ namespace }}'
+          stringData:
+            username: eda_event_stream
+            password: '{{ guard_test_sentinel }}'
+            database: eda
+            port: '5432'
+            host: '{{ guard_test_pg_host }}'
+            sslmode: prefer
+            type: managed
+      no_log: '{{ guard_test_no_log | default(true) }}'

@@ -31,7 +31,7 @@
 # Event stream database user configuration
 - name: Determine and set event stream postgres configuration secret
   import_tasks: set_event_stream_secret.yml
-  when: managed_database | bool or (event_stream.database_secret is defined and event_stream.database_secret | length > 0)
+  when: managed_database | bool or event_stream.database_secret | default('') | length > 0
 
 - name: Validate event stream configuration for external database
   ansible.builtin.fail:
@@ -45,7 +45,7 @@
     - not managed_database | bool
     - event_stream is defined
     - event_stream.keys() | length > 0
-    - event_stream.database_secret is not defined or not event_stream.database_secret
+    - not event_stream.database_secret | default('')
 
 - name: Create event stream database user in PostgreSQL
   ansible.builtin.import_tasks: create_event_stream_user.yml
@@ -59,7 +59,7 @@
   import_tasks: set_event_persistence_secret.yml
   when: >-
     event_persistence.deploy_db | default(false) | bool or
-    (event_persistence.database_secret is defined and event_persistence.database_secret | length > 0)
+    event_persistence.database_secret | default('') | length > 0
 
 - name: Create event persistence database in PostgreSQL
   ansible.builtin.import_tasks: create_event_persistence_db.yml
