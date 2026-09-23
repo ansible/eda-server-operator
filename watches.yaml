@@ -3,6 +3,7 @@
   group: eda.ansible.com
   kind: EDA
   playbook: playbooks/eda.yml
+  snakeCaseParameters: False
   finalizer:
     name: eda.ansible.com/finalizer
     playbook: playbooks/eda_finalizer.yml

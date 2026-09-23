@@ -87,3 +87,46 @@
       - np_ui_absent.resources | length == 0
     fail_msg: "UI NetworkPolicy should be absent when ui_disabled=true"
   when: ui_disabled | bool
+
+- name: Add topology spread constraints for the API pods to the EDA CR
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        api:
+          topology_spread_constraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: '{{ deployment_type }}-api'
+
+- name: Wait for the API Deployment to pick up the topology spread constraints
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-api'
+  register: api_deployment
+  until:
+    - api_deployment.resources | length > 0
+    - api_deployment.resources[0].spec.template.spec.topologySpreadConstraints is defined
+  retries: 30
+  delay: 10
+
+- name: Assert the topology spread constraints are rendered with camelCase keys and the CR values
+  ansible.builtin.assert:
+    that:
+      - _constraints | length == 1
+      - _constraints[0].maxSkew == 1
+      - _constraints[0].topologyKey == 'kubernetes.io/hostname'
+      - _constraints[0].whenUnsatisfiable == 'ScheduleAnyway'
+      - _constraints[0].labelSelector.matchLabels['app.kubernetes.io/component'] == deployment_type + '-api'
+    fail_msg: "API Deployment topologySpreadConstraints do not match the CR: {{ _constraints }}"
+  vars:
+    _constraints: "{{ api_deployment.resources[0].spec.template.spec.topologySpreadConstraints }}"
