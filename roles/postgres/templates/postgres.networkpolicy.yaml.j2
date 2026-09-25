@@ -52,13 +52,20 @@ spec:
         - protocol: TCP
           port: {{ eda_postgres_port | default('5432') }}
   egress:
-    # Allow DNS resolution via OpenShift DNS
+    # Allow DNS resolution via OpenShift DNS and kube-system
     - to:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: openshift-dns
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
       ports:
         - protocol: TCP
           port: 5353
         - protocol: UDP
           port: 5353
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
