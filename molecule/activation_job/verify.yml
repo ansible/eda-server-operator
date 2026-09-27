@@ -1,0 +1,385 @@
+---
+- name: Bootstrap EDA for activation Job verification
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    cr_file: eda_v1alpha1_eda.yaml
+
+  tasks:
+    - name: Create the sample EDA
+      kubernetes.core.k8s:
+        state: present
+        namespace: '{{ namespace }}'
+        definition: "{{ lookup('template', '/'.join([samples_dir, cr_file])) | from_yaml }}"
+        wait: true
+        wait_timeout: 600
+        wait_condition:
+          type: Successful
+          status: 'True'
+
+    - name: Set EDA resource name from sample CR
+      ansible.builtin.set_fact:
+        eda_cr_name: >-
+          {{ (lookup('file', samples_dir + '/' + cr_file) | from_yaml).metadata.name }}
+
+    - name: Read the generated EDA admin password
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Secret
+        namespace: '{{ namespace }}'
+        name: '{{ eda_cr_name }}-admin-password'
+      register: eda_admin_password_secret
+      until: eda_admin_password_secret.resources | length == 1
+      retries: 30
+      delay: 10
+      no_log: true
+
+    - name: Set the EDA admin password
+      ansible.builtin.set_fact:
+        eda_admin_password: >-
+          {{ eda_admin_password_secret.resources[0].data.password | b64decode }}
+      no_log: true
+
+- name: Verify API-created activation Jobs
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    activation_job_namespace: "{{ namespace | truncate(47, true, '') }}-activation-jobs"
+    activation_name: molecule-activation
+    decision_environment_name: molecule-decision-environment
+    project_name: molecule-project
+    project_url: https://github.com/ansible/eda-sample-project.git
+    rulebook_name: range_long_running.yml
+    decision_environment_image: quay.io/ansible/ansible-rulebook:main
+    eda_api_local_port: 18000
+    eda_api_port_forward_log: "/tmp/molecule-{{ namespace }}-eda-api-port-forward.log"
+
+  module_defaults:
+    group/ansible.eda.eda:
+      controller_host: "http://127.0.0.1:{{ eda_api_local_port }}"
+      controller_username: admin
+      controller_password: "{{ eda_admin_password }}"
+      validate_certs: false
+
+  tasks:
+    - name: Exercise an activation through the EDA API
+      block:
+        - name: Create the activation Job namespace
+          kubernetes.core.k8s:
+            api_version: v1
+            kind: Namespace
+            name: '{{ activation_job_namespace }}'
+            state: present
+
+        - name: Configure activation Job placement and resource limits
+          kubernetes.core.k8s:
+            state: patched
+            api_version: eda.ansible.com/v1alpha1
+            kind: EDA
+            namespace: '{{ namespace }}'
+            name: '{{ eda_cr_name }}'
+            definition:
+              spec:
+                activation_worker:
+                  activation_job_namespace: '{{ activation_job_namespace }}'
+                extra_settings:
+                  - setting: EDA_K8S_CPU_LIMIT
+                    value: 500m
+                  - setting: EDA_K8S_MEM_LIMIT
+                    value: 512Mi
+
+        - name: Wait for the EDA environment ConfigMap to contain activation Job settings
+          kubernetes.core.k8s_info:
+            api_version: v1
+            kind: ConfigMap
+            namespace: '{{ namespace }}'
+            name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+          register: activation_job_environment
+          until:
+            - activation_job_environment.resources | length == 1
+            - >-
+              activation_job_environment.resources[0].data['EDA_ACTIVATION_JOB_NAMESPACE']
+              | default('') == activation_job_namespace
+            - >-
+              activation_job_environment.resources[0].data['EDA_K8S_CPU_LIMIT']
+              | default('') == '500m'
+            - >-
+              activation_job_environment.resources[0].data['EDA_K8S_MEM_LIMIT']
+              | default('') == '512Mi'
+          retries: 30
+          delay: 10
+
+        - name: Wait for API and activation worker rollouts to apply the settings
+          kubernetes.core.k8s_info:
+            api_version: apps/v1
+            kind: Deployment
+            namespace: '{{ namespace }}'
+            name: '{{ eda_cr_name }}-{{ item }}'
+          register: configured_eda_deployments
+          until:
+            - configured_eda_deployments.resources | length == 1
+            - >-
+              configured_eda_deployments.resources[0].status.observedGeneration | default(0)
+              == configured_eda_deployments.resources[0].metadata.generation
+            - >-
+              configured_eda_deployments.resources[0].status.updatedReplicas | default(0)
+              == configured_eda_deployments.resources[0].spec.replicas
+            - >-
+              configured_eda_deployments.resources[0].status.availableReplicas | default(0)
+              == configured_eda_deployments.resources[0].spec.replicas
+          retries: 60
+          delay: 10
+          loop:
+            - api
+            - activation-worker
+
+        - name: Start an EDA API port-forward
+          ansible.builtin.shell: >-
+            kubectl --kubeconfig {{ kubeconfig | quote }} --namespace {{ namespace | quote }}
+            port-forward service/{{ eda_cr_name }}-api {{ eda_api_local_port }}:8000
+            > {{ eda_api_port_forward_log | quote }} 2>&1 & echo $!
+          args:
+            executable: /bin/bash
+          register: eda_api_port_forward
+          changed_when: false
+
+        - name: Wait for the EDA API port-forward
+          ansible.builtin.wait_for:
+            host: 127.0.0.1
+            port: '{{ eda_api_local_port }}'
+            state: started
+            timeout: 60
+
+        - name: Create the EDA sample project
+          ansible.eda.project:
+            name: '{{ project_name }}'
+            description: Molecule EDA activation project
+            url: '{{ project_url }}'
+            organization_name: Default
+            wait: false
+            state: present
+
+        - name: Wait for the EDA sample project import
+          ansible.eda.project_info:
+            name: '{{ project_name }}'
+          register: project_status
+          until:
+            - project_status.projects | length == 1
+            - project_status.projects[0].import_state == 'completed'
+          failed_when: >-
+            project_status.projects | length == 1
+            and project_status.projects[0].import_state == 'failed'
+          retries: 60
+          delay: 5
+
+        - name: Create the EDA decision environment
+          ansible.eda.decision_environment:
+            name: '{{ decision_environment_name }}'
+            description: Molecule EDA activation decision environment
+            image_url: '{{ decision_environment_image }}'
+            pull_policy: missing
+            organization_name: Default
+            state: present
+
+        - name: Create the rulebook activation through the EDA API
+          ansible.eda.rulebook_activation:
+            name: '{{ activation_name }}'
+            description: Molecule EDA activation
+            project_name: '{{ project_name }}'
+            rulebook_name: '{{ rulebook_name }}'
+            decision_environment_name: '{{ decision_environment_name }}'
+            organization_name: Default
+            state: present
+
+        - name: Wait for the rulebook activation to run
+          ansible.eda.rulebook_activation_info:
+            name: '{{ activation_name }}'
+          register: activation_status
+          until:
+            - activation_status.activations | length == 1
+            - activation_status.activations[0].status == 'running'
+          failed_when: >-
+            activation_status.activations | length == 1
+            and activation_status.activations[0].status in ['failed', 'error']
+          retries: 60
+          delay: 5
+
+        - name: Retrieve the API-created activation Job
+          kubernetes.core.k8s_info:
+            api_version: batch/v1
+            kind: Job
+            namespace: '{{ activation_job_namespace }}'
+            label_selectors:
+              - app=eda
+          register: activation_job
+          until:
+            - activation_job.resources | length == 1
+            - activation_job.resources[0].status.active | default(0) == 1
+          retries: 30
+          delay: 5
+
+        - name: Retrieve the API-created activation Pod
+          kubernetes.core.k8s_info:
+            api_version: v1
+            kind: Pod
+            namespace: '{{ activation_job_namespace }}'
+            label_selectors:
+              - "job-name={{ activation_job.resources[0].metadata.name }}"
+          register: activation_pod
+          until:
+            - activation_pod.resources | length == 1
+            - activation_pod.resources[0].status.phase == 'Running'
+          retries: 30
+          delay: 5
+
+        - name: Verify the activation Job reflects EDA operator configuration
+          ansible.builtin.assert:
+            that:
+              - _activation_job.metadata.namespace == activation_job_namespace
+              - _activation_job.metadata.labels.app == 'eda'
+              - _activation_job.spec.template.metadata.labels.app == 'eda'
+              - _activation_job.spec.template.metadata.labels['job-name'] == _activation_job.metadata.name
+              - _activation_container.image == decision_environment_image
+              - _activation_container.resources.limits.cpu == '500m'
+              - _activation_container.resources.limits.memory == '512Mi'
+              - _activation_pod.metadata.namespace == activation_job_namespace
+              - _activation_pod.metadata.labels.app == 'eda'
+              - _activation_pod.metadata.labels['job-name'] == _activation_job.metadata.name
+            fail_msg: >-
+              API-created activation workload does not match the operator configuration:
+              job={{ _activation_job }}, pod={{ _activation_pod }}
+          vars:
+            _activation_job: '{{ activation_job.resources[0] }}'
+            _activation_pod: '{{ activation_pod.resources[0] }}'
+            _activation_container: '{{ _activation_job.spec.template.spec.containers | first }}'
+
+        - name: Verify no activation Job was created in the EDA namespace
+          kubernetes.core.k8s_info:
+            api_version: batch/v1
+            kind: Job
+            namespace: '{{ namespace }}'
+            label_selectors:
+              - app=eda
+          register: control_namespace_activation_jobs
+
+        - name: Assert the activation Job only exists in the configured namespace
+          ansible.builtin.assert:
+            that:
+              - control_namespace_activation_jobs.resources | length == 0
+            fail_msg: >-
+              Activation Job was created in {{ namespace }} instead of
+              {{ activation_job_namespace }}: {{ control_namespace_activation_jobs.resources }}
+
+        - name: Delete the EDA CR while the activation is active
+          kubernetes.core.k8s:
+            api_version: eda.ansible.com/v1alpha1
+            kind: EDA
+            namespace: '{{ namespace }}'
+            name: '{{ eda_cr_name }}'
+            state: absent
+
+        - name: Wait for the EDA CR to be deleted
+          kubernetes.core.k8s_info:
+            api_version: eda.ansible.com/v1alpha1
+            kind: EDA
+            namespace: '{{ namespace }}'
+            name: '{{ eda_cr_name }}'
+          register: deleted_eda
+          until: deleted_eda.resources | length == 0
+          retries: 60
+          delay: 5
+
+        - name: Record that the EDA API has been deleted
+          ansible.builtin.set_fact:
+            eda_cr_deleted: true
+
+        - name: Wait for the activation Job to be deleted from the separate namespace
+          kubernetes.core.k8s_info:
+            api_version: batch/v1
+            kind: Job
+            namespace: '{{ activation_job_namespace }}'
+            label_selectors:
+              - app=eda
+          register: deleted_activation_job
+          until: deleted_activation_job.resources | length == 0
+          retries: 30
+          delay: 5
+
+        - name: Wait for cross-namespace activation Job RBAC to be deleted
+          kubernetes.core.k8s_info:
+            api_version: rbac.authorization.k8s.io/v1
+            kind: '{{ item }}'
+            namespace: '{{ activation_job_namespace }}'
+            name: '{{ eda_cr_name }}-activation-job-manager'
+          register: deleted_activation_job_rbac
+          until: deleted_activation_job_rbac.resources | length == 0
+          retries: 30
+          delay: 5
+          loop:
+            - Role
+            - RoleBinding
+
+
+      rescue:
+        - name: Read the EDA API port-forward log
+          ansible.builtin.command:
+            argv:
+              - /usr/bin/cat
+              - '{{ eda_api_port_forward_log }}'
+          register: eda_api_port_forward_log_output
+          changed_when: false
+          failed_when: false
+
+        - name: Show the EDA API port-forward log
+          ansible.builtin.debug:
+            var: eda_api_port_forward_log_output.stdout_lines
+
+        - name: Fail after preserving activation diagnostics
+          ansible.builtin.fail:
+            msg: API-created activation Job verification failed
+
+      always:
+        - name: Delete the rulebook activation after a failed verification
+          ansible.eda.rulebook_activation:
+            name: '{{ activation_name }}'
+            state: absent
+          failed_when: false
+          when:
+            - eda_admin_password is defined
+            - not (eda_cr_deleted | default(false))
+
+        - name: Delete the EDA decision environment after a failed verification
+          ansible.eda.decision_environment:
+            name: '{{ decision_environment_name }}'
+            state: absent
+          failed_when: false
+          when:
+            - eda_admin_password is defined
+            - not (eda_cr_deleted | default(false))
+
+        - name: Delete the EDA sample project after a failed verification
+          ansible.eda.project:
+            name: '{{ project_name }}'
+            state: absent
+          failed_when: false
+          when:
+            - eda_admin_password is defined
+            - not (eda_cr_deleted | default(false))
+
+        - name: Stop the EDA API port-forward
+          ansible.builtin.command:
+            argv:
+              - /bin/kill
+              - '{{ eda_api_port_forward.stdout }}'
+          changed_when: false
+          failed_when: false
+          when: eda_api_port_forward is defined
+
+        - name: Remove the EDA API port-forward log
+          ansible.builtin.file:
+            path: '{{ eda_api_port_forward_log }}'
+            state: absent
