@@ -76,13 +76,63 @@
 
 - name: Apply UI deployment resources if UI is enabled
   k8s:
-    state: "{{ 'present' if not ui_disabled else 'absent' }}"
+    apply: yes
+    state: present
     definition: "{{ lookup('template', item + '.yaml.j2') }}"
     wait: no
   loop:
     - 'eda-ui.service'
     - 'eda-ui.deployment'
     - 'eda-ui.ingress'
+  when: not ui_disabled
+
+- name: Read UI deployment placement
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-ui"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: _ui_deployment
+  when: not ui_disabled
+
+- name: Reconcile UI deployment placement
+  kubernetes.core.k8s_json_patch:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-ui"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    patch:
+      - op: add
+        path: /spec/template/spec/nodeSelector
+        value: "{{ combined_ui.node_selector }}"
+      - op: add
+        path: /spec/template/spec/tolerations
+        value: "{{ combined_ui.tolerations }}"
+      - op: add
+        path: /spec/template/spec/affinity
+        value: "{{ combined_ui.affinity }}"
+      - op: add
+        path: /spec/template/spec/topologySpreadConstraints
+        value: "{{ combined_ui.topology_spread_constraints | default([]) }}"
+  when:
+    - not ui_disabled
+    - _ui_deployment.resources | length > 0
+    - >-
+      (_ui_deployment.resources[0].spec.template.spec.nodeSelector | default({}, true)) != combined_ui.node_selector
+      or (_ui_deployment.resources[0].spec.template.spec.tolerations | default([], true)) != combined_ui.tolerations
+      or (_ui_deployment.resources[0].spec.template.spec.affinity | default({}, true)) != combined_ui.affinity
+      or (_ui_deployment.resources[0].spec.template.spec.topologySpreadConstraints | default([], true)) != (combined_ui.topology_spread_constraints | default([]))
+
+- name: Remove UI deployment resources if UI is disabled
+  k8s:
+    state: absent
+    definition: "{{ lookup('template', item + '.yaml.j2') }}"
+    wait: no
+  loop:
+    - 'eda-ui.service'
+    - 'eda-ui.deployment'
+    - 'eda-ui.ingress'
+  when: ui_disabled
 
 - name: Apply API Route or Ingress if UI is disabled
   k8s:

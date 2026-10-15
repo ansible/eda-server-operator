@@ -130,3 +130,56 @@
     fail_msg: "API Deployment topologySpreadConstraints do not match the CR: {{ _constraints }}"
   vars:
     _constraints: "{{ api_deployment.resources[0].spec.template.spec.topologySpreadConstraints }}"
+
+- name: Add a node selector for the UI pods to the EDA CR
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        ui:
+          node_selector:
+            kubernetes.io/os: linux
+  when: not (ui_disabled | bool)
+
+- name: Wait for the UI Deployment to pick up the node selector
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-ui'
+  register: ui_deployment
+  until:
+    - ui_deployment.resources | length > 0
+    - "ui_deployment.resources[0].spec.template.spec.nodeSelector == {'kubernetes.io/os': 'linux'}"
+  retries: 30
+  delay: 10
+  when: not (ui_disabled | bool)
+
+- name: Remove the UI node selector from the EDA CR
+  kubernetes.core.k8s_json_patch:
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    patch:
+      - op: remove
+        path: /spec/ui/node_selector/kubernetes.io~1os
+  when: not (ui_disabled | bool)
+
+- name: Wait for the UI Deployment to remove the node selector
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-ui'
+  register: ui_deployment
+  until:
+    - ui_deployment.resources | length > 0
+    - (ui_deployment.resources[0].spec.template.spec.nodeSelector | default({}, true)) == {}
+  retries: 30
+  delay: 10
+  when: not (ui_disabled | bool)
