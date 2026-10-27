@@ -16,6 +16,23 @@
   ansible.builtin.set_fact:
     eda_cr_name: "{{ lookup('file', samples_dir + '/eda_v1alpha1_eda.yaml') | from_yaml | json_query('metadata.name') }}"
 
+- name: Read EDA application environment ConfigMap
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+  register: eda_env_properties
+  until: eda_env_properties.resources | length > 0
+  retries: 10
+  delay: 5
+
+- name: Assert activation URLs use namespace-qualified control-plane Services
+  ansible.builtin.assert:
+    that:
+      - eda_env_properties.resources[0].data.EDA_WEBSOCKET_BASE_URL == 'ws://' ~ eda_cr_name ~ '-daphne.' ~ namespace ~ '.svc:8001'
+      - eda_env_properties.resources[0].data.EDA_WEBSOCKET_TOKEN_BASE_URL == 'http://' ~ eda_cr_name ~ '-api.' ~ namespace ~ '.svc:8000'
+
 - name: Verify default-deny NetworkPolicy exists
   kubernetes.core.k8s_info:
     api_version: networking.k8s.io/v1
