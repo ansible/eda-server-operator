@@ -29,7 +29,9 @@ spec:
         - protocol: TCP
           port: {{ api_nginx_port }}
     # Allow traffic from the gateway operator (reverse proxy) and other AAP
-    # component pods that call the EDA API
+    # component pods that call the EDA API. namespaceSelector: {} +
+    # podSelector (same list item = AND) allows the operator pod to reach the
+    # EDA API when it runs in a separate namespace.
     - from:
         - podSelector:
             matchExpressions:
@@ -38,7 +40,8 @@ spec:
                 values:
                   - '{{ deployment_type }}-operator'
                   - 'aap-operator'
-        - podSelector:
+        - namespaceSelector: {}
+          podSelector:
             matchLabels:
               control-plane: controller-manager
       ports:

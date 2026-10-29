@@ -29,7 +29,9 @@ spec:
       ports:
         - protocol: TCP
           port: 8080
-    # Allow traffic from the gateway operator (reverse proxy)
+    # Allow traffic from the gateway operator (reverse proxy).
+    # namespaceSelector: {} + podSelector (same list item = AND) allows the
+    # operator pod to reach the UI when it runs in a separate namespace.
     - from:
         - podSelector:
             matchExpressions:
@@ -38,7 +40,8 @@ spec:
                 values:
                   - '{{ deployment_type }}-operator'
                   - 'aap-operator'
-        - podSelector:
+        - namespaceSelector: {}
+          podSelector:
             matchLabels:
               control-plane: controller-manager
       ports:
