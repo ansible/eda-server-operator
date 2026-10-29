@@ -1,0 +1,43 @@
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: ${MOLECULE_PROJECT_DIRECTORY}/molecule/requirements.yml
+prerun: false
+driver:
+  name: default
+platforms:
+  - name: cluster
+    groups:
+      - k8s
+provisioner:
+  name: ansible
+  playbooks:
+    prepare: ../default/prepare.yml
+  inventory:
+    group_vars:
+      all:
+        namespace: ${TEST_OPERATOR_NAMESPACE:-osdk-test}
+        guard_test_event_stream_secret: eda-sample-event-stream-postgres-external
+        guard_test_sentinel: aap91811-do-not-regenerate
+        guard_test_pg_host: eda-sample-postgres-15
+        guard_test_event_persistence_generated_suffix: event-persistence-postgres-configuration
+        guard_test_event_stream_generated_suffix: event-stream-postgres-configuration
+        guard_test_no_log: true
+        deployment_type: eda
+        supported_pg_version: 15
+    host_vars:
+      localhost:
+        ansible_python_interpreter: '{{ ansible_playbook_python }}'
+        config_dir: ${MOLECULE_PROJECT_DIRECTORY}/config
+        samples_dir: ${MOLECULE_PROJECT_DIRECTORY}/config/samples
+        project_dir: ${MOLECULE_PROJECT_DIRECTORY}
+        operator_image: testing-operator
+        operator_pull_policy: "Never"
+        kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+        kustomize: ${KUSTOMIZE_PATH:-kustomize}
+  env:
+    K8S_AUTH_KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
+    KUBECONFIG: ${MOLECULE_EPHEMERAL_DIRECTORY}/kubeconfig
+verifier:
+  name: ansible

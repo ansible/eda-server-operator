@@ -11,6 +11,16 @@
       vars:
         state: absent
 
+    - name: Destroy activation job namespace test namespaces
+      k8s:
+        api_version: v1
+        kind: Namespace
+        name: '{{ item }}'
+        state: absent
+      loop:
+        - "{{ namespace | truncate(52, true, '') }}-eda-jobs-a"
+        - "{{ namespace | truncate(52, true, '') }}-eda-jobs-b"
+
     - name: Destroy Namespace
       k8s:
         api_version: v1
