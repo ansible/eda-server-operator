@@ -121,10 +121,7 @@ spec:
 {% if __event_persistence_database_secret is defined %}
         # Event persistence database credentials
         - name: EDA_EVENT_PERSISTENCE_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __event_persistence_database_secret }}'
-              key: host
+          value: '{{ event_persistence_db_host }}'
         - name: EDA_EVENT_PERSISTENCE_DB_PORT
           valueFrom:
             secretKeyRef:
@@ -222,10 +219,7 @@ spec:
 {% if __event_persistence_database_secret is defined %}
         # Event persistence database credentials
         - name: EDA_EVENT_PERSISTENCE_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __event_persistence_database_secret }}'
-              key: host
+          value: '{{ event_persistence_db_host }}'
         - name: EDA_EVENT_PERSISTENCE_DB_PORT
           valueFrom:
             secretKeyRef:
