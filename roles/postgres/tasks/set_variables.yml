@@ -13,3 +13,21 @@
 - name: Determine if database is managed based on secret values
   set_fact:
     managed_database: "{{ pg_config['resources'][0]['data']['type'] | default('') | b64decode == 'managed' }}"
+
+- name: Determine if database configuration is managed by AAP
+  set_fact:
+    aap_managed_database: >-
+      {{ (pg_config['resources'][0]['data']['managed_by_aap']
+          | default('false' | b64encode)
+          | b64decode
+          | lower) == 'true' }}
+  no_log: "{{ no_log }}"
+
+- name: Determine activation database host
+  set_fact:
+    activation_db_host: >-
+      {{ eda_postgres_host ~ '.' ~ ansible_operator_meta.namespace ~ '.svc'
+         if ((managed_database | bool or aap_managed_database | bool)
+             and '.' not in eda_postgres_host)
+         else eda_postgres_host }}
+  no_log: "{{ no_log }}"

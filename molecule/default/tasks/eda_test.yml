@@ -33,6 +33,42 @@
       - eda_env_properties.resources[0].data.EDA_WEBSOCKET_BASE_URL == 'ws://' ~ eda_cr_name ~ '-daphne.' ~ namespace ~ '.svc:8001'
       - eda_env_properties.resources[0].data.EDA_WEBSOCKET_TOKEN_BASE_URL == 'http://' ~ eda_cr_name ~ '-api.' ~ namespace ~ '.svc:8000'
 
+- name: Read the API Deployment
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-api'
+  register: api_deployment_initial
+  until: api_deployment_initial.resources | length > 0
+  retries: 10
+  delay: 5
+
+- name: Assert initial data uses namespace-qualified managed database hosts
+  ansible.builtin.assert:
+    that:
+      - _activation_db_host == eda_cr_name ~ '-postgres-' ~ supported_pg_version ~ '.' ~ namespace ~ '.svc'
+      - _event_persistence_db_host == eda_cr_name ~ '-postgres-' ~ supported_pg_version ~ '.' ~ namespace ~ '.svc'
+    fail_msg: >-
+      EDA_ACTIVATION_DB_HOST and EDA_EVENT_PERSISTENCE_DB_HOST must be
+      namespace-qualified for the managed database: {{ _initial_data_env }}
+  vars:
+    _initial_data_env: >-
+      {{ api_deployment_initial.resources[0].spec.template.spec.initContainers
+         | selectattr('name', 'equalto', 'eda-initial-data')
+         | map(attribute='env')
+         | first }}
+    _activation_db_host: >-
+      {{ _initial_data_env
+         | selectattr('name', 'equalto', 'EDA_ACTIVATION_DB_HOST')
+         | map(attribute='value')
+         | first }}
+    _event_persistence_db_host: >-
+      {{ _initial_data_env
+         | selectattr('name', 'equalto', 'EDA_EVENT_PERSISTENCE_DB_HOST')
+         | map(attribute='value')
+         | first }}
+
 - name: Verify default-deny NetworkPolicy exists
   kubernetes.core.k8s_info:
     api_version: networking.k8s.io/v1
