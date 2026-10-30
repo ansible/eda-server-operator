@@ -103,10 +103,7 @@ spec:
               name: '{{ __database_secret }}'
               key: host
         - name: EDA_ACTIVATION_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __database_secret }}'
-              key: host
+          value: '{{ activation_db_host }}'
         - name: EDA_DB_NAME
           valueFrom:
             secretKeyRef:
@@ -149,10 +146,7 @@ spec:
         - name: ANSIBLE_REVERSE_RESOURCE_SYNC
           value: 'false'
         - name: EDA_ACTIVATION_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __database_secret }}'
-              key: host
+          value: '{{ activation_db_host }}'
         - name: EDA_DB_HOST
           valueFrom:
             secretKeyRef:
@@ -303,10 +297,7 @@ spec:
               name: '{{ db_fields_encryption_secret_name }}'
               key: secret_key
         - name: EDA_ACTIVATION_DB_HOST
-          valueFrom:
-            secretKeyRef:
-              name: '{{ __database_secret }}'
-              key: host
+          value: '{{ activation_db_host }}'
 {% if __event_persistence_database_secret is defined %}
         # Event persistence database credentials
         - name: EDA_EVENT_PERSISTENCE_DB_HOST
