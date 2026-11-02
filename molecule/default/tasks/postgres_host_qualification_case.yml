@@ -1,0 +1,18 @@
+---
+- name: Derive host from synthetic database configuration
+  ansible.builtin.include_tasks: ../../../roles/postgres/tasks/qualify_database_host.yml
+  vars:
+    postgres_database_host: "{{ database_host_case.secret.host }}"
+    postgres_database_namespace: postgres-host-test
+    postgres_database_is_eda_managed: "{{ database_host_case.secret.type | default('') == 'managed' }}"
+    postgres_database_is_aap_managed: "{{ database_host_case.secret.managed_by_aap | default(false) | bool }}"
+    postgres_database_services: "{{ database_host_case.services }}"
+    no_log: true  # noqa: var-naming[no-reserved]
+
+- name: Assert derived host matches the synthetic case
+  ansible.builtin.assert:
+    that:
+      - postgres_qualified_database_host == database_host_case.expected
+    fail_msg: >-
+      {{ database_host_case.path }} host '{{ database_host_case.secret.host }}' was derived as
+      '{{ postgres_qualified_database_host }}', expected '{{ database_host_case.expected }}'.

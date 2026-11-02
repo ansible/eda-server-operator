@@ -23,11 +23,24 @@
           | lower) == 'true' }}
   no_log: "{{ no_log }}"
 
+- name: Read Services in the control-plane namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: postgres_control_plane_services
+  no_log: "{{ no_log }}"
+
 - name: Determine activation database host
-  set_fact:
-    activation_db_host: >-
-      {{ eda_postgres_host ~ '.' ~ ansible_operator_meta.namespace ~ '.svc'
-         if ((managed_database | bool or aap_managed_database | bool)
-             and '.' not in eda_postgres_host)
-         else eda_postgres_host }}
+  ansible.builtin.include_tasks: qualify_database_host.yml
+  vars:
+    postgres_database_host: "{{ eda_postgres_host }}"
+    postgres_database_namespace: "{{ ansible_operator_meta.namespace }}"
+    postgres_database_is_eda_managed: "{{ managed_database }}"
+    postgres_database_is_aap_managed: "{{ aap_managed_database }}"
+    postgres_database_services: "{{ postgres_control_plane_services.resources }}"
+
+- name: Store activation database host
+  ansible.builtin.set_fact:
+    activation_db_host: "{{ postgres_qualified_database_host }}"
   no_log: "{{ no_log }}"
