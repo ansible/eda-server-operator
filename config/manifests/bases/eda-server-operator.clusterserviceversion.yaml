@@ -607,6 +607,11 @@ spec:
         path: activation_worker.topology_spread_constraints
         x-descriptors:
         - urn:alm:descriptor:com.tectonic.ui:advanced
+      - description: HorizontalPodAutoscaler configuration for the activation worker.
+        displayName: Autoscaling
+        path: activation_worker.autoscaling
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:advanced
       - description: "DEPRECATED: Redis is no longer used by EDA. This section is ignored."
         displayName: Redis deployment configuration (Deprecated)
         path: redis

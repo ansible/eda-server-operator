@@ -58,6 +58,13 @@ _activation_worker:
     requests:
       cpu: 25m
       memory: 150Mi
+  # CPU utilization is relative to requests; with the default 25m request,
+  # this target is illustrative and has not been validated under production load.
+  autoscaling:
+    enabled: false
+    min_replicas: 2
+    max_replicas: 6
+    target_cpu_utilization_percentage: 70
   node_selector: {}
   tolerations: []
   affinity: {}

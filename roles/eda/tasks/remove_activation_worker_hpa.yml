@@ -1,0 +1,9 @@
+---
+- name: Remove activation worker HPA
+  kubernetes.core.k8s:
+    api_version: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    name: "{{ ansible_operator_meta.name }}-activation-worker"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    state: absent
+    wait: true

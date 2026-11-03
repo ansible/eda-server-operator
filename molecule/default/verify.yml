@@ -15,6 +15,10 @@
           include_tasks: '{{ item }}'
           with_fileglob:
             - tasks/*_test.yml
+          when: item | basename != 'activation_worker_hpa_test.yml'
+
+        - name: Run activation worker HPA tests after the EDA fixture exists
+          ansible.builtin.include_tasks: tasks/activation_worker_hpa_test.yml
       rescue:
         - name: Retrieve relevant resources
           k8s_info:

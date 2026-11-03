@@ -9,7 +9,11 @@ metadata:
     {{ lookup("template", "../common/templates/labels/version.yaml.j2") | indent(width=4) | trim }}
     app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
 spec:
+{% if not combined_activation_worker.autoscaling.enabled | bool %}
   replicas: {{ combined_activation_worker.replicas }}
+{% elif activation_worker_bootstrap | default(false) | bool %}
+  replicas: {{ combined_activation_worker.autoscaling.min_replicas }}
+{% endif %}
 {% if combined_activation_worker.strategy is defined %}
   strategy:
     type: {{ combined_activation_worker.strategy.type }}

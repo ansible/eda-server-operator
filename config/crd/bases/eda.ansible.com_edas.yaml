@@ -3635,6 +3635,36 @@ spec:
                             type: array
                         type: object
                     type: object
+                  autoscaling:
+                    description: HorizontalPodAutoscaler configuration for the
+                      activation worker deployment.
+                    properties:
+                      enabled:
+                        description: Enable HorizontalPodAutoscaler for the activation
+                          worker deployment. When disabled, the deployment uses the
+                          fixed spec.activation_worker.replicas value.
+                        type: boolean
+                        default: false
+                      min_replicas:
+                        description: Minimum number of activation worker replicas
+                          when autoscaling is enabled.
+                        type: integer
+                        minimum: 1
+                        default: 2
+                      max_replicas:
+                        description: Maximum number of activation worker replicas
+                          when autoscaling is enabled.
+                        type: integer
+                        minimum: 1
+                        default: 6
+                      target_cpu_utilization_percentage:
+                        description: Target CPU utilization percentage for the activation
+                          worker deployment. The HPA scales based on the ratio of
+                          current CPU usage to the CPU request defined in spec.activation_worker.resource_requirements.requests.cpu.
+                        type: integer
+                        minimum: 1
+                        default: 70
+                    type: object
                 type: object
               worker:
                 description: (Deprecated) Defines desired state of eda-worker resources

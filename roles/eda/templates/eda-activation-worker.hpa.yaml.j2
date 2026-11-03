@@ -1,0 +1,23 @@
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: "{{ ansible_operator_meta.name }}-activation-worker"
+  namespace: "{{ ansible_operator_meta.namespace }}"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-activation-worker"
+  minReplicas: {{ combined_activation_worker.autoscaling.min_replicas }}
+  maxReplicas: {{ combined_activation_worker.autoscaling.max_replicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ combined_activation_worker.autoscaling.target_cpu_utilization_percentage }}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300

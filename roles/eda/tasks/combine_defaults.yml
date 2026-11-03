@@ -12,10 +12,10 @@
     combined_default_worker: "{{ _default_worker }}"
     combined_activation_worker: "{{ _activation_worker }}"
 
-- name: Combine worker params
+- name: Combine legacy worker params
   set_fact:
     combined_default_worker: "{{ _worker | combine(worker, recursive=True) }}"
-    combined_activation_worker: "{{ _worker | combine(worker, recursive=True) }}"
+    combined_activation_worker: "{{ combined_activation_worker | combine(worker, recursive=True) }}"
   when: worker is defined
 
 - name: Set default worker parameters when worker is not defined
@@ -24,8 +24,8 @@
   when:
     - default_worker is defined
 
-- name: Set activation worker parameters when worker is not defined
+- name: Combine activation worker parameters
   set_fact:
-    combined_activation_worker: "{{ _activation_worker | combine(activation_worker, recursive=True) }}"
+    combined_activation_worker: "{{ combined_activation_worker | combine(activation_worker, recursive=True) }}"
   when:
     - activation_worker is defined

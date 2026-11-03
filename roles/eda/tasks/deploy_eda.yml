@@ -46,6 +46,67 @@
     wait: yes
   when: public_base_url is defined
 
+- name: Read activation worker Deployment before autoscaling handoff
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-activation-worker"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    hidden_fields: []
+  register: activation_worker_deployment_before_autoscaling
+  when: combined_activation_worker.autoscaling.enabled | bool
+
+- name: Mark a new activation worker Deployment for minimum-replica bootstrap
+  ansible.builtin.set_fact:
+    activation_worker_bootstrap: >-
+      {{ activation_worker_deployment_before_autoscaling.resources | length == 0
+         or activation_worker_deployment_before_autoscaling.resources[0].spec.replicas | default(1) | int == 0 }}
+  when: combined_activation_worker.autoscaling.enabled | bool
+
+- name: Read activation worker apply bookkeeping before ownership handoff
+  ansible.builtin.set_fact:
+    activation_worker_last_applied: >-
+      {{ activation_worker_deployment_before_autoscaling.resources[0].metadata.annotations[
+         'kubectl.kubernetes.io/last-applied-configuration'] | from_json }}
+  when:
+    - combined_activation_worker.autoscaling.enabled | bool
+    - activation_worker_deployment_before_autoscaling.resources | length > 0
+    - >-
+      'kubectl.kubernetes.io/last-applied-configuration' in
+      activation_worker_deployment_before_autoscaling.resources[0].metadata.annotations | default({})
+
+- name: Remove replicas from activation worker apply bookkeeping during HPA handoff
+  ansible.builtin.set_fact:
+    activation_worker_last_applied_without_replicas: >-
+      {{ activation_worker_last_applied | combine({
+         'spec': (activation_worker_last_applied.spec | default({}) | dict2items
+                  | rejectattr('key', 'equalto', 'replicas') | list | items2dict)
+         }, recursive=False) }}
+  when:
+    - activation_worker_last_applied is defined
+    - activation_worker_last_applied.spec.replicas is defined
+
+- name: Release activation worker replicas from the previous apply definition
+  kubernetes.core.k8s_json_patch:
+    api_version: apps/v1
+    kind: Deployment
+    name: "{{ ansible_operator_meta.name }}-activation-worker"
+    namespace: "{{ ansible_operator_meta.namespace }}"
+    patch:
+      - op: test
+        path: /metadata/annotations/kubectl.kubernetes.io~1last-applied-configuration
+        value: >-
+          {{ activation_worker_deployment_before_autoscaling.resources[0].metadata.annotations[
+             'kubectl.kubernetes.io/last-applied-configuration'] }}
+      - op: replace
+        path: /metadata/annotations/kubectl.kubernetes.io~1last-applied-configuration
+        value: "{{ activation_worker_last_applied_without_replicas | to_json }}"
+  when: activation_worker_last_applied_without_replicas is defined
+
+- name: Remove activation worker HPA before restoring fixed replicas
+  ansible.builtin.include_tasks: remove_activation_worker_hpa.yml
+  when: not (combined_activation_worker.autoscaling.enabled | bool)
+
 - name: Apply Backend deployment resources
   k8s:
     apply: yes
@@ -60,6 +121,13 @@
     - 'eda-event-stream.configmap'
     - 'eda-event-stream.service'
     - 'eda-event-stream.deployment'
+
+- name: Apply activation worker HPA
+  kubernetes.core.k8s:
+    apply: yes
+    definition: "{{ lookup('template', 'eda-activation-worker.hpa.yaml.j2') }}"
+    wait: no
+  when: combined_activation_worker.autoscaling.enabled | bool
 
 - name: Apply event-stream ingress resources
   k8s:

@@ -4,6 +4,10 @@
 - name: Combine default and custom vars for each component
   include_tasks: combine_defaults.yml
 
+- name: Validate activation worker autoscaling settings
+  ansible.builtin.include_tasks: validate_activation_worker_autoscaling.yml
+  when: combined_activation_worker.autoscaling.enabled | bool
+
 - name: Warn if user still references redis configuration
   ansible.builtin.debug:
     msg: >-

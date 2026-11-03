@@ -1,0 +1,339 @@
+---
+- name: Set EDA role task directory for focused runtime tests
+  ansible.builtin.set_fact:
+    eda_role_tasks_dir: "{{ playbook_dir }}/../../roles/eda/tasks"
+
+- name: Load EDA role defaults for legacy worker merge regression
+  ansible.builtin.include_vars:
+    file: "{{ playbook_dir }}/../../roles/eda/defaults/main.yml"
+
+- name: Combine legacy and activation worker settings
+  ansible.builtin.include_tasks: "{{ eda_role_tasks_dir }}/combine_defaults.yml"
+  vars:
+    worker:
+      replicas: 3
+      resource_requirements:
+        requests:
+          cpu: 200m
+    activation_worker:
+      replicas: 4
+      autoscaling:
+        enabled: true
+
+- name: Assert activation worker overrides legacy worker while inheriting its settings
+  ansible.builtin.assert:
+    that:
+      - combined_activation_worker.replicas == 4
+      - combined_activation_worker.resource_requirements.requests.cpu == '200m'
+      - combined_activation_worker.autoscaling.enabled
+      - combined_activation_worker.autoscaling.min_replicas == 2
+
+- name: Validate an activation worker with a positive CPU request
+  ansible.builtin.include_tasks: "{{ eda_role_tasks_dir }}/validate_activation_worker_autoscaling.yml"
+  vars:
+    combined_activation_worker:
+      autoscaling:
+        enabled: true
+        min_replicas: 2
+        max_replicas: 6
+        target_cpu_utilization_percentage: 70
+      resource_requirements:
+        requests:
+          cpu: 25m
+
+- name: Reject inconsistent activation worker autoscaling bounds
+  block:
+    - name: Set invalid activation worker bounds
+      ansible.builtin.set_fact:
+        combined_activation_worker:
+          autoscaling:
+            enabled: true
+            min_replicas: 3
+            max_replicas: 2
+            target_cpu_utilization_percentage: 70
+          resource_requirements:
+            requests:
+              cpu: 25m
+
+    - name: Validate invalid activation worker bounds
+      ansible.builtin.include_tasks: "{{ eda_role_tasks_dir }}/validate_activation_worker_autoscaling.yml"
+
+    - name: Fail if invalid bounds were accepted
+      ansible.builtin.fail:
+        msg: "Unexpected validation success"
+  rescue:
+    - name: Assert invalid bounds fail with the documented validation message
+      ansible.builtin.assert:
+        that:
+          - "'activation_worker.autoscaling requires' in ansible_failed_result.msg"
+
+- name: Reject activation worker autoscaling without a positive CPU request
+  block:
+    - name: Set activation worker without CPU request
+      ansible.builtin.set_fact:
+        combined_activation_worker:
+          autoscaling:
+            enabled: true
+            min_replicas: 2
+            max_replicas: 6
+            target_cpu_utilization_percentage: 70
+          resource_requirements:
+            requests:
+              memory: 150Mi
+
+    - name: Validate activation worker without CPU request
+      ansible.builtin.include_tasks: "{{ eda_role_tasks_dir }}/validate_activation_worker_autoscaling.yml"
+
+    - name: Fail if missing CPU request was accepted
+      ansible.builtin.fail:
+        msg: "Unexpected validation success"
+  rescue:
+    - name: Assert missing CPU request fails clearly
+      ansible.builtin.assert:
+        that:
+          - "'activation_worker.autoscaling requires' in ansible_failed_result.msg"
+
+- name: Enable activation worker autoscaling with a fixed test range
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}"
+    definition:
+      spec:
+        activation_worker:
+          autoscaling:
+            enabled: true
+            min_replicas: 2
+            max_replicas: 6
+            target_cpu_utilization_percentage: 70
+
+- name: Wait for activation worker HPA creation
+  kubernetes.core.k8s_info:
+    api_version: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+  register: activation_worker_hpa
+  until: activation_worker_hpa.resources | length == 1
+  retries: 30
+  delay: 10
+
+- name: Assert activation worker HPA target and metric configuration
+  ansible.builtin.assert:
+    that:
+      - activation_worker_hpa.resources[0].spec.scaleTargetRef.apiVersion == 'apps/v1'
+      - activation_worker_hpa.resources[0].spec.scaleTargetRef.kind == 'Deployment'
+      - activation_worker_hpa.resources[0].spec.scaleTargetRef.name == eda_cr_name ~ '-activation-worker'
+      - activation_worker_hpa.resources[0].spec.minReplicas == 2
+      - activation_worker_hpa.resources[0].spec.maxReplicas == 6
+      - activation_worker_hpa.resources[0].spec.metrics[0].resource.name == 'cpu'
+      - activation_worker_hpa.resources[0].spec.metrics[0].resource.target.averageUtilization == 70
+      - activation_worker_hpa.resources[0].spec.behavior.scaleDown.stabilizationWindowSeconds == 300
+
+- name: Wait for activation worker minimum replica bootstrap
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+    hidden_fields: []
+  register: activation_worker_deployment
+  until:
+    - activation_worker_deployment.resources | length == 1
+    - activation_worker_deployment.resources[0].spec.replicas | default(1) == 2
+  retries: 30
+  delay: 10
+
+- name: Assert apply bookkeeping no longer owns activation worker replicas
+  ansible.builtin.assert:
+    that:
+      - >-
+        (activation_worker_deployment.resources[0].metadata.annotations[
+        'kubectl.kubernetes.io/last-applied-configuration'] | from_json).spec.replicas is not defined
+    fail_msg: "The EDA operator apply definition still owns activation-worker spec.replicas"
+
+- name: Set exact test scale bounds for repeated reconciliation
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}"
+    definition:
+      spec:
+        activation_worker:
+          autoscaling:
+            min_replicas: 3
+            max_replicas: 3
+
+- name: Wait for exact activation worker test bounds
+  kubernetes.core.k8s_info:
+    api_version: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+  register: activation_worker_hpa
+  until:
+    - activation_worker_hpa.resources | length == 1
+    - activation_worker_hpa.resources[0].spec.minReplicas == 3
+    - activation_worker_hpa.resources[0].spec.maxReplicas == 3
+  retries: 30
+  delay: 10
+
+- name: Set the activation worker to an externally selected HPA scale
+  kubernetes.core.k8s:
+    state: patched
+    api_version: apps/v1
+    kind: Deployment
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+    definition:
+      spec:
+        replicas: 3
+
+- name: Change HPA target to exercise repeated reconciliation
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}"
+    definition:
+      spec:
+        activation_worker:
+          autoscaling:
+            target_cpu_utilization_percentage: 71
+
+- name: Wait for activation worker HPA reconciliation
+  kubernetes.core.k8s_info:
+    api_version: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+  register: activation_worker_hpa
+  until:
+    - activation_worker_hpa.resources | length == 1
+    - activation_worker_hpa.resources[0].spec.metrics[0].resource.target.averageUtilization == 71
+  retries: 30
+  delay: 10
+
+- name: Read activation worker after repeated HPA reconciliation
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+    hidden_fields: []
+  register: activation_worker_deployment
+  until:
+    - activation_worker_deployment.resources | length == 1
+    - activation_worker_deployment.resources[0].spec.replicas == 3
+  retries: 10
+  delay: 5
+
+- name: Assert repeated reconciliation preserves HPA-selected replicas
+  ansible.builtin.assert:
+    that:
+      - activation_worker_deployment.resources[0].spec.replicas == 3
+      - >-
+        (activation_worker_deployment.resources[0].metadata.annotations[
+        'kubectl.kubernetes.io/last-applied-configuration'] | from_json).spec.replicas is not defined
+
+- name: Disable activation worker autoscaling
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}"
+    definition:
+      spec:
+        activation_worker:
+          autoscaling:
+            enabled: false
+
+- name: Wait for activation worker HPA removal before restoring fixed replicas
+  kubernetes.core.k8s_info:
+    api_version: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+  register: activation_worker_hpa
+  until: activation_worker_hpa.resources | length == 0
+  retries: 30
+  delay: 10
+
+- name: Wait for fixed activation worker replicas after disabling autoscaling
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: "{{ namespace }}"
+    name: "{{ eda_cr_name }}-activation-worker"
+  register: activation_worker_deployment
+  until:
+    - activation_worker_deployment.resources | length == 1
+    - activation_worker_deployment.resources[0].spec.replicas == 2
+  retries: 30
+  delay: 10
+
+- name: Re-enable autoscaling after a simulated idle scale-down
+  block:
+    - name: Ensure HPA is absent before idling the activation worker
+      ansible.builtin.include_tasks: "{{ eda_role_tasks_dir }}/remove_activation_worker_hpa.yml"
+      vars:
+        ansible_operator_meta:
+          name: "{{ eda_cr_name }}"
+          namespace: "{{ namespace }}"
+
+    - name: Scale activation worker to zero for idle simulation
+      kubernetes.core.k8s:
+        state: patched
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: "{{ eda_cr_name }}-activation-worker"
+        definition:
+          spec:
+            replicas: 0
+
+    - name: Re-enable activation worker autoscaling for resume
+      kubernetes.core.k8s:
+        state: patched
+        api_version: eda.ansible.com/v1alpha1
+        kind: EDA
+        namespace: "{{ namespace }}"
+        name: "{{ eda_cr_name }}"
+        definition:
+          spec:
+            activation_worker:
+              autoscaling:
+                enabled: true
+                min_replicas: 3
+                max_replicas: 3
+                target_cpu_utilization_percentage: 71
+
+    - name: Wait for activation worker HPA to resume the idle Deployment
+      kubernetes.core.k8s_info:
+        api_version: autoscaling/v2
+        kind: HorizontalPodAutoscaler
+        namespace: "{{ namespace }}"
+        name: "{{ eda_cr_name }}-activation-worker"
+      register: activation_worker_hpa
+      until: activation_worker_hpa.resources | length == 1
+      retries: 30
+      delay: 10
+
+    - name: Wait for activation worker to resume at the configured minimum
+      kubernetes.core.k8s_info:
+        api_version: apps/v1
+        kind: Deployment
+        namespace: "{{ namespace }}"
+        name: "{{ eda_cr_name }}-activation-worker"
+      register: activation_worker_deployment
+      until:
+        - activation_worker_deployment.resources | length == 1
+        - activation_worker_deployment.resources[0].spec.replicas == 3
+      retries: 30
+      delay: 10

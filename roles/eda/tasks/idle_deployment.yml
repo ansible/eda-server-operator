@@ -1,4 +1,7 @@
 ---
+- name: Remove activation worker HPA before idling deployments
+  ansible.builtin.include_tasks: remove_activation_worker_hpa.yml
+
 - name: Scale down EDA Deployments
   kubernetes.core.k8s:
     state: present
