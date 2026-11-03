@@ -29,7 +29,10 @@ spec:
       ports:
         - protocol: TCP
           port: {{ event_stream_nginx_port }}
-    # Allow traffic from the gateway operator and other EDA pods
+    # Allow traffic from the gateway operator and other EDA pods.
+    # namespaceSelector: {} + podSelector (same list item = AND) allows the
+    # operator pod to reach the event stream when it runs in a separate
+    # namespace.
     - from:
         - podSelector:
             matchExpressions:
@@ -38,7 +41,8 @@ spec:
                 values:
                   - '{{ deployment_type }}-operator'
                   - 'aap-operator'
-        - podSelector:
+        - namespaceSelector: {}
+          podSelector:
             matchLabels:
               control-plane: controller-manager
       ports:
