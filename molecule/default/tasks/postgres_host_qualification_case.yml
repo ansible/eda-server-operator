@@ -13,6 +13,7 @@
   ansible.builtin.assert:
     that:
       - postgres_qualified_database_host == database_host_case.expected
+      - postgres_database_host_requires_namespace_qualification == database_host_case.expected_namespace_qualification
     fail_msg: >-
       {{ database_host_case.path }} host '{{ database_host_case.secret.host }}' was derived as
       '{{ postgres_qualified_database_host }}', expected '{{ database_host_case.expected }}'.

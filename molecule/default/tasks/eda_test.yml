@@ -44,14 +44,20 @@
   retries: 10
   delay: 5
 
-- name: Assert initial data uses namespace-qualified managed database hosts
+- name: Assert initial data derives namespace-qualified managed database hosts from Secrets
   ansible.builtin.assert:
     that:
-      - _activation_db_host == eda_cr_name ~ '-postgres-' ~ supported_pg_version ~ '.' ~ namespace ~ '.svc'
-      - _event_persistence_db_host == eda_cr_name ~ '-postgres-' ~ supported_pg_version ~ '.' ~ namespace ~ '.svc'
+      - _activation_db_host == '$(EDA_ACTIVATION_DB_SERVICE_HOST).' ~ namespace ~ '.svc'
+      - _activation_db_service_host.secretKeyRef.name == eda_cr_name ~ '-postgres-configuration'
+      - _activation_db_service_host.secretKeyRef.key == 'host'
+      - _event_persistence_db_host == '$(EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST).' ~ namespace ~ '.svc'
+      - >-
+        _event_persistence_db_service_host.secretKeyRef.name == eda_cr_name
+        ~ '-event-persistence-postgres-configuration'
+      - _event_persistence_db_service_host.secretKeyRef.key == 'host'
     fail_msg: >-
       EDA_ACTIVATION_DB_HOST and EDA_EVENT_PERSISTENCE_DB_HOST must be
-      namespace-qualified for the managed database: {{ _initial_data_env }}
+      derived from the current managed database Secret: {{ _initial_data_env }}
   vars:
     _initial_data_env: >-
       {{ api_deployment_initial.resources[0].spec.template.spec.initContainers
@@ -63,10 +69,20 @@
          | selectattr('name', 'equalto', 'EDA_ACTIVATION_DB_HOST')
          | map(attribute='value')
          | first }}
+    _activation_db_service_host: >-
+      {{ _initial_data_env
+         | selectattr('name', 'equalto', 'EDA_ACTIVATION_DB_SERVICE_HOST')
+         | map(attribute='valueFrom')
+         | first }}
     _event_persistence_db_host: >-
       {{ _initial_data_env
          | selectattr('name', 'equalto', 'EDA_EVENT_PERSISTENCE_DB_HOST')
          | map(attribute='value')
+         | first }}
+    _event_persistence_db_service_host: >-
+      {{ _initial_data_env
+         | selectattr('name', 'equalto', 'EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST')
+         | map(attribute='valueFrom')
          | first }}
 
 - name: Verify default-deny NetworkPolicy exists

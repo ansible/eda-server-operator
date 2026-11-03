@@ -2,14 +2,20 @@
 # The EDA-managed marker is set only for the operator-provisioned local DB.
 # AAP's ownership marker is also used for external DBs, so require an actual
 # Service name match before qualifying an AAP-managed host.
+- name: Determine whether the database host requires namespace qualification
+  ansible.builtin.set_fact:
+    postgres_database_host_requires_namespace_qualification: >-
+      {{ '.' not in postgres_database_host and
+         (postgres_database_is_eda_managed | bool or
+          (postgres_database_is_aap_managed | bool and
+           postgres_database_host in (postgres_database_services | default([])
+             | map(attribute='metadata.name') | list))) }}
+  no_log: "{{ no_log }}"
+
 - name: Derive a namespace-qualified host only for managed local Services
   ansible.builtin.set_fact:
     postgres_qualified_database_host: >-
       {{ postgres_database_host ~ '.' ~ postgres_database_namespace ~ '.svc'
-         if ('.' not in postgres_database_host and
-             (postgres_database_is_eda_managed | bool or
-              (postgres_database_is_aap_managed | bool and
-               postgres_database_host in (postgres_database_services | default([])
-                 | map(attribute='metadata.name') | list))))
+         if postgres_database_host_requires_namespace_qualification | bool
          else postgres_database_host }}
   no_log: "{{ no_log }}"

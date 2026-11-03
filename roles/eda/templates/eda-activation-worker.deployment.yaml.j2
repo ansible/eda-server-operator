@@ -91,8 +91,21 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: host
+{% if activation_db_host_requires_namespace_qualification | bool %}
+        - name: EDA_ACTIVATION_DB_SERVICE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
         - name: EDA_ACTIVATION_DB_HOST
-          value: '{{ activation_db_host }}'
+          value: '$(EDA_ACTIVATION_DB_SERVICE_HOST).{{ ansible_operator_meta.namespace }}.svc'
+{% else %}
+        - name: EDA_ACTIVATION_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+{% endif %}
         - name: EDA_DB_NAME
           valueFrom:
             secretKeyRef:
@@ -120,8 +133,21 @@ spec:
               key: secret_key
 {% if __event_persistence_database_secret is defined %}
         # Event persistence database credentials
+{% if event_persistence_db_host_requires_namespace_qualification | bool %}
+        - name: EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
         - name: EDA_EVENT_PERSISTENCE_DB_HOST
-          value: '{{ event_persistence_db_host }}'
+          value: '$(EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST).{{ ansible_operator_meta.namespace }}.svc'
+{% else %}
+        - name: EDA_EVENT_PERSISTENCE_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
+{% endif %}
         - name: EDA_EVENT_PERSISTENCE_DB_PORT
           valueFrom:
             secretKeyRef:
@@ -189,8 +215,21 @@ spec:
             secretKeyRef:
               name: '{{ __database_secret }}'
               key: host
+{% if activation_db_host_requires_namespace_qualification | bool %}
+        - name: EDA_ACTIVATION_DB_SERVICE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
         - name: EDA_ACTIVATION_DB_HOST
-          value: '{{ activation_db_host }}'
+          value: '$(EDA_ACTIVATION_DB_SERVICE_HOST).{{ ansible_operator_meta.namespace }}.svc'
+{% else %}
+        - name: EDA_ACTIVATION_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __database_secret }}'
+              key: host
+{% endif %}
         - name: EDA_DB_NAME
           valueFrom:
             secretKeyRef:
@@ -218,8 +257,21 @@ spec:
               key: secret_key
 {% if __event_persistence_database_secret is defined %}
         # Event persistence database credentials
+{% if event_persistence_db_host_requires_namespace_qualification | bool %}
+        - name: EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
         - name: EDA_EVENT_PERSISTENCE_DB_HOST
-          value: '{{ event_persistence_db_host }}'
+          value: '$(EDA_EVENT_PERSISTENCE_DB_SERVICE_HOST).{{ ansible_operator_meta.namespace }}.svc'
+{% else %}
+        - name: EDA_EVENT_PERSISTENCE_DB_HOST
+          valueFrom:
+            secretKeyRef:
+              name: '{{ __event_persistence_database_secret }}'
+              key: host
+{% endif %}
         - name: EDA_EVENT_PERSISTENCE_DB_PORT
           valueFrom:
             secretKeyRef:

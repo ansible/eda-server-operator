@@ -43,4 +43,6 @@
 - name: Store activation database host
   ansible.builtin.set_fact:
     activation_db_host: "{{ postgres_qualified_database_host }}"
+    activation_db_host_requires_namespace_qualification: >-
+      {{ postgres_database_host_requires_namespace_qualification }}
   no_log: "{{ no_log }}"
