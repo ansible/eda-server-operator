@@ -13,3 +13,36 @@
 - name: Determine if database is managed based on secret values
   set_fact:
     managed_database: "{{ pg_config['resources'][0]['data']['type'] | default('') | b64decode == 'managed' }}"
+
+- name: Determine if database configuration is managed by AAP
+  set_fact:
+    aap_managed_database: >-
+      {{ (pg_config['resources'][0]['data']['managed_by_aap']
+          | default('false' | b64encode)
+          | b64decode
+          | lower) == 'true' }}
+  no_log: "{{ no_log }}"
+
+- name: Read Services in the control-plane namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Service
+    namespace: "{{ ansible_operator_meta.namespace }}"
+  register: postgres_control_plane_services
+  no_log: "{{ no_log }}"
+
+- name: Determine activation database host
+  ansible.builtin.include_tasks: qualify_database_host.yml
+  vars:
+    postgres_database_host: "{{ eda_postgres_host }}"
+    postgres_database_namespace: "{{ ansible_operator_meta.namespace }}"
+    postgres_database_is_eda_managed: "{{ managed_database }}"
+    postgres_database_is_aap_managed: "{{ aap_managed_database }}"
+    postgres_database_services: "{{ postgres_control_plane_services.resources }}"
+
+- name: Store activation database host
+  ansible.builtin.set_fact:
+    activation_db_host: "{{ postgres_qualified_database_host }}"
+    activation_db_host_requires_namespace_qualification: >-
+      {{ postgres_database_host_requires_namespace_qualification }}
+  no_log: "{{ no_log }}"

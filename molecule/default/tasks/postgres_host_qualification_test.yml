@@ -1,0 +1,73 @@
+---
+- name: Verify synthetic managed and AAP-owned database host cases
+  ansible.builtin.include_tasks: postgres_host_qualification_case.yml
+  loop:
+    - path: activation
+      secret:
+        host: corpdb
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: unrelated-service
+      expected: corpdb
+      expected_namespace_qualification: false
+    - path: event persistence
+      secret:
+        host: corpdb
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: unrelated-service
+      expected: corpdb
+      expected_namespace_qualification: false
+    - path: activation
+      secret:
+        host: 2001:db8::10
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: unrelated-service
+      expected: 2001:db8::10
+      expected_namespace_qualification: false
+    - path: event persistence
+      secret:
+        host: 2001:db8::10
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: unrelated-service
+      expected: 2001:db8::10
+      expected_namespace_qualification: false
+    - path: activation
+      secret:
+        host: aap-postgres
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: aap-postgres
+      expected: aap-postgres.postgres-host-test.svc
+      expected_namespace_qualification: true
+    - path: event persistence
+      secret:
+        host: aap-postgres
+        type: unmanaged
+        managed_by_aap: true
+      services:
+        - metadata:
+            name: aap-postgres
+      expected: aap-postgres.postgres-host-test.svc
+      expected_namespace_qualification: true
+    - path: EDA-managed database
+      secret:
+        host: eda-demo-postgres-15
+        type: managed
+      services: []
+      expected: eda-demo-postgres-15.postgres-host-test.svc
+      expected_namespace_qualification: true
+  loop_control:
+    loop_var: database_host_case

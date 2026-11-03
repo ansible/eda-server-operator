@@ -122,8 +122,19 @@ For the operator-managed PostgreSQL database, the Service endpoint is
 host and port configured for the event source if they differ, particularly
 when using an external database.
 
-For a PostgreSQL-backed event source in a separate execution namespace, allow
-both of these paths:
+For an EDA-managed database, the operator sets `EDA_ACTIVATION_DB_HOST` (and,
+when configured, `EDA_EVENT_PERSISTENCE_DB_HOST`) to the namespace-qualified
+Service name when the configured host is unqualified (contains no dot). For an
+AAP-managed database configuration, it qualifies an unqualified host only if
+that exact name matches a Service in the control-plane namespace;
+`managed_by_aap` alone does not identify a local database Service. Hosts that
+contain a dot are left unchanged. An AAP-managed host with no matching Service
+is also left unchanged. Ensure an unmanaged/external host resolves and is
+reachable from the execution namespace. For example, an in-cluster database
+may need a Service or alias with that hostname in the execution namespace.
+
+When a PostgreSQL database is backed by Pods in another namespace, allow both
+of these paths:
 
 1. Egress from activation Pods to the database Pods on the configured
    PostgreSQL TCP port. If execution-namespace egress is restricted, add this
@@ -192,12 +203,14 @@ spec:
           port: 5432
 ```
 
-These examples apply to the operator-managed database. For an external
-database, allow the configured destination and port using the applicable
-execution-namespace egress policy and external firewall or database controls;
-there is no in-cluster PostgreSQL Pod NetworkPolicy to update. Do not expect a
-PostgreSQL-backed event source to work when either required network path is
-denied.
+These examples apply to PostgreSQL Pods managed by the EDA operator. For an
+unmanaged/external database, allow the configured destination and port using
+the applicable execution-namespace egress policy and external firewall or
+database controls. If that database is backed by Pods in the cluster, also
+ensure its namespace's NetworkPolicies allow the required ingress from the
+execution namespace; the EDA operator does not manage those policies. Do not
+expect a PostgreSQL-backed event source to work when either required network
+path is denied.
 
 ## Validate on an enforced-policy OpenShift cluster
 
