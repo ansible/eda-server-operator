@@ -4,11 +4,42 @@
   collections:
     - kubernetes.core
   tasks:
-    - name: Delete all activation Jobs
+    - name: Look up the EDA environment ConfigMap
+      k8s_info:
+        api_version: v1
+        kind: ConfigMap
+        namespace: '{{ ansible_operator_meta.namespace }}'
+        name: '{{ ansible_operator_meta.name }}-eda-env-properties'
+      register: eda_environment_configmap
+
+    - name: Record the configured activation Job namespace
+      set_fact:
+        activation_job_namespace: >-
+          {{ ((eda_environment_configmap.resources | first | default({})).data | default({}))
+             .get('EDA_ACTIVATION_JOB_NAMESPACE', '') }}
+
+    - name: Delete activation Jobs from all configured namespaces
       k8s:
         api_version: batch/v1
         kind: Job
-        namespace: '{{ ansible_operator_meta.namespace }}'
+        namespace: '{{ item }}'
         state: absent
         label_selectors:
           - "app=eda"
+      loop: >-
+        {{ [ansible_operator_meta.namespace, activation_job_namespace]
+           | reject('equalto', '') | unique | list }}
+
+    - name: Delete cross-namespace activation Job RBAC
+      k8s:
+        api_version: rbac.authorization.k8s.io/v1
+        kind: '{{ item }}'
+        namespace: '{{ activation_job_namespace }}'
+        name: '{{ ansible_operator_meta.name }}-activation-job-manager'
+        state: absent
+      loop:
+        - RoleBinding
+        - Role
+      when:
+        - activation_job_namespace | length > 0
+        - activation_job_namespace != ansible_operator_meta.namespace

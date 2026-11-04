@@ -1,0 +1,310 @@
+---
+- name: Apply placement settings to every EDA component
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        api:
+          replicas: 1
+          resource_requirements:
+            requests:
+              cpu: 101m
+              memory: 201Mi
+            limits:
+              cpu: 301m
+              memory: 1Gi
+          node_selector:
+            kubernetes.io/os: linux
+          tolerations:
+            - key: eda.example.com/component
+              operator: Equal
+              value: api
+              effect: NoSchedule
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/component: '{{ deployment_type }}-api'
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+        default_worker:
+          replicas: 1
+          resource_requirements:
+            requests:
+              cpu: 102m
+              memory: 202Mi
+            limits:
+              cpu: 302m
+              memory: 402Mi
+          node_selector:
+            kubernetes.io/os: linux
+          tolerations:
+            - key: eda.example.com/component
+              operator: Equal
+              value: default-worker
+              effect: NoSchedule
+          topology_spread_constraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/component: '{{ deployment_type }}-default-worker'
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+        activation_worker:
+          replicas: 1
+          resource_requirements:
+            requests:
+              cpu: 103m
+              memory: 203Mi
+            limits:
+              cpu: 303m
+              memory: 403Mi
+          node_selector:
+            kubernetes.io/os: linux
+          tolerations:
+            - key: eda.example.com/component
+              operator: Equal
+              value: activation-worker
+              effect: NoSchedule
+          topology_spread_constraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/component: '{{ deployment_type }}-activation-worker'
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+        event_stream:
+          replicas: 1
+          resource_requirements:
+            requests:
+              cpu: 104m
+              memory: 204Mi
+            limits:
+              cpu: 304m
+              memory: 404Mi
+          node_selector:
+            kubernetes.io/os: linux
+          tolerations:
+            - key: eda.example.com/component
+              operator: Equal
+              value: event-stream
+              effect: NoSchedule
+          topology_spread_constraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/component: '{{ deployment_type }}-event-stream'
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+        ui:
+          replicas: 1
+          resource_requirements:
+            requests:
+              cpu: 105m
+              memory: 205Mi
+            limits:
+              cpu: 305m
+              memory: 405Mi
+          node_selector:
+            kubernetes.io/os: linux
+          tolerations:
+            - key: eda.example.com/component
+              operator: Equal
+              value: ui
+              effect: NoSchedule
+          topology_spread_constraints:
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: '{{ deployment_type }}-ui'
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    topologyKey: kubernetes.io/hostname
+                    labelSelector:
+                      matchLabels:
+                        app.kubernetes.io/component: '{{ deployment_type }}-ui'
+          strategy:
+            type: RollingUpdate
+            rollingUpdate:
+              maxSurge: 1
+              maxUnavailable: 0
+
+- name: Wait for component Deployments to receive placement settings
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ item.deployment }}'
+  register: component_deployments
+  until:
+    - component_deployments.resources | length > 0
+    - component_deployments.resources[0].spec.replicas == item.replicas
+    - >-
+      (component_deployments.resources[0].spec.template.spec.nodeSelector | default({}))
+      .get('kubernetes.io/os', '') == 'linux'
+  retries: 30
+  delay: 10
+  loop:
+    - deployment: api
+      component: api
+      container: eda-api
+      replicas: 1
+      request_cpu: 101m
+      request_memory: 201Mi
+      limit_cpu: 301m
+      limit_memory: 1Gi
+    - deployment: default-worker
+      component: default-worker
+      container: eda-default-worker
+      replicas: 1
+      request_cpu: 102m
+      request_memory: 202Mi
+      limit_cpu: 302m
+      limit_memory: 402Mi
+    - deployment: activation-worker
+      component: activation-worker
+      container: eda-activation-worker
+      replicas: 1
+      request_cpu: 103m
+      request_memory: 203Mi
+      limit_cpu: 303m
+      limit_memory: 403Mi
+    - deployment: event-stream
+      component: event-stream
+      container: eda-event-stream
+      replicas: 1
+      request_cpu: 104m
+      request_memory: 204Mi
+      limit_cpu: 304m
+      limit_memory: 404Mi
+    - deployment: ui
+      component: ui
+      container: eda-ui
+      replicas: 1
+      request_cpu: 105m
+      request_memory: 205Mi
+      limit_cpu: 305m
+      limit_memory: 405Mi
+
+- name: Assert every component Deployment preserves the placement contract
+  ansible.builtin.assert:
+    that:
+      - _deployment.spec.replicas == _component.replicas
+      - _deployment.spec.strategy.type == 'RollingUpdate'
+      - _deployment.spec.strategy.rollingUpdate.maxSurge | string == '1'
+      - _deployment.spec.strategy.rollingUpdate.maxUnavailable | string == '0'
+      - _pod_spec.nodeSelector['kubernetes.io/os'] == 'linux'
+      - _toleration | length == 1
+      - _toleration[0].value == _component.component
+      - _toleration[0].effect == 'NoSchedule'
+      - _anti_affinity | length == 1
+      - _anti_affinity[0].weight == 100
+      - _anti_affinity[0].podAffinityTerm.topologyKey == 'kubernetes.io/hostname'
+      - >-
+        _anti_affinity[0].podAffinityTerm.labelSelector.matchLabels['app.kubernetes.io/component']
+        == deployment_type + '-' + _component.component
+      - _container.resources.requests.cpu == _component.request_cpu
+      - _container.resources.requests.memory == _component.request_memory
+      - _container.resources.limits.cpu == _component.limit_cpu
+      - _container.resources.limits.memory == _component.limit_memory
+    fail_msg: >-
+      {{ _component.deployment }} Deployment does not match the placement settings
+      from the EDA CR: {{ _deployment }}
+  vars:
+    _component: '{{ item.item }}'
+    _deployment: '{{ item.resources[0] }}'
+    _pod_spec: '{{ _deployment.spec.template.spec }}'
+    _container: "{{ _pod_spec.containers | selectattr('name', 'equalto', _component.container) | first }}"
+    _toleration: "{{ _pod_spec.tolerations | selectattr('key', 'equalto', 'eda.example.com/component') | list }}"
+    _anti_affinity: '{{ _pod_spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution }}'
+  loop: '{{ component_deployments.results }}'
+
+- name: Wait for non-API Deployments to receive topology spread constraints
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: Deployment
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ item.item.deployment }}'
+  register: non_api_topology_deployments
+  until:
+    - non_api_topology_deployments.resources | length > 0
+    - non_api_topology_deployments.resources[0].spec.template.spec.topologySpreadConstraints is defined
+  retries: 30
+  delay: 10
+  loop: "{{ component_deployments.results | rejectattr('item.component', 'equalto', 'api') | list }}"
+
+- name: Assert topology spread constraints for non-API Deployments
+  ansible.builtin.assert:
+    that:
+      - _constraints | length == 1
+      - _constraints[0].maxSkew == 1
+      - _constraints[0].topologyKey == 'kubernetes.io/hostname'
+      - _constraints[0].whenUnsatisfiable == 'ScheduleAnyway'
+      - >-
+        _constraints[0].labelSelector.matchLabels['app.kubernetes.io/component']
+        == deployment_type + '-' + _component.component
+    fail_msg: >-
+      {{ _component.deployment }} Deployment topologySpreadConstraints do not match
+      the EDA CR: {{ _constraints }}
+  vars:
+    _component: '{{ item.item.item }}'
+    _constraints: '{{ item.resources[0].spec.template.spec.topologySpreadConstraints }}'
+  loop: '{{ non_api_topology_deployments.results }}'

@@ -1,0 +1,65 @@
+---
+- name: Configure application settings and ServiceAccount annotations
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        extra_settings:
+          - setting: EDA_K8S_CPU_LIMIT
+            value: 500m
+          - setting: EDA_K8S_MEM_LIMIT
+            value: 512Mi
+          - setting: EDA_ALLOWED_SERVICE_ACCOUNTS
+            value: eda-workload
+          - setting: EDA_ACTIVATION_DB_LOG_RETENTION_DAYS
+            value: '30'
+        service_account_annotations: |
+          eda.ansible.com/test-annotation: configured
+
+- name: Wait for the EDA environment ConfigMap to receive application settings
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+  register: configured_eda_environment_configmap
+  until:
+    - configured_eda_environment_configmap.resources | length > 0
+    - configured_eda_environment_configmap.resources[0].data.get('EDA_K8S_CPU_LIMIT', '') == '500m'
+    - configured_eda_environment_configmap.resources[0].data.get('EDA_K8S_MEM_LIMIT', '') == '512Mi'
+    - configured_eda_environment_configmap.resources[0].data.get('EDA_ALLOWED_SERVICE_ACCOUNTS', '') == 'eda-workload'
+    - configured_eda_environment_configmap.resources[0].data.get('EDA_ACTIVATION_DB_LOG_RETENTION_DAYS', '') == '30'
+  retries: 30
+  delay: 10
+
+- name: Wait for the EDA ServiceAccount to receive annotations from the CR
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ServiceAccount
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+  register: eda_service_account
+  until:
+    - eda_service_account.resources | length == 1
+    - eda_service_account.resources[0].metadata.annotations['eda.ansible.com/test-annotation'] == 'configured'
+  retries: 30
+  delay: 10
+
+- name: Assert application settings and ServiceAccount annotations were rendered
+  ansible.builtin.assert:
+    that:
+      - _settings['EDA_K8S_CPU_LIMIT'] == '500m'
+      - _settings['EDA_K8S_MEM_LIMIT'] == '512Mi'
+      - _settings['EDA_ALLOWED_SERVICE_ACCOUNTS'] == 'eda-workload'
+      - _settings['EDA_ACTIVATION_DB_LOG_RETENTION_DAYS'] == '30'
+      - _service_account.metadata.annotations['eda.ansible.com/test-annotation'] == 'configured'
+    fail_msg: >-
+      EDA application settings or ServiceAccount annotations were not rendered from
+      the EDA CR: settings={{ _settings }}, service_account={{ _service_account }}
+  vars:
+    _settings: '{{ configured_eda_environment_configmap.resources[0].data }}'
+    _service_account: '{{ eda_service_account.resources[0] }}'
