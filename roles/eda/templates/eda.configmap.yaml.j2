@@ -45,6 +45,16 @@ data:
 {% endif %}
 {% endif %}
 
+  # Database TLS: the sslmode of the database configuration secret (as for the event stream and
+  # event persistence databases); with certificate verification, the system trust store, which
+  # includes bundle_cacert_secret when it is set.
+{% if 'EDA_PGSSLMODE' not in _user_settings %}
+  EDA_PGSSLMODE: "{{ eda_postgres_sslmode }}"
+{% endif %}
+{% if eda_postgres_sslmode in ['verify-ca', 'verify-full'] and 'EDA_PGSSLROOTCERT' not in _user_settings %}
+  EDA_PGSSLROOTCERT: "/etc/pki/tls/certs/ca-bundle.crt"
+{% endif %}
+
   # Custom user variables
 {% for item in extra_settings | default([]) %}
   {{ item.setting | upper }}: "{{ item.value }}"
