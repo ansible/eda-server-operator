@@ -56,3 +56,6 @@
 
 - name: Patch Labels
   include_tasks: patch_labels.yml
+
+- name: Strip last-applied-configuration from operator-managed secrets
+  ansible.builtin.include_tasks: strip_secret_last_applied.yml
