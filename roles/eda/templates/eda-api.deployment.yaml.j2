@@ -83,6 +83,29 @@ spec:
         {{ combined_api.affinity | to_nice_yaml | indent(width=8) }}
 {% endif %}
       initContainers:
+{% if bundle_ca_crt  %}
+{# Runs first: the init containers below connect to the database and need the bundle CA
+   when sslmode is verify-ca or verify-full. #}
+      - name: configure-bundle-ca-cert
+        image: {{ _image }}
+        imagePullPolicy: '{{ image_pull_policy }}'
+        command:
+          - /bin/sh
+          - -c
+          - |
+            mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
+            update-ca-trust extract --output /etc/pki/ca-trust/extracted
+{% if combined_api.resource_requirements is defined %}
+        resources: {{ combined_api.resource_requirements }}
+{% endif %}
+        volumeMounts:
+          - name: "ca-trust-extracted"
+            mountPath: "/etc/pki/ca-trust/extracted"
+          - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
+            mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
+            subPath: bundle-ca.crt
+            readOnly: true
+{% endif %}
       - name: run-migrations
         image: {{ _image }}
         imagePullPolicy: '{{ image_pull_policy }}'
@@ -144,6 +167,12 @@ spec:
               key: secret_key
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
+{% endif %}
+{% if bundle_ca_crt %}
+        volumeMounts:
+          - name: "ca-trust-extracted"
+            mountPath: "/etc/pki/ca-trust/extracted"
+            readOnly: true
 {% endif %}
       - name: eda-initial-data
         image: {{ _image }}
@@ -261,31 +290,17 @@ spec:
 {% if combined_api.resource_requirements is defined %}
         resources: {{ combined_api.resource_requirements }}
 {% endif %}
-{% if not ui_disabled %}
+{% if not ui_disabled or bundle_ca_crt %}
         volumeMounts:
+{% if not ui_disabled %}
           - name: static-files
             mountPath: {{ static_path }}
 {% endif %}
-{% if bundle_ca_crt  %}
-      - name: configure-bundle-ca-cert
-        image: {{ _image }}
-        imagePullPolicy: '{{ image_pull_policy }}'
-        command:
-          - /bin/sh
-          - -c
-          - |
-            mkdir -p /etc/pki/ca-trust/extracted/{java,pem,openssl,edk2}
-            update-ca-trust extract --output /etc/pki/ca-trust/extracted
-{% if combined_api.resource_requirements is defined %}
-        resources: {{ combined_api.resource_requirements }}
-{% endif %}
-        volumeMounts:
+{% if bundle_ca_crt %}
           - name: "ca-trust-extracted"
             mountPath: "/etc/pki/ca-trust/extracted"
-          - name: "{{ ansible_operator_meta.name }}-bundle-cacert"
-            mountPath: /etc/pki/ca-trust/source/anchors/bundle-ca.crt
-            subPath: bundle-ca.crt
             readOnly: true
+{% endif %}
 {% endif %}
       containers:
       - name: eda-api
