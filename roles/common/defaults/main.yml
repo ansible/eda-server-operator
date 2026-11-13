@@ -21,3 +21,8 @@ set_self_labels: true
 is_k8s: false
 is_openshift: false
 
+# Field managers that mean GitOps / oc apply owns last-applied-configuration.
+# Skip strip when any of these is present so oc apply / ArgoCD / Flux 3-way merge
+# keeps working even if the Secret uses this CR's generated default name.
+_gitops_field_manager_regex: '^(kubectl|oc|argocd|flux|kustomize-controller|helm)'
+
