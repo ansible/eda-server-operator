@@ -112,6 +112,11 @@ data:
 
             root /usr/share/nginx/html;
 
+            # HSTS (ngx_http_headers_module is required) (15768000 seconds = 6 months)
+            add_header Strict-Transport-Security max-age=15768000 always;
+            add_header X-Frame-Options "DENY" always;
+            add_header X-Content-Type-Options nosniff always;
+
             location ~ ^/api/eda {
                 proxy_pass http://{{ api_server_name }}:{{ api_nginx_port }};
                 proxy_set_header Origin http://{{ api_server_name }}:{{ api_nginx_port }};
@@ -119,6 +124,11 @@ data:
                 proxy_set_header X-Forwarded-Proto $remote_scheme;
                 proxy_set_header X-Forwarded-Port $server_port;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                # Hide the upstream's security headers; this location inherits the server-level set,
+                # so forwarding them would duplicate every header in the response.
+                proxy_hide_header Strict-Transport-Security;
+                proxy_hide_header X-Frame-Options;
+                proxy_hide_header X-Content-Type-Options;
                 # Return 503 Service Unavailable with JSON response if gunicorn fails to respond
                 proxy_read_timeout {{ eda_nginx_read_timeout }}s;
                 error_page 504 =503 /json_503;
@@ -126,6 +136,10 @@ data:
             }
 
             location ~* \.(json|woff|woff2|jpe?g|png|gif|ico|svg|css|js)$ {
+                # Repeat security headers here because nginx does not merge add_header directives from parent contexts.
+                add_header Strict-Transport-Security max-age=15768000 always;
+                add_header X-Frame-Options "DENY" always;
+                add_header X-Content-Type-Options nosniff always;
                 add_header Cache-Control "public, max-age=31536000, s-maxage=31536000, immutable";
                 try_files $uri =404;
                 gzip_static on;
@@ -134,12 +148,20 @@ data:
             location / {
                 autoindex off;
                 expires off;
+                # Repeat security headers here because nginx does not merge add_header directives from parent contexts.
+                add_header Strict-Transport-Security max-age=15768000 always;
+                add_header X-Frame-Options "DENY" always;
+                add_header X-Content-Type-Options nosniff always;
                 add_header Cache-Control "public, max-age=0, s-maxage=0, must-revalidate" always;
                 try_files $uri $uri/ /index.html =404;
             }
             location = /json_503 {
               # Custom JSON response for 503 Service Unavailable
               internal;
+              # Repeat security headers here because nginx does not merge add_header directives from parent contexts.
+              add_header Strict-Transport-Security max-age=15768000 always;
+              add_header X-Frame-Options "DENY" always;
+              add_header X-Content-Type-Options nosniff always;
               add_header Content-Type application/json;
   
               # Check if X-Request-ID is set and include it in the response
