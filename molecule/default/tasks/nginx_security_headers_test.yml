@@ -1,0 +1,58 @@
+---
+- name: Set EDA resource name from sample CR
+  ansible.builtin.set_fact:
+    eda_cr_name: "{{ lookup('file', samples_dir + '/eda_v1alpha1_eda.yaml') | from_yaml | json_query('metadata.name') }}"
+
+- name: Get the EDA nginx ConfigMaps
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ item.name_suffix }}'
+  loop:
+    - name_suffix: '{{ deployment_type }}-configmap'
+      conf_key: nginx_default_conf_template
+      header_count: 4
+    - name_suffix: nginx-api-configmap
+      conf_key: nginx_api_default_conf_template
+      header_count: 2
+    - name_suffix: nginx-event-stream-configmap
+      conf_key: nginx_event_stream_default_conf_template
+      header_count: 2
+  register: nginx_configmaps
+
+- name: Assert the EDA nginx ConfigMaps exist
+  ansible.builtin.assert:
+    that:
+      - item.resources | length == 1
+    fail_msg: '{{ item.item.name_suffix }} ConfigMap was not created'
+  loop: '{{ nginx_configmaps.results }}'
+  loop_control:
+    label: '{{ item.item.name_suffix }}'
+
+- name: Verify security headers are configured at the server level and every add_header location
+  ansible.builtin.assert:
+    that:
+      - >-
+        (item.resources[0].data[item.item.conf_key].split('location')[0]
+        | regex_findall('add_header ')
+        | length) == 3
+      - >-
+        (item.resources[0].data[item.item.conf_key]
+        | regex_findall('add_header Strict-Transport-Security max-age=15768000 always;')
+        | length) == item.item.header_count
+      - >-
+        (item.resources[0].data[item.item.conf_key]
+        | regex_findall('add_header X-Frame-Options "DENY" always;')
+        | length) == item.item.header_count
+      - >-
+        (item.resources[0].data[item.item.conf_key]
+        | regex_findall('add_header X-Content-Type-Options nosniff always;')
+        | length) == item.item.header_count
+    fail_msg: >-
+      {{ item.item.name_suffix }} must set all three security headers with always at the server level (before the
+      first location) and in each location that declares its own add_header directives (expected
+      {{ item.item.header_count }} occurrences).
+  loop: '{{ nginx_configmaps.results }}'
+  loop_control:
+    label: '{{ item.item.name_suffix }}'
