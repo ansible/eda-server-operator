@@ -21,7 +21,9 @@ spec:
     - Egress
   ingress:
     # Allow traffic from EDA operator-managed pods and the operator
-    # controller-manager (for DB initialization)
+    # controller-manager (for DB initialization). namespaceSelector: {} +
+    # podSelector (same list item = AND) allows the operator pod to reach the
+    # database when it runs in a separate namespace.
     - from:
         - podSelector:
             matchExpressions:
@@ -30,7 +32,8 @@ spec:
                 values:
                   - '{{ deployment_type }}-operator'
                   - 'aap-operator'
-        - podSelector:
+        - namespaceSelector: {}
+          podSelector:
             matchLabels:
               control-plane: controller-manager
         # EDA activation Job pods (created at runtime by activation workers,
