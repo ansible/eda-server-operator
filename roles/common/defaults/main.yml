@@ -21,3 +21,9 @@ set_self_labels: true
 is_k8s: false
 is_openshift: false
 
+# kubernetes.core client-side apply writes last-applied-configuration under
+# OpenAPI-Generator. Skip strip when any other manager owns that annotation
+# (kubectl/oc apply, custom --field-manager, Argo/Flux/Helm). A later
+# kubectl label does not own the key, so leftovers still get cleaned.
+_leftover_csa_manager_regex: '^(openapi-generator)'
+
