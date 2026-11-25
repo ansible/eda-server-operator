@@ -4,6 +4,7 @@
   kind: EDA
   playbook: playbooks/eda.yml
   snakeCaseParameters: False
+  markUnsafe: true
   finalizer:
     name: eda.ansible.com/finalizer
     playbook: playbooks/eda_finalizer.yml
@@ -13,6 +14,7 @@
   kind: EDABackup
   role: backup
   snakeCaseParameters: False
+  markUnsafe: true
   finalizer:
     name: eda.ansible.com/finalizer
     role: backup
@@ -24,5 +26,6 @@
   kind: EDARestore
   role: restore
   snakeCaseParameters: False
+  markUnsafe: true
 
 #+kubebuilder:scaffold:watch
