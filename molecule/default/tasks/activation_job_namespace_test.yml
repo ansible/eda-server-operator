@@ -1,0 +1,302 @@
+---
+- name: Set activation job namespace test names
+  ansible.builtin.set_fact:
+    activation_job_namespace_a: "{{ namespace | truncate(52, true, '') }}-eda-jobs-a"
+    activation_job_namespace_b: "{{ namespace | truncate(52, true, '') }}-eda-jobs-b"
+
+- name: Create activation job namespaces
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: '{{ item }}'
+  loop:
+    - '{{ activation_job_namespace_a }}'
+    - '{{ activation_job_namespace_b }}'
+
+- name: Configure the first activation job namespace
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        activation_worker:
+          activation_job_namespace: '{{ activation_job_namespace_a }}'
+
+- name: Wait for the EDA environment ConfigMap to select the first namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+  register: eda_environment_configmap
+  until:
+    - eda_environment_configmap.resources | length > 0
+    - >-
+      eda_environment_configmap.resources[0].data['EDA_ACTIVATION_JOB_NAMESPACE']
+      | default('') == activation_job_namespace_a
+  retries: 30
+  delay: 10
+
+- name: Wait for cross-namespace RBAC in the first namespace
+  kubernetes.core.k8s_info:
+    api_version: rbac.authorization.k8s.io/v1
+    kind: '{{ item }}'
+    namespace: '{{ activation_job_namespace_a }}'
+    name: '{{ eda_cr_name }}-activation-job-manager'
+  register: first_namespace_rbac
+  until: first_namespace_rbac.resources | length == 1
+  retries: 30
+  delay: 10
+  loop:
+    - Role
+    - RoleBinding
+
+- name: Assert cross-namespace RBAC grants the EDA ServiceAccount access to activation Job resources
+  ansible.builtin.assert:
+    that:
+      - _rbac.metadata.namespace == activation_job_namespace_a
+      - _rbac.metadata.name == eda_cr_name + '-activation-job-manager'
+      - (_rbac.rules | selectattr('resources', 'contains', 'secrets') | list | length) == 1
+      - (_rbac.rules | selectattr('resources', 'contains', 'jobs') | list | length) == 1
+      - (_rbac.rules | selectattr('resources', 'contains', 'pods') | list | length) == 1
+      - (_rbac.rules | selectattr('resources', 'contains', 'pods/log') | list | length) == 1
+      - (_rbac.rules | selectattr('resources', 'contains', 'services') | list | length) == 1
+    fail_msg: 'Role in the activation job namespace is incomplete: {{ _rbac }}'
+  vars:
+    _rbac: '{{ first_namespace_rbac.results[0].resources[0] }}'
+
+- name: Assert cross-namespace RoleBinding targets the EDA ServiceAccount
+  ansible.builtin.assert:
+    that:
+      - _role_binding.metadata.namespace == activation_job_namespace_a
+      - _role_binding.roleRef.name == eda_cr_name + '-activation-job-manager'
+      - _role_binding.subjects | length == 1
+      - _role_binding.subjects[0].kind == 'ServiceAccount'
+      - _role_binding.subjects[0].name == eda_cr_name
+      - _role_binding.subjects[0].namespace == namespace
+    fail_msg: 'RoleBinding in the activation job namespace is incorrect: {{ _role_binding }}'
+  vars:
+    _role_binding: '{{ first_namespace_rbac.results[1].resources[0] }}'
+
+- name: Retrieve NetworkPolicies that must permit activation Jobs from the first namespace
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ item }}'
+  register: first_namespace_network_policies
+  until: first_namespace_network_policies.resources | length == 1
+  retries: 30
+  delay: 10
+  loop:
+    - '{{ eda_cr_name }}-api'
+    - '{{ eda_cr_name }}-postgres-{{ supported_pg_version }}'
+
+- name: Assert NetworkPolicies select activation Jobs from the first namespace
+  ansible.builtin.assert:
+    that:
+      - _activation_job_peers | length == 1
+      - >-
+        _activation_job_peers[0].namespaceSelector.matchLabels['kubernetes.io/metadata.name']
+        == activation_job_namespace_a
+      - _activation_job_peers[0].podSelector.matchLabels.app == 'eda'
+      - _expected_ports | difference(_ingress_ports) | length == 0
+    fail_msg: >-
+      NetworkPolicy does not allow activation Jobs from {{ activation_job_namespace_a }}:
+      {{ _network_policy }}
+  vars:
+    _network_policy: '{{ item.resources[0] }}'
+    _activation_job_peers: >-
+      {{ _network_policy.spec.ingress
+         | map(attribute='from')
+         | flatten
+         | selectattr('namespaceSelector', 'defined')
+         | selectattr('podSelector', 'defined')
+         | list }}
+    _ingress_ports: >-
+      {{ _network_policy.spec.ingress | map(attribute='ports') | select | flatten
+         | map(attribute='port') | list }}
+    _expected_ports: >-
+      {{ [8000, 8001] if _network_policy.metadata.name == eda_cr_name + '-api' else [5432] }}
+  loop: '{{ first_namespace_network_policies.results }}'
+
+- name: Switch activation Jobs to the second namespace
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        activation_worker:
+          activation_job_namespace: '{{ activation_job_namespace_b }}'
+
+- name: Wait for the EDA environment ConfigMap to select the second namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+  register: second_eda_environment_configmap
+  until:
+    - second_eda_environment_configmap.resources | length > 0
+    - >-
+      second_eda_environment_configmap.resources[0].data['EDA_ACTIVATION_JOB_NAMESPACE']
+      | default('') == activation_job_namespace_b
+  retries: 30
+  delay: 10
+
+- name: Wait for RBAC in the second namespace and removal from the first namespace
+  kubernetes.core.k8s_info:
+    api_version: rbac.authorization.k8s.io/v1
+    kind: '{{ item.kind }}'
+    namespace: '{{ item.namespace }}'
+    name: '{{ eda_cr_name }}-activation-job-manager'
+  register: switched_namespace_rbac
+  until: switched_namespace_rbac.resources | length == item.expected_count
+  retries: 30
+  delay: 10
+  loop:
+    - kind: Role
+      namespace: '{{ activation_job_namespace_a }}'
+      expected_count: 0
+    - kind: RoleBinding
+      namespace: '{{ activation_job_namespace_a }}'
+      expected_count: 0
+    - kind: Role
+      namespace: '{{ activation_job_namespace_b }}'
+      expected_count: 1
+    - kind: RoleBinding
+      namespace: '{{ activation_job_namespace_b }}'
+      expected_count: 1
+
+- name: Retrieve NetworkPolicies after switching activation Jobs to the second namespace
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ item }}'
+  register: second_namespace_network_policies
+  until:
+    - second_namespace_network_policies.resources | length == 1
+    - >-
+      activation_job_namespace_b in
+      (second_namespace_network_policies.resources[0].spec.ingress | to_json)
+  retries: 30
+  delay: 10
+  loop:
+    - '{{ eda_cr_name }}-api'
+    - '{{ eda_cr_name }}-postgres-{{ supported_pg_version }}'
+
+- name: Assert NetworkPolicies select activation Jobs from the second namespace
+  ansible.builtin.assert:
+    that:
+      - _activation_job_peers | length == 1
+      - >-
+        _activation_job_peers[0].namespaceSelector.matchLabels['kubernetes.io/metadata.name']
+        == activation_job_namespace_b
+      - _activation_job_peers[0].podSelector.matchLabels.app == 'eda'
+    fail_msg: >-
+      NetworkPolicy does not allow activation Jobs from {{ activation_job_namespace_b }}:
+      {{ _network_policy }}
+  vars:
+    _network_policy: '{{ item.resources[0] }}'
+    _activation_job_peers: >-
+      {{ _network_policy.spec.ingress
+         | map(attribute='from')
+         | flatten
+         | selectattr('namespaceSelector', 'defined')
+         | selectattr('podSelector', 'defined')
+         | list }}
+  loop: '{{ second_namespace_network_policies.results }}'
+
+- name: Remove the activation job namespace override
+  kubernetes.core.k8s:
+    state: patched
+    api_version: eda.ansible.com/v1alpha1
+    kind: EDA
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}'
+    definition:
+      spec:
+        activation_worker:
+          activation_job_namespace: ''
+
+- name: Wait for the EDA environment ConfigMap to remove the namespace override
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: ConfigMap
+    namespace: '{{ namespace }}'
+    name: '{{ eda_cr_name }}-{{ deployment_type }}-env-properties'
+  register: reset_eda_environment_configmap
+  until:
+    - reset_eda_environment_configmap.resources | length > 0
+    - reset_eda_environment_configmap.resources[0].data['EDA_ACTIVATION_JOB_NAMESPACE'] | default('') == ''
+  retries: 30
+  delay: 10
+
+- name: Wait for cross-namespace RBAC removal after resetting the override
+  kubernetes.core.k8s_info:
+    api_version: rbac.authorization.k8s.io/v1
+    kind: '{{ item.kind }}'
+    namespace: '{{ item.namespace }}'
+    name: '{{ eda_cr_name }}-activation-job-manager'
+  register: reset_namespace_rbac
+  until: reset_namespace_rbac.resources | length == 0
+  retries: 30
+  delay: 10
+  loop:
+    - kind: Role
+      namespace: '{{ activation_job_namespace_a }}'
+    - kind: RoleBinding
+      namespace: '{{ activation_job_namespace_a }}'
+    - kind: Role
+      namespace: '{{ activation_job_namespace_b }}'
+    - kind: RoleBinding
+      namespace: '{{ activation_job_namespace_b }}'
+
+- name: Retrieve NetworkPolicies after removing the activation job namespace override
+  kubernetes.core.k8s_info:
+    api_version: networking.k8s.io/v1
+    kind: NetworkPolicy
+    namespace: '{{ namespace }}'
+    name: '{{ item }}'
+  register: reset_namespace_network_policies
+  until:
+    - reset_namespace_network_policies.resources | length == 1
+    - >-
+      activation_job_namespace_b not in
+      (reset_namespace_network_policies.resources[0].spec.ingress | to_json)
+  retries: 30
+  delay: 10
+  loop:
+    - '{{ eda_cr_name }}-api'
+    - '{{ eda_cr_name }}-postgres-{{ supported_pg_version }}'
+
+- name: Assert NetworkPolicies return to same-namespace activation Job selection
+  ansible.builtin.assert:
+    that:
+      - _same_namespace_activation_job_peers | length == 1
+      - _same_namespace_activation_job_peers[0].podSelector.matchLabels.app == 'eda'
+      - _same_namespace_activation_job_peers[0].namespaceSelector is not defined
+    fail_msg: >-
+      NetworkPolicy did not return to same-namespace activation Job selection:
+      {{ _network_policy }}
+  vars:
+    _network_policy: '{{ item.resources[0] }}'
+    _same_namespace_activation_job_peers: >-
+      {{ _network_policy.spec.ingress
+         | map(attribute='from')
+         | flatten
+         | selectattr('podSelector', 'defined')
+         | selectattr('podSelector.matchLabels.app', 'defined')
+         | selectattr('podSelector.matchLabels.app', 'equalto', 'eda')
+         | list }}
+  loop: '{{ reset_namespace_network_policies.results }}'

@@ -11,10 +11,20 @@
 
   tasks:
     - block:
-        - name: Import all test files from tasks/
-          include_tasks: '{{ item }}'
-          with_fileglob:
-            - tasks/*_test.yml
+        - name: Verify the base EDA deployment
+          import_tasks: tasks/eda_test.yml
+
+        - name: Verify postgres secret guard behavior
+          import_tasks: tasks/postgres_secret_guard_test.yml
+
+        - name: Verify component placement settings
+          import_tasks: tasks/component_placement_test.yml
+
+        - name: Verify application settings and ServiceAccount configuration
+          import_tasks: tasks/configuration_transport_test.yml
+
+        - name: Verify activation job namespace reconciliation
+          import_tasks: tasks/activation_job_namespace_test.yml
       rescue:
         - name: Retrieve relevant resources
           k8s_info:

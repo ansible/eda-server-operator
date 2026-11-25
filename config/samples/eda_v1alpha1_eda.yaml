@@ -9,10 +9,11 @@ metadata:
     app.kubernetes.io/created-by: eda-server-operator
   name: eda-sample
 spec:
+  automation_server_url: https://awx-host
   no_log: true
   image_pull_policy: IfNotPresent
   service_type: ClusterIP
-  ingress_type: Route
+  ingress_type: none
   api:
     replicas: 1
     resource_requirements:
